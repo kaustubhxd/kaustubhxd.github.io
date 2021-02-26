@@ -1,30 +1,44 @@
+
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div v-for="x in ['Projects','Skills']" :key="x"> 
+      <Floatable :title="x"/>
   </div>
-  <router-view/>
+  <Docker/>
+  <Ripple/>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import Docker from './components/Docker'
+import Floatable from './components/Floatable'
+import Ripple from './components/Ripple'
 
-#nav {
-  padding: 30px;
+export default {
+  components: {Docker, Floatable,Ripple},
+  setup(){
+    
+    document.body.style.backgroundImage =  `url(${require('@/assets/gifs/1.gif')})`;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1) ) + min;
     }
+
+    document.body.addEventListener('dblclick', () => {
+      try{
+        document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
+      }catch(err){}
+    })
+
+    setInterval(() => {
+      try{
+        document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
+      }catch(err){}
+    },30000)
+
   }
 }
+</script>
+
+  
+<style>
+
 </style>

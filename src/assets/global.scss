@@ -1,0 +1,46 @@
+html, body {
+    margin      :   0px;
+    height      :   100%;
+
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: 30px;
+
+    /* letter-spacing: 0.5px; */
+
+    overflow-x  :   hidden;
+    overflow-y  :   hidden;
+}
+
+body{
+    height                  :   100%;
+    /* background-image        :   url("./assets/gifs/1.gif");  */
+    background-position     :   center;    
+    background-repeat       :   no-repeat; 
+    background-size         :   cover; 
+
+    -webkit-touch-callout   :   none;
+    -webkit-user-select     :   none;
+    -khtml-user-select      :   none;
+    -moz-user-select        :   none;
+    -ms-user-select         :   none;
+    user-select             :   none;
+}
+
+h1,h2,h3,h4,h5,h6,p,a{
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+ol{
+    padding:0
+}
+
+ul{
+    padding :   0;
+    margin  :   5px 0 0 0;
+}
+
+a{
+    padding: 5px;
+}
