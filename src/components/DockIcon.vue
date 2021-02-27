@@ -5,7 +5,6 @@
       :class = "{ 'shake-dock' : shakeDock }"
       @animationend="shakeDock = false"
       @mouseup="handleClick()"
-      @click="shakeDock = true"
     >
     
         <img :src = "icon"  >
@@ -26,7 +25,7 @@ import {windows,setWindowState} from '../store/state'
 export default {
     props: ['name','id','icon'],
 
-    setup(props,{emit}){
+    setup(props){
         const info = ref(windows.value[props.id])
 
         const icon = require('@/assets/icons/' + props.icon )
@@ -43,6 +42,7 @@ export default {
             }else if(!info.value.minimized && info.value.active){
                 setWindowState(props.id,'minimized')
             }else if (!info.value.active){
+                shakeDock.value = true
                 setWindowState(props.id,'open')
             }
         }

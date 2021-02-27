@@ -7,7 +7,7 @@
                     top: boxTop + 'px',
                     opacity: boxOpacity
                 }"
-          :class="{ 'window-animate-minmax' : animateWindowMinMax }"
+          :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : true }"
           @transitionend    ="animateWindowMinMax = false"    
           @transitioncancel ="animateWindowMinMax = false"   
           
@@ -260,6 +260,19 @@ export default {
 
         });
 
+        onMounted(() => {
+            function reportResize(){
+                console.log('resizd')
+                if(box.value){
+                    boxWidth.value = parseInt(box.value.style.width)
+                    boxHeight.value = parseInt(box.value.style.height)
+                }
+            }
+
+            new ResizeObserver(reportResize).observe(box.value)
+
+        })
+
 
         return {
             box,
@@ -296,7 +309,7 @@ export default {
     overflow-x          :   hidden;
     overflow-y          :   auto;
     scrollbar-width     :   thin ;
-    resize              :   none;
+    resize              :   both;
     min-width           :   100px;
     min-height          :   100px ;
     /* resize              :   both ;
@@ -377,5 +390,61 @@ export default {
     width       :   inherit ;
     height      :   inherit ;
 }
+
+.swashOut {
+  -webkit-animation-name: swashOut;
+  animation-name: swashOut;
+}
+@-webkit-keyframes swashOut {
+  0% {
+    opacity: 1;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+  }
+
+  80% {
+    opacity: 1;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(0.9, 0.9);
+    transform: scale(0.9, 0.9);
+  }
+
+  100% {
+    opacity: 0;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(0, 0);
+    transform: scale(0, 0);
+  }
+}
+@keyframes swashOut {
+  0% {
+    opacity: 1;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+  }
+
+  80% {
+    opacity: 1;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(0.9, 0.9);
+    transform: scale(0.9, 0.9);
+  }
+
+  100% {
+    opacity: 0;
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scale(0, 0);
+    transform: scale(0, 0);
+  }
+}
+
 
 </style>
