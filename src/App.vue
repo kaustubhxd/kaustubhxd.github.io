@@ -1,20 +1,25 @@
 
 <template>
-  <div v-for="x in ['Projects','Skills']" :key="x"> 
-      <Floatable :title="x"/>
+  <div v-for="(info,id) in activeWindows" :key="id"> 
+      <Floatable :title="info.title" :id='id'/>
   </div>
   <Docker/>
   <Ripple/>
 </template>
 
 <script>
+import { computed, ref } from 'vue'
+import { K } from './assets/constants'
 import Docker from './components/Docker'
 import Floatable from './components/Floatable'
 import Ripple from './components/Ripple'
+import {windows} from './store/state'
 
 export default {
   components: {Docker, Floatable,Ripple},
   setup(){
+
+    var activeWindows = computed(() => Object.fromEntries(Object.entries(windows.value).filter(([k,v]) => v.active)))
     
     document.body.style.backgroundImage =  `url(${require('@/assets/gifs/1.gif')})`;
 
@@ -22,11 +27,15 @@ export default {
       return Math.floor(Math.random() * (max - min + 1) ) + min;
     }
 
-    document.body.addEventListener('dblclick', () => {
-      try{
-        document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
-      }catch(err){}
+    document.body.addEventListener('dblclick', (e) => {
+      if (e.target.localName == 'body'){
+        try{
+          document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
+        }catch(err){}
+
+      }
     })
+
 
     setInterval(() => {
       try{
@@ -34,7 +43,13 @@ export default {
       }catch(err){}
     },30000)
 
+      return {
+    windows,
+    activeWindows 
   }
+  }
+
+
 }
 </script>
 

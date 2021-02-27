@@ -1,32 +1,45 @@
 <template>
-<div id="dock-container">
+<div id="dock-container" ref='dockElement'>
 <div id="dock">
     <ul>
-
-        <li>
-        <span>Skills</span>
-        <a id = "skills-element" href="#" class = "dock-element"><img src="../assets/icons/skills.svg">
-        <div id="skills-dot"  class = "dock-dot"></div></a>
-        </li>
-
-        <li>
-        <span>Who?</span>
-            <a id = "who-element" href="#" class = "dock-element"><img src="../assets/icons/who.svg"/>
-            <div id="who-dot"  class = "dock-dot"></div></a>
-        </li>
-
-        <li>
-        <span>Projects</span>
-        <a  id = "projects-element" href="#" class = "dock-element"><img src="../assets/icons/projects.svg"/>
-        <div id="projects-dot"  class = "dock-dot"></div></a>
-        </li>
+        <DockIcon name='Skills' id='skills' icon="skills.svg"/>
+        <DockIcon name='Who?' id='who' icon="who.svg"/>
+        <DockIcon name='Projects' id='projects' icon="projects.svg" />
     </ul>
 </div>
 </div> 
 </template>
 
 <script>
+import DockIcon from './DockIcon'
+import {dockStyle} from '../store/state'
+import { onMounted, ref } from 'vue'
+
 export default {
+    components: {DockIcon },
+    setup(){
+        
+        const dockElement = ref(null)
+
+        onMounted(() => {
+            function reportResize() {
+                dockStyle.value.width   = dockElement.value.offsetWidth
+                dockStyle.value.height  = dockElement.value.offsetHeight
+                dockStyle.value.top     = dockElement.value.offsetTop
+                dockStyle.value.left    = dockElement.value.offsetLeft
+            }
+            reportResize()
+
+            new ResizeObserver(reportResize).observe(dockElement.value)
+
+
+        })
+
+        return{
+            dockElement        
+        }
+    }
+
 
 }
 </script>
@@ -46,14 +59,16 @@ export default {
     
 	background: rgba(255, 255, 255, 0.2);
     border-radius: 10px 10px 0 0;
+
+    #dock{
+        align-items: flex-start;
+        display: flex;
+        flex-direction: row;
+        width: max-content;
+    }
 }
 
-#dock{
-    align-items: flex-start;
-    display: flex;
-    flex-direction: row;
-    width: max-content;
-}
+
 
 #dock-container li {
 	list-style-type: none;
@@ -118,11 +133,6 @@ export default {
     transition          :   opacity 0.6s,
                             background-color 0.6s ease;
 }
-
-#who-dot{
-    display :   block ;
-}
-
 
 .shake-dock {
     animation: shake 0.5s;

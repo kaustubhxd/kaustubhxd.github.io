@@ -3,18 +3,28 @@
     @mouseover.stop="dotsHovered()" 
     @mouseout="dotsNotHovered()"
     @mouseup="dotsHovered()">
-        <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" @mousedown="dotsClicked('close')"></div>
-        <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   @mousedown="dotsClicked('min')"></div>
-        <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   @mousedown="dotsClicked('max')"></div>
+        <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" 
+            @mousedown="dotsClicked('close')" 
+            @mouseup="setWindowState(props.id,'killed')"></div>
+
+        <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   
+            @mousedown="dotsClicked('min')"
+            @mouseup="setWindowState(props.id,'minimized')" ></div>
+
+        <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   
+            @mousedown="dotsClicked('max')"   
+            @mouseup="emit('maximize')"></div>
     </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import {K} from '../assets/constants'
+import {setWindowState} from '../store/state'
 
 export default {
-    setup(){
+    props: ['name','id'],
+    setup(props,{emit}){
         
         const closeDot  =   ref(K.closeDotNormal) 
         const minDot    =   ref(K.minimizeDotNormal)
@@ -39,6 +49,7 @@ export default {
             else if (dot === 'max')     {   maxDot.value    =   K.maximizeDotClicked }
         }
 
+
         return{
             dotsHovered,
             dotsNotHovered,
@@ -46,9 +57,11 @@ export default {
             maxDot,
             minDot,
             closeDot,
+            props,
+            setWindowState,
+            emit
         }
     }
-
 }
 </script>
 

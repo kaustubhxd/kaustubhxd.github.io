@@ -1,17 +1,30 @@
 <template>
-    <div class="ripple"></div>
+    <div class="rippl" 
+        :class="{'animate' : ripple.active}"
+        @animationend ="ripple.active = false"
+        :style="{   left: ripple.left + 'px', 
+                    top:  ripple.top + 'px' 
+        }" 
+    ></div>
 </template>
 
 <script>
+import {ripple} from '../store/state'
+
 export default {
+    setup(){
+        return{
+            ripple,        
+        }
+    }
 
 }
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 
   /*Ripple*/
-.ripple {
+.rippl {
     width: 10px;
     height: 10px;
     opacity: 0;
@@ -24,10 +37,10 @@ export default {
   
 /*Animate Function*/
 .animate {
-    animation: ripple-mo 0.5s cubic-bezier(0, 0, 0.2, 1);
+    animation: rippl-mo 0.5s cubic-bezier(0, 0, 0.2, 1);
 }
 
-@keyframes ripple-mo {
+@keyframes rippl-mo {
     0% {
         transform: scale(0);
         opacity: 1;
