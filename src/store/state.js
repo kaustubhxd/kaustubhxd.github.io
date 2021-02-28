@@ -13,6 +13,8 @@ const ripple = ref({
     left    : 100,
 })
 
+const ZIndexMax = ref(10);
+
 const windows = ref({
     'skills' : {
         title       :   'Skills',
@@ -21,6 +23,12 @@ const windows = ref({
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,
+        zIndex      :   1,
+        width   :   window.innerWidth  * (3/8),
+        height  :   window.innerHeight  * (8/13),
+        opacity :   1,
+        top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
+        left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
     },
     'who' : {
         title       :   'Who?',
@@ -29,6 +37,12 @@ const windows = ref({
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,
+        zIndex      :   1,
+        width   :   window.innerWidth  * (3/8),
+        height  :   window.innerHeight  * (8/13),
+        opacity :   1,
+        top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
+        left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
     },    
     'projects' : {
         title       :   'Projects',
@@ -37,6 +51,12 @@ const windows = ref({
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,
+        zIndex      :   1,
+        width   :   window.innerWidth  * (3/8),
+        height  :   window.innerHeight  * (8/13),
+        opacity :   1,
+        top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
+        left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
     },
 })
 
@@ -56,8 +76,11 @@ function setWindowState(window,state){
         windows.value[window].maximized     = false
         windows.value[window].stuckToSide   = false
     }else if(state == 'minimized'){
+        windows.value[window].zIndex = 1
         windows.value[window].minimized = true
     }else if(state == 'open' && !windows.value[window].active){
+        windows.value[window].zIndex = ZIndexMax.value + 1
+        ZIndexMax.value += 1
         windows.value[window].active = true
     }else if(state == 'restore'){
         windows.value[window].minimized = false
@@ -68,6 +91,7 @@ export {
     ripple,
     windows,
     setWindowState,
-    dockStyle
+    dockStyle,
+    ZIndexMax
 }
 

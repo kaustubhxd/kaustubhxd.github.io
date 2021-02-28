@@ -22,6 +22,8 @@ export default {
         const dockElement = ref(null)
 
         onMounted(() => {
+            // ResizeObserver observes the change in dock shape
+            // see how window minimize transition works to get why we do it here
             function reportResize() {
                 dockStyle.value.width   = dockElement.value.offsetWidth
                 dockStyle.value.height  = dockElement.value.offsetHeight
@@ -47,7 +49,7 @@ export default {
 <style lang='scss'>
 
 #dock-container {
-    z-index: 12;
+    z-index: 9999;
     position: fixed;
     bottom: 0;
     left: 50%;

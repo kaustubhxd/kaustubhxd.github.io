@@ -28,6 +28,8 @@ export default {
     setup(props){
         const info = ref(windows.value[props.id])
 
+        // vue + WEBPACK introduces the additional atrocity of using require
+        // for something as basic as pointing to an asset location 
         const icon = require('@/assets/icons/' + props.icon )
 
         const shakeDock = ref(false)
@@ -46,10 +48,6 @@ export default {
                 setWindowState(props.id,'open')
             }
         }
-
-
-
-
 
 
         return {

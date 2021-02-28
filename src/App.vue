@@ -9,7 +9,6 @@
 
 <script>
 import { computed, ref } from 'vue'
-import { K } from './assets/constants'
 import Docker from './components/Docker'
 import Floatable from './components/Floatable'
 import Ripple from './components/Ripple'
@@ -19,6 +18,7 @@ export default {
   components: {Docker, Floatable,Ripple},
   setup(){
 
+    // digs inside the dictionary 'windows' to find out which window has a state active == true, displays that
     var activeWindows = computed(() => Object.fromEntries(Object.entries(windows.value).filter(([k,v]) => v.active)))
     
     document.body.style.backgroundImage =  `url(${require('@/assets/gifs/1.gif')})`;

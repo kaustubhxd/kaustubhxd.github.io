@@ -5,18 +5,18 @@
                     height : boxHeight + 'px',
                     left: boxLeft + 'px', 
                     top: boxTop + 'px',
-                    opacity: boxOpacity
+                    opacity: boxOpacity,
+                    zIndex: zIndex
                 }"
-          :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : true }"
+          :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
           @transitionend    ="animateWindowMinMax = false"    
           @transitioncancel ="animateWindowMinMax = false"   
-          
-        
+          @animationend     ="animateSwashOut = false"
+          @animationcance   ="animateSwashOut = false"          
         >
-                <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
             <div id="title-bar" class="title-bar">
 
-                <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()'/>
+                <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()' @close='closeWindow()'/>
 
                 <div class="tab-space" id = "tab-space"  
                 @mousedown="dragMouseDown"
@@ -38,6 +38,11 @@
                         Systems theory says that a system can have properties that none of its underlying components have and could not have been predicted based on the parts. (An emergent property). 
                         Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
                         It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
+                        
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                            Why do we use it?
+                            
+                            It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
                     </p>
                 </div>
             </div>
@@ -46,9 +51,9 @@
 </template>
 
 <script>
-import { onBeforeUnmount, onBeforeUpdate, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
-import {ripple,windows,setWindowState,dockStyle} from '../store/state'
+import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
 
 export default {
     components: {ActionButtons},
@@ -57,14 +62,6 @@ export default {
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
 
         const windowState = ref(windows.value[props.id])
-
-        // const boxStyle = ref({
-        //     width   :   window.innerWidth  * (3/8),
-        //     height  :   window.innerHeight  * (8/13),
-        //     opacity :   1,
-        //     top     :   Math.floor(Math.random() * ((window.innerHeight - (boxHeight.value + 100)) - 100) + 100),
-        //     left    :   Math.floor(Math.random() * ((window.innerWidth - (boxWidth.value + 100)) - 100) + 100),
-        // })
 
         const boxWidth = ref(window.innerWidth  * (3/8))
         const boxHeight = ref(window.innerHeight  * (8/13))
@@ -91,6 +88,11 @@ export default {
 
         function dragMouseDown (event) {
             event.preventDefault()
+
+            // set the z-index of window as max so the clicked windows pops on top 
+            setMaxIndex()
+
+            // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
             if(windowState.value.maximized || windowState.value.stuckToSide){
                 let ratioX = event.clientX / boxWidth.value
                 // console.log(boxWidthCustom.value)
@@ -110,6 +112,8 @@ export default {
             document.onmousemove = elementDrag
             document.onmouseup = closeDragElement
         }
+
+        // on mousemove 
         function elementDrag (event) {
             event.preventDefault()
             positions.value.movementX = positions.value.clientX - event.clientX
@@ -122,15 +126,6 @@ export default {
 
             boxTop.value    = (box.value.offsetTop - positions.value.movementY)
             boxLeft.value   = (box.value.offsetLeft - positions.value.movementX)      
-
-
-
-            // box.value.style.top = (box.value.offsetTop - positions.value.movementY) + 'px'
-            // box.value.style.left = (box.value.offsetLeft - positions.value.movementX) + 'px'  
-
-            
-            // if (parseInt(box.value.style.top)  < 0)   box.value.style.top  = 0
-            // if (parseInt(box.value.style.left) < 0)   box.value.style.left = 0
         }
 
         function closeDragElement (event) {
@@ -245,7 +240,10 @@ export default {
             console.log('maximized')
         }
 
-        watch(() => windowState.value.minimized, (newValue, oldValue) => {
+        // 'watching' changes to store's minimized value and acting on it here.
+        // why? two separate components(ActionButtons and DockIcon) can call minimize.
+        // since Floatable.vue has access to all variables, this seemed like a good idea 
+        watch(() => windowState.value.minimized, (newValue) => {
             if(newValue == false){
                 animateWindowMinMax.value = true
 
@@ -260,7 +258,11 @@ export default {
 
         });
 
+
         onMounted(() => {
+            // ResizeObserver is used here to tackle issues while manually resizing window using the mouse
+            // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
+            // without this, the window ignores manual resize shape and reverts back onComponentUpdate
             function reportResize(){
                 console.log('resizd')
                 if(box.value){
@@ -268,10 +270,26 @@ export default {
                     boxHeight.value = parseInt(box.value.style.height)
                 }
             }
-
             new ResizeObserver(reportResize).observe(box.value)
 
         })
+
+        const animateSwashOut = ref(false)
+        function closeWindow(){
+            animateSwashOut.value = true
+            boxOpacity.value = 0
+
+            box.value.onanimationend = () => {
+                setWindowState(props.id,'killed')
+            }
+        }
+
+        const zIndex = ref(windowState.value.zIndex)
+
+        function setMaxIndex(){
+            zIndex.value = ZIndexMax.value + 1
+            ZIndexMax.value += 1
+        }
 
 
         return {
@@ -289,7 +307,11 @@ export default {
             windowState,
             minWindow,
             dockStyle,
-            boxOpacity
+            boxOpacity,
+            closeWindow,
+            animateSwashOut,
+            setMaxIndex,
+            zIndex
         }
     }
 }
@@ -306,9 +328,7 @@ export default {
     border-radius       :   5px 5px 5px 5px;
               
 
-    overflow-x          :   hidden;
-    overflow-y          :   auto;
-    scrollbar-width     :   thin ;
+    overflow            :   hidden;
     resize              :   both;
     min-width           :   100px;
     min-height          :   100px ;
@@ -368,16 +388,20 @@ export default {
 .window{
     margin-top      :   24px;
     width           :   inherit;
+    height          :   inherit ;
     border-radius   :   5px 5px 0 0;
     text-align      :   start;
-    overflow-x      :   hidden;
-    overflow-y      :   auto;
+    overflow      :   hidden;
     scrollbar-width :   thin;
 
     min-width       :   100px;
     min-height      :   100px;  
 
     .text{  
+        overflow-y      :   auto;
+        overflow-x      :   hidden;
+        scrollbar-width :   thin;
+
         border-radius   :   10px;
         height          :   inherit;
         width           :   inherit;
@@ -392,33 +416,8 @@ export default {
 }
 
 .swashOut {
-  -webkit-animation-name: swashOut;
   animation-name: swashOut;
-}
-@-webkit-keyframes swashOut {
-  0% {
-    opacity: 1;
-    -webkit-transform-origin: 50% 50%;
-    transform-origin: 50% 50%;
-    -webkit-transform: scale(1, 1);
-    transform: scale(1, 1);
-  }
-
-  80% {
-    opacity: 1;
-    -webkit-transform-origin: 50% 50%;
-    transform-origin: 50% 50%;
-    -webkit-transform: scale(0.9, 0.9);
-    transform: scale(0.9, 0.9);
-  }
-
-  100% {
-    opacity: 0;
-    -webkit-transform-origin: 50% 50%;
-    transform-origin: 50% 50%;
-    -webkit-transform: scale(0, 0);
-    transform: scale(0, 0);
-  }
+  animation-duration: 0.7s;
 }
 @keyframes swashOut {
   0% {

@@ -5,7 +5,7 @@
     @mouseup="dotsHovered()">
         <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" 
             @mousedown="dotsClicked('close')" 
-            @mouseup="setWindowState(props.id,'killed')"></div>
+            @mouseup="emit('close')"></div>
 
         <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   
             @mousedown="dotsClicked('min')"
