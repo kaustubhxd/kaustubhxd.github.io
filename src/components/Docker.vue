@@ -13,28 +13,38 @@
 <script>
 import DockIcon from './DockIcon'
 import {dockStyle} from '../store/state'
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
 
 export default {
     components: {DockIcon },
     setup(){
         
         const dockElement = ref(null)
+        var resizeObserver
 
-        onMounted(() => {
-            // ResizeObserver observes the change in dock shape
-            // see how window minimize transition works to get why we do it here
-            function reportResize() {
+        // ResizeObserver (in onMounted) observes the change in dock shape
+        // see how window minimize transition works to get why we do it here
+        function reportResize() {
+            console.log('dock resize triggered')
+            if(dockElement.value){
                 dockStyle.value.width   = dockElement.value.offsetWidth
                 dockStyle.value.height  = dockElement.value.offsetHeight
                 dockStyle.value.top     = dockElement.value.offsetTop
                 dockStyle.value.left    = dockElement.value.offsetLeft
             }
+        }
+
+        onMounted(() => {
             reportResize()
+            resizeObserver = new ResizeObserver(reportResize)
+            resizeObserver.observe(dockElement.value)
+            window.addEventListener('resize', reportResize);
+        })
 
-            new ResizeObserver(reportResize).observe(dockElement.value)
-
-
+        onBeforeUnmount(() =>{
+            resizeObserver.disconnect()
+            window.removeEventListener('resize', reportResize);
+            console.log('docker unmounted')
         })
 
         return{

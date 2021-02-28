@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
 import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
 
@@ -78,6 +78,8 @@ export default {
 
         const box = ref()
         const animateWindowMinMax = ref(false)
+
+        var windowResizeObserver
 
        const positions = ref({
         clientX: undefined,
@@ -122,8 +124,6 @@ export default {
             positions.value.clientY = event.clientY
 
             // set the element's new position:
-
-
             boxTop.value    = (box.value.offsetTop - positions.value.movementY)
             boxLeft.value   = (box.value.offsetLeft - positions.value.movementX)      
         }
@@ -174,6 +174,7 @@ export default {
         }
 
         function maxWindow(){
+            console.log(boxWidth.value,window.innerWidth,boxHeight.value,window.innerHeight)
             if(animateWindowMinMax.value == true)   animateWindowMinMax.value = false
             animateWindowMinMax.value = true
 
@@ -186,8 +187,6 @@ export default {
 
                 setWindowState(props.id,'normal')
                 console.log('normalized')
-
-
             }else{
                 boxWidthCustom.value = boxWidth.value
                 boxHeightCustom.value = boxHeight.value
@@ -253,7 +252,7 @@ export default {
         // 'watching' changes to store's minimized value and acting on it here.
         // why? two separate components(ActionButtons and DockIcon) can call minimize.
         // since Floatable.vue has access to all variables, this seemed like a good idea 
-        watch(() => windowState.value.minimized, (newValue) => {
+        const unwatchMinimized = watch(() => windowState.value.minimized, (newValue) => {
             if(newValue == false){
                 animateWindowMinMax.value = true
 
@@ -277,13 +276,17 @@ export default {
                 console.log('----------------------')
                 if(box.value){
                     if (boxWidth.value != parseInt(box.value.style.width) || boxHeight.value != parseInt(box.value.style.height)){
-                        boxWidth.value = parseInt(box.value.style.width)
-                        boxHeight.value = parseInt(box.value.style.height)
+                            boxWidth.value      = parseInt(box.value.style.width)
+                            boxHeight.value     = parseInt(box.value.style.height)
+                            boxWidthCustom.value = parseInt(box.value.style.width)
+                            boxHeightCustom.value = parseInt(box.value.style.height)
+
                     }
 
                 }
             }
-            new ResizeObserver(reportResize).observe(box.value)
+            windowResizeObserver = new ResizeObserver(reportResize)
+            windowResizeObserver.observe(box.value)
 
         })
 
@@ -303,6 +306,12 @@ export default {
             zIndex.value = ZIndexMax.value + 1
             ZIndexMax.value += 1
         }
+
+        onBeforeUnmount(() => {
+            windowResizeObserver.disconnect()
+            unwatchMinimized()
+            console.log('floatable unmounted')
+        })
 
 
         return {
@@ -343,8 +352,8 @@ export default {
 
     overflow            :   hidden;
     resize              :   both;
-    min-width           :   100px;
-    min-height          :   100px ;
+    min-width           :   64px;
+    min-height          :   64px ;
     /* resize              :   both ;
     min-width           :   64px;
     min-height          :   24px ; */
@@ -407,8 +416,8 @@ export default {
     overflow      :   hidden;
     scrollbar-width :   thin;
 
-    min-width       :   100px;
-    min-height      :   100px;  
+    min-width       :   64px;
+    min-height      :   64px;  
 
     .text{  
         overflow-y      :   auto;
@@ -418,6 +427,8 @@ export default {
         border-radius   :   10px;
         height          :   inherit;
         width           :   inherit;
+        min-width: 64px;
+        min-height: 64px;
         padding         :   0;
     }
 }   
