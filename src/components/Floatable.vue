@@ -94,15 +94,15 @@ export default {
 
             // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
             if(windowState.value.maximized || windowState.value.stuckToSide){
-                let ratioX = event.clientX / boxWidth.value
+                let ratioX = (event.clientX - boxLeft.value) / boxWidth.value
                 // console.log(boxWidthCustom.value)
                 // console.log(ratioX)
                 boxWidth.value = boxWidthCustom.value
                 boxHeight.value = boxHeightCustom.value
 
-                boxLeft.value = boxLeft.value + event.clientX - (boxWidthCustom.value * ratioX)
+                boxLeft.value = event.clientX - (boxWidthCustom.value * ratioX)
                 setWindowState(props.id,'normal')
-
+                console.log('normalized on drag')
             }
 
 
@@ -134,29 +134,34 @@ export default {
 
             let outOfBounds = false
 
-            if  (boxTop.value  < 0) {
-                boxTop.value  = 0
-                outOfBounds = true
-                maxWindow()
-            }
-
+            // stick left
             if  (boxLeft.value < 0)   
             {
                 boxLeft.value = 0
                 outOfBounds = true
                 stickToSide('left')
             }
-            if  (boxTop.value > window.innerHeight) 
+            // stick right
+            else if(event.clientX >= (window.innerWidth - 1))
+            {
+                outOfBounds = true
+                stickToSide('right')
+            }  
+            // maximize
+            else if  (boxTop.value  < 0) {
+                boxTop.value  = 0
+                outOfBounds = true
+                maxWindow()
+            }
+            // too far down
+            else if  (boxTop.value > window.innerHeight) 
             {
                 boxTop.value = window.innerHeight - (boxHeight.value / 3)
                 outOfBounds = true
             }
-
-            if(event.clientX >= (window.innerWidth - 1))
-            {
-                outOfBounds = true
-                stickToSide('right')
-            }    
+  
+            
+ 
 
             if(outOfBounds) {
                 ripple.value.top  = event.clientY < 0 ? 0 : event.clientY >= window.innerHeight ? window.innerHeight : event.clientY
@@ -173,7 +178,6 @@ export default {
             animateWindowMinMax.value = true
 
             if(boxWidth.value == window.innerWidth && boxHeight.value == window.innerHeight ){
-                console.log('normalize window')
                 boxWidth.value = boxWidthCustom.value
                 boxHeight.value = boxHeightCustom.value
 
@@ -181,9 +185,10 @@ export default {
                 boxTop.value = boxTopCustom.value
 
                 setWindowState(props.id,'normal')
+                console.log('normalized')
+
 
             }else{
-                console.log('maximize window')
                 boxWidthCustom.value = boxWidth.value
                 boxHeightCustom.value = boxHeight.value
                 boxLeftCustom.value = boxLeft.value
@@ -194,8 +199,9 @@ export default {
                 boxLeft.value = 0
                 boxTop.value = 0
 
-
                 setWindowState(props.id,'maximized')
+                console.log('maximize window')
+
             }
 
         }
@@ -214,6 +220,7 @@ export default {
             boxTop.value    = dockStyle.value.top
             boxLeft.value   = dockStyle.value.left - dockStyle.value.width/2
             boxOpacity.value = 0
+            console.log(`minimized`)
 
         }
 
@@ -226,11 +233,14 @@ export default {
                 boxLeft.value = 0
                 boxHeight.value = window.innerHeight
                 boxWidth.value = window.innerWidth / 2
+                console.log(`stick ${side}`)
+
             }else if (side == 'right'){
                 boxTop.value = 0
                 boxLeft.value = window.innerWidth / 2
                 boxHeight.value = window.innerHeight
                 boxWidth.value = window.innerWidth / 2
+                console.log(`stick ${side}`)
             }
 
             setWindowState(props.id,'stuckToSide')
@@ -264,10 +274,13 @@ export default {
             // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
             // without this, the window ignores manual resize shape and reverts back onComponentUpdate
             function reportResize(){
-                console.log('resizd')
+                console.log('----------------------')
                 if(box.value){
-                    boxWidth.value = parseInt(box.value.style.width)
-                    boxHeight.value = parseInt(box.value.style.height)
+                    if (boxWidth.value != parseInt(box.value.style.width) || boxHeight.value != parseInt(box.value.style.height)){
+                        boxWidth.value = parseInt(box.value.style.width)
+                        boxHeight.value = parseInt(box.value.style.height)
+                    }
+
                 }
             }
             new ResizeObserver(reportResize).observe(box.value)
