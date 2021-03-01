@@ -21,6 +21,8 @@
 import { ref } from 'vue'
 import {K} from '../assets/constants'
 import {setWindowState} from '../store/state'
+import {isSmartPhone} from '../assets/scripts'
+
 
 export default {
     props: ['name','id'],
@@ -29,6 +31,12 @@ export default {
         const closeDot  =   ref(K.closeDotNormal) 
         const minDot    =   ref(K.minimizeDotNormal)
         const maxDot    =   ref(K.maximizeDotNormal)  
+
+        if(isSmartPhone()){
+            closeDot.value = K.closeDotPrelight
+            minDot.value = K.minimizeDotPrelight
+            maxDot.value = K.maximizeDotPrelight
+        }
         
         function dotsHovered(){
             closeDot.value = K.closeDotPrelight
@@ -37,9 +45,11 @@ export default {
         }
 
         function dotsNotHovered(){
-            closeDot.value = K.closeDotNormal
-            minDot.value = K.minimizeDotNormal
-            maxDot.value = K.maximizeDotNormal
+            if(!isSmartPhone()){
+                closeDot.value = K.closeDotNormal
+                minDot.value = K.minimizeDotNormal
+                maxDot.value = K.maximizeDotNormal
+            }
         }
 
         
@@ -48,7 +58,6 @@ export default {
             else if (dot === 'min')     {   minDot.value    =   K.minimizeDotClicked }
             else if (dot === 'max')     {   maxDot.value    =   K.maximizeDotClicked }
         }
-
 
         return{
             dotsHovered,

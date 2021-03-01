@@ -49,6 +49,8 @@ export default {
             }
         }
 
+        const dockHovering = ref(false)
+
         console.log(info.value.minimized)
         return {
             props,
@@ -57,15 +59,14 @@ export default {
             shakeDock,
             toggleShake,
             setWindowState,
-            handleClick
+            handleClick,
+            dockHovering
         }
     },
 }
 </script>
 
 <style lang='scss'>
-
-
 
 #dot{
     display :   block ;
@@ -120,6 +121,7 @@ li:hover img {
 	transform: scale(1.8);
 	margin: 0 2em;
 }
+
 
 li:hover+li img,
 li.prev img {

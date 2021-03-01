@@ -46,8 +46,8 @@
                             
                             It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
                     </p> -->
-                    <Projects/>
-
+                    <Skills v-if="props.id == 'skills'" />
+                    <Projects v-if="props.id == 'projects'"/>
                 </div>
 
             </div>
@@ -60,24 +60,38 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
 import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
 import Projects from './Projects'
+import Skills from './Skills'
+import {isSmartPhone} from '../assets/scripts'
 
 export default {
-    components: {ActionButtons,Projects},
+    components: {ActionButtons,Projects,Skills},
     props: ['title','id'],
     setup(props){
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
 
+        console.log(props.id)
+
         const windowState = ref(windows.value[props.id])
+
+
+
 
         const boxWidth = ref(window.innerWidth  * (3/8))
         const boxHeight = ref(window.innerHeight  * (8/13))
+        const boxTop = ref(Math.floor(Math.random() * ((window.innerHeight - (boxHeight.value + 100)) - 100) + 100))
+        const boxLeft = ref(Math.floor(Math.random() * ((window.innerWidth - (boxWidth.value + 100)) - 100) + 100))
         const boxOpacity = ref(1)
+
+        if(isSmartPhone()){
+            boxWidth.value   =   (window.innerWidth * (7/8));
+            boxHeight.value  =   (window.innerHeight * (10/13));
+            boxTop.value     =   (window.innerHeight - boxHeight.value)/4;
+            boxLeft.value    =   (window.innerWidth - boxWidth.value)/2;
+        }
         
         const boxWidthCustom = ref(boxWidth.value)
         const boxHeightCustom = ref(boxHeight.value)
         
-        const boxTop = ref(Math.floor(Math.random() * ((window.innerHeight - (boxHeight.value + 100)) - 100) + 100))
-        const boxLeft = ref(Math.floor(Math.random() * ((window.innerWidth - (boxWidth.value + 100)) - 100) + 100))
 
         const boxLeftCustom = ref(boxLeft.value)
         const boxTopCustom = ref(boxTop.value)
@@ -86,6 +100,7 @@ export default {
         const animateWindowMinMax = ref(false)
 
         var windowResizeObserver
+
 
        const positions = ref({
         clientX: undefined,

@@ -1,0 +1,56 @@
+<template>
+    <div class="skills-wrapper">
+        <div class="skill" v-for="(icon,skill) in skills" :key='skill'>
+            <img class="skill-icon" :src="require('../assets/icons/skills/' + icon)">
+            <div class="skill-name">{{skill}}</div>
+        </div>
+    </div>
+
+</template>
+
+<script>
+import {skills} from '../assets/content'
+export default {
+    setup(){
+        return {
+            skills
+        }
+    }
+}
+</script>
+
+<style scoped>
+.skills-wrapper{
+    display                 :   grid;
+    grid-template-columns   :   repeat(auto-fit, 200px);
+    gap                     :   10px;
+    justify-content         :   center ;
+
+    padding-bottom          :   30px;
+}
+
+.skill-icon{
+    display     :   block;
+    width       :   70px;
+    height      :   px;
+    object-fit  :   contain;
+
+    margin-top      :   20px;
+    margin-left     :   auto;
+    margin-right    :   auto;
+}
+
+.skill-name{
+        font-size   :   24px;
+    border-bottom: 1px solid #000;
+    padding-bottom: 3px;
+    border-color: #eaeaea;
+
+    color       :   #111;
+
+    display     :   block;
+    text-align  :   center;
+
+    margin-bottom   :   20px;
+}
+</style>

@@ -19,7 +19,7 @@ const windows = ref({
     'skills' : {
         title       :   'Skills',
         minimized   :   false,
-        active      :   false,
+        active      :   true,
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,
@@ -33,7 +33,7 @@ const windows = ref({
     'who' : {
         title       :   'Who?',
         minimized   :   false,
-        active      :   true,
+        active      :   false,
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,
