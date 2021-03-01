@@ -26,8 +26,10 @@
             </div>
             
             <div id = "main-window" class="window">
-                <div class ="text">
-                    <p>
+                <div class ="content">
+                    <!-- <p>
+                        {{boxHeightCustom}} {{boxWidthCustom}}
+                        <br>
                         {{props.title}}
                         <br>
                         {{windowState}}
@@ -43,8 +45,11 @@
                             Why do we use it?
                             
                             It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-                    </p>
+                    </p> -->
+                    <Projects/>
+
                 </div>
+
             </div>
         </div> 
     </div>
@@ -54,9 +59,10 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
 import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
+import Projects from './Projects'
 
 export default {
-    components: {ActionButtons},
+    components: {ActionButtons,Projects},
     props: ['title','id'],
     setup(props){
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
@@ -88,44 +94,54 @@ export default {
         movementY: 0
       }) 
 
+        var ratioX;
         function dragMouseDown (event) {
+            // console.log('click :',event)
             event.preventDefault()
 
             // set the z-index of window as max so the clicked windows pops on top 
-            setMaxIndex()
-
             // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
-            if(windowState.value.maximized || windowState.value.stuckToSide){
-                let ratioX = (event.clientX - boxLeft.value) / boxWidth.value
-                // console.log(boxWidthCustom.value)
-                // console.log(ratioX)
-                boxWidth.value = boxWidthCustom.value
-                boxHeight.value = boxHeightCustom.value
-
-                boxLeft.value = event.clientX - (boxWidthCustom.value * ratioX)
-                setWindowState(props.id,'normal')
-                console.log('normalized on drag')
-            }
-
+            setMaxIndex()
 
             // get the mouse cursor position at startup:
             positions.value.clientX = event.clientX
             positions.value.clientY = event.clientY
-            document.onmousemove = elementDrag
-            document.onmouseup = closeDragElement
+            document.onmousemove    = elementDrag
+            document.onmouseup      = closeDragElement
         }
 
         // on mousemove 
         function elementDrag (event) {
-            event.preventDefault()
-            positions.value.movementX = positions.value.clientX - event.clientX
-            positions.value.movementY = positions.value.clientY - event.clientY
-            positions.value.clientX = event.clientX
-            positions.value.clientY = event.clientY
 
-            // set the element's new position:
-            boxTop.value    = (box.value.offsetTop - positions.value.movementY)
-            boxLeft.value   = (box.value.offsetLeft - positions.value.movementX)      
+            if(windowState.value.maximized || windowState.value.stuckToSide){
+                
+                ratioX = (event.clientX - boxLeft.value) / boxWidth.value
+                // console.log(boxWidthCustom.value)
+                // console.log(ratioX)
+
+                boxWidth.value = boxWidthCustom.value
+                boxHeight.value = boxHeightCustom.value
+
+                console.log(boxWidthCustom.value,boxHeightCustom.value)
+                console.log(event.clientX - (boxWidthCustom.value * ratioX))
+
+                boxLeft.value = event.clientX - (boxWidthCustom.value * ratioX)
+                console.log(boxLeft.value)
+                setWindowState(props.id,'normal')
+                console.log('normalized on drag')
+            }else{
+
+                event.preventDefault()
+                positions.value.movementX = positions.value.clientX - event.clientX
+                positions.value.movementY = positions.value.clientY - event.clientY
+                positions.value.clientX = event.clientX
+                positions.value.clientY = event.clientY
+
+                // set the element's new position:
+                boxTop.value    = (box.value.offsetTop - positions.value.movementY)
+                boxLeft.value   = (box.value.offsetLeft - positions.value.movementX)      
+
+            }
         }
 
         function closeDragElement (event) {
@@ -160,21 +176,15 @@ export default {
                 outOfBounds = true
             }
   
-            
- 
-
             if(outOfBounds) {
                 ripple.value.top  = event.clientY < 0 ? 0 : event.clientY >= window.innerHeight ? window.innerHeight : event.clientY
                 ripple.value.left = event.clientX < 0 ? 0 : event.clientX >= window.innerWidth ? window.innerWidth : event.clientX
                 ripple.value.active = true
 
             }
-            
-
         }
 
         function maxWindow(){
-            console.log(boxWidth.value,window.innerWidth,boxHeight.value,window.innerHeight)
             if(animateWindowMinMax.value == true)   animateWindowMinMax.value = false
             animateWindowMinMax.value = true
 
@@ -188,10 +198,12 @@ export default {
                 setWindowState(props.id,'normal')
                 console.log('normalized')
             }else{
-                boxWidthCustom.value = boxWidth.value
-                boxHeightCustom.value = boxHeight.value
-                boxLeftCustom.value = boxLeft.value
-                boxTopCustom.value = boxTop.value
+                if(!windowState.value.stuckToSide){
+                    boxWidthCustom.value = boxWidth.value
+                    boxHeightCustom.value = boxHeight.value
+                    boxLeftCustom.value = boxLeft.value
+                    boxTopCustom.value = boxTop.value
+                }
 
                 boxWidth.value = window.innerWidth
                 boxHeight.value = window.innerHeight
@@ -208,11 +220,11 @@ export default {
         function minWindow(){
             setWindowState(props.id,'minimized')
             animateWindowMinMax.value = true
-
-            boxWidthCustom.value    = boxWidth.value
-            boxHeightCustom.value   = boxHeight.value
-            boxTopCustom.value      = boxTop.value
-            boxLeftCustom.value     = boxLeft.value
+            
+            // boxWidthCustom.value      = parseInt(box.value.style.width)
+            // boxHeightCustom.value     = parseInt(box.value.style.height)
+            // boxTopCustom.value        = parseInt(box.value.style.top) 
+            // boxLeftCustom.value       = parseInt(box.value.style.left)  
 
             boxWidth.value  = dockStyle.value.width
             boxHeight.value = dockStyle.value.height
@@ -224,25 +236,35 @@ export default {
         }
 
         function stickToSide(side){
-            boxWidthCustom.value = boxWidth.value
-            boxHeightCustom.value = boxHeight.value
-            animateWindowMinMax.value = true
-            if(side == 'left'){
-                boxTop.value = 0
-                boxLeft.value = 0
-                boxHeight.value = window.innerHeight
-                boxWidth.value = window.innerWidth / 2
-                console.log(`stick ${side}`)
+            if(!windowState.value.stuckToSide){
+                if(!windowState.value.maximized){
+                    boxWidthCustom.value    = boxWidth.value
+                    boxHeightCustom.value   = boxHeight.value
+                }
+                animateWindowMinMax.value = true
+                if(side == 'left'){
+                    boxTop.value = 0
+                    boxLeft.value = 0
+                    boxHeight.value = window.innerHeight
+                    boxWidth.value = window.innerWidth / 2
+                    console.log(`stick ${side}`)
 
-            }else if (side == 'right'){
-                boxTop.value = 0
-                boxLeft.value = window.innerWidth / 2
-                boxHeight.value = window.innerHeight
-                boxWidth.value = window.innerWidth / 2
-                console.log(`stick ${side}`)
+                }else if (side == 'right'){
+
+                    if (windowState.value.maximized){
+                        console.log('shits maximized bruh')
+
+                    }
+
+                    boxTop.value = 0
+                    boxLeft.value = window.innerWidth / 2
+                    boxHeight.value = window.innerHeight
+                    boxWidth.value = window.innerWidth / 2
+                    console.log(`stick ${side}`)
+                }
+
+                setWindowState(props.id,'stuckToSide')
             }
-
-            setWindowState(props.id,'stuckToSide')
         }
 
         if (windowState.value.maximized){
@@ -252,16 +274,23 @@ export default {
         // 'watching' changes to store's minimized value and acting on it here.
         // why? two separate components(ActionButtons and DockIcon) can call minimize.
         // since Floatable.vue has access to all variables, this seemed like a good idea 
-        const unwatchMinimized = watch(() => windowState.value.minimized, (newValue) => {
-            if(newValue == false){
+        const unwatchMinimized = watch(() => windowState.value.minimized, (isMinimized) => {
+            if(isMinimized == false){
                 animateWindowMinMax.value = true
+                if(windowState.value.maximized){
+                    boxWidth.value = window.innerWidth
+                    boxHeight.value = window.innerHeight
+                    boxLeft.value = 0
+                    boxTop.value = 0                
+                }else{
+                    boxWidth.value = boxWidthCustom.value  
+                    boxHeight.value = boxHeightCustom.value   
+                    boxTop.value = boxTopCustom.value      
+                    boxLeft.value = boxLeftCustom.value      
+                }
 
-                boxWidth.value = boxWidthCustom.value  
-                boxHeight.value = boxHeightCustom.value   
-                boxTop.value = boxTopCustom.value      
-                boxLeft.value = boxLeftCustom.value     
                 boxOpacity.value = 1
-            }else if (newValue == true){
+            }else if (isMinimized == true){
                 minWindow()
             }
 
@@ -269,11 +298,11 @@ export default {
 
 
         onMounted(() => {
-            // ResizeObserver is used here to tackle issues while manually resizing window using the mouse
+            // ResizeObserver is used here to tackle issues while user manually resizes window using the mouse
             // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
-            // without this, the window ignores manual resize shape and reverts back onComponentUpdate
+            // without this, the window ignores manual resize shape and reverts back on component update
             function reportResize(){
-                console.log('----------------------')
+                console.log('---------------------- window resize')
                 if(box.value){
                     if (boxWidth.value != parseInt(box.value.style.width) || boxHeight.value != parseInt(box.value.style.height)){
                             boxWidth.value      = parseInt(box.value.style.width)
@@ -333,14 +362,16 @@ export default {
             closeWindow,
             animateSwashOut,
             setMaxIndex,
-            zIndex
+            zIndex,
+            boxWidthCustom,
+            boxHeightCustom
         }
     }
 }
 </script>
 
 
-<style lang='scss'>
+<style lang='scss' scoped>
 
 .floatable {
     position            :   absolute;
@@ -379,7 +410,7 @@ export default {
 
 .window-animate-minmax{
     transition: top 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), 
-                left 0.3s 0s cubic-bezier(0.1, 1.2, 0.3, 1), 
+                left 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), 
                 transform 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1),
                 opacity      1.0s;
 
@@ -419,12 +450,11 @@ export default {
     min-width       :   64px;
     min-height      :   64px;  
 
-    .text{  
+    .content{  
         overflow-y      :   auto;
         overflow-x      :   hidden;
         scrollbar-width :   thin;
 
-        border-radius   :   10px;
         height          :   inherit;
         width           :   inherit;
         min-width: 64px;

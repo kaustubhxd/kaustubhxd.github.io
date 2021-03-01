@@ -28,7 +28,7 @@ export default {
     width: 10px;
     height: 10px;
     opacity: 0;
-    z-index: 10;
+    z-index: 9999;
     transform: scale(0);
     background: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
