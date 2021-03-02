@@ -54,11 +54,6 @@ p, li, span, label, input, textarea {
     font-family: 'Open Sans','sans-serif';
 }
 
-a{
-    text-decoration :   none;
-    color           :   #000;
-     font-family: 'Open Sans','sans-serif';
-}
 
 ul{
     list-style      :   none;
