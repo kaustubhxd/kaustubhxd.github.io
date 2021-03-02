@@ -9,6 +9,11 @@
                         <div class="post-preview">
                             <h6 class="post-title">{{project.title}}</h6>
                             <p class="post-content">{{project.content}}</p>
+                            <div class='post-lang'>
+                                <span v-for="lang in project.languages" :key='lang'>
+                                    <img class="lang-icon" :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')"/>
+                                </span>
+                            </div>
                             <p><a class="post-link" target="_blank" :href="project.link">Check Out</a></p>
                         </div>
                     </div>
@@ -18,17 +23,19 @@
 </template>
 
 <script>
-import {projects} from '../assets/content'
+import {projects,skills} from '../assets/content'
 export default {
     setup(){
+
         return {
-            projects
+            projects,
+            skills
         }
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 *{
     font-family: 'Open Sans','sans-serif';
@@ -100,8 +107,8 @@ h6  {font-size      :   16px;}
     margin-left     :   auto;
     margin-right    :   auto;
 
-    border              :   2px solid #4b5156;
-    background-color    :   rgb(251,249,243,0.8);
+    border              :   1px solid #eaeaea;
+    border-radius   :   5px;
 }
 
 .post{
@@ -110,7 +117,8 @@ h6  {font-size      :   16px;}
     background-color    :   #fff;
     padding             :   15px;
 
-    border       :   3px solid #4b5156;
+    border          :   1px solid #eaeaea;
+    border-radius   :   5px;
 }
 
 .post-title{
@@ -129,8 +137,9 @@ h6  {font-size      :   16px;}
 }
 
 .post-content{
-    color       :   #4b5156;
-    font-size   :   22px;
+    color           :   #4b5156;
+    font-size       :   22px;
+    margin-bottom   :   0px;
 }
 
 .post-link{
@@ -138,4 +147,16 @@ h6  {font-size      :   16px;}
     bottom: 5px;    
     font-size: 20px;
 }
+
+.post-lang{
+    display: inline-block;
+    padding-left    : 24px;
+
+    .lang-icon{
+        width   : 30px;
+        height  : 30px;
+        margin-right : 1px;
+    }
+}
+
 </style>

@@ -1,32 +1,35 @@
 <template>
-    <li>
-    <span>{{props.name}}</span>
-    <a id = "element" href="#" class = "dock-element"
-      :class = "{ 'shake-dock' : shakeDock }"
-      @animationend="shakeDock = false"
-      @mouseup="handleClick()"
-    >
-    
-        <img :src = "icon"  >
+    <span :class="{ 'deviceHasHover' : !isDeviceSmartPhone  }">
+        <li >
+        <span>{{props.name}}</span>
+        <a id = "element" href="#" class = "dock-element"
+        :class = "{ 'shake-dock' : shakeDock }"
+        @animationend="shakeDock = false"
+        @mouseup="handleClick()"
+        >
+        
+            <img :src = "icon"  >
 
-    <div    
-        class = "dock-dot" 
-        id="dot"  
-        :class="{ 'dot-min' : info.minimized, 'dot-active': (info.active && !info.minimized) }" >
-    </div></a>
-
-    </li>
+        <div    
+            class = "dock-dot" 
+            id="dot"  
+            :class="{ 'dot-min' : info.minimized, 'dot-active': (info.active && !info.minimized) }" >
+        </div></a>
+        </li>
+    </span>
 </template>
 
 <script>
 import { ref } from 'vue'
 import {windows,setWindowState} from '../store/state'
+import {isSmartPhone} from '../assets/scripts'
 
 export default {
     props: ['name','id','icon'],
 
     setup(props){
         const info = ref(windows.value[props.id])
+        const isDeviceSmartPhone = isSmartPhone()
 
         // vue + WEBPACK introduces the additional atrocity of using require
         // for something as basic as pointing to an asset location 
@@ -52,6 +55,7 @@ export default {
         const dockHovering = ref(false)
 
         console.log(info.value.minimized)
+
         return {
             props,
             info,
@@ -60,7 +64,8 @@ export default {
             toggleShake,
             setWindowState,
             handleClick,
-            dockHovering
+            dockHovering,
+            isDeviceSmartPhone
         }
     },
 }
@@ -117,13 +122,14 @@ li img {
 	transition: all 0.3s;
 }
 
-li:hover img {
+// https://stackoverflow.com/a/30303898
+.deviceHasHover li:hover img {
 	transform: scale(1.8);
 	margin: 0 2em;
 }
 
 
-li:hover+li img,
+.deviceHasHover li:hover+li img,
 li.prev img {
 	transform: scale(1.4);
 	margin: 0 1.5em;
@@ -141,7 +147,7 @@ li span {
 	border-radius: 12px;
 }
 
-li:hover span { 
+.deviceHasHover li:hover span { 
 	display: block;
 	color: #fff;
 }

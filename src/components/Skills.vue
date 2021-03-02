@@ -46,7 +46,7 @@ export default {
     padding-bottom: 3px;
     border-color: #eaeaea;
 
-    color       :   #111;
+    color       :   #404040;
 
     display     :   block;
     text-align  :   center;

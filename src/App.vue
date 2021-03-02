@@ -37,11 +37,11 @@ export default {
     })
 
 
-    setInterval(() => {
-      try{
-        document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
-      }catch(err){}
-    },30000)
+    // setInterval(() => {
+    //   try{
+    //     document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
+    //   }catch(err){}
+    // },30000)
 
       return {
     windows,

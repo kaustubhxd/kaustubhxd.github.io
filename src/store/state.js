@@ -47,7 +47,7 @@ const windows = ref({
     'projects' : {
         title       :   'Projects',
         minimized   :   false,
-        active      :   false,
+        active      :   true,
         position    :   [0,0],
         stuckToSide :   false,
         maximized   :   false,

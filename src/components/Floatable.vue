@@ -48,6 +48,8 @@
                     </p> -->
                     <Skills v-if="props.id == 'skills'" />
                     <Projects v-if="props.id == 'projects'"/>
+                    <Who v-if="props.id == 'who'"/>
+
                 </div>
 
             </div>
@@ -61,10 +63,11 @@ import ActionButtons from '../components/ActionButtons'
 import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
 import Projects from './Projects'
 import Skills from './Skills'
+import Who from './Who'
 import {isSmartPhone} from '../assets/scripts'
 
 export default {
-    components: {ActionButtons,Projects,Skills},
+    components: {ActionButtons,Projects,Skills,Who},
     props: ['title','id'],
     setup(props){
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
