@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
+
+
 html, body {
     margin      :   0px;
     height      :   100%;
@@ -40,7 +43,6 @@ ul{
     padding :   0;
     margin  :   5px 0 0 0;
 }
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
 
 html, body,p {
     font-family: 'Open Sans', sans-serif;
@@ -48,6 +50,7 @@ html, body,p {
   
 
 a{
+    margin:0;
     padding: 5px;
     color: #17a2b8;
     text-decoration: none;

@@ -16,8 +16,8 @@
         <p>Started coding since I was 14; haven't stopped since.</p>
         <p>In my free time, if I'm not preoccupied enjoying music, skateboarding with the boys or looking at memes, 
             I spend my time experimenting with a new language or a framework and try to build something cool and useful.</p>
-        <p>Currently trying my hand at understanding how Cloud Services work.<br> Passed the Microsoft Certified: Azure Fundamentals Certification recently. 
-            <a target="_blank" href="https://www.youracclaim.com/badges/d464a37d-27ab-4d23-a86b-ee43899320ba/public_url">Check Out</a>
+        <p>Currently trying my hand at understanding how Cloud Services work.<br> Passed the <a target="_blank" href="https://www.youracclaim.com/badges/d464a37d-27ab-4d23-a86b-ee43899320ba/public_url">Microsoft Certified: Azure AZ-900</a> Certification recently. 
+            
         </p>
     </div>
 </div>

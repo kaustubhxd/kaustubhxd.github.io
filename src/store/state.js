@@ -1,5 +1,8 @@
 import {ref} from 'vue'
 
+// const screenSide = {left:true, right:true}
+// Object.freeze(screenSide)
+
 const dockStyle = ref({
     top     :   0,
     left    :   0,
@@ -20,8 +23,8 @@ const windows = ref({
         title       :   'Skills',
         minimized   :   false,
         active      :   false,
-        position    :   [0,0],
         stuckToSide :   false,
+        stuckWhere  :   'left',
         maximized   :   false,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
@@ -36,6 +39,8 @@ const windows = ref({
         active      :   true,
         position    :   [0,0],
         stuckToSide :   false,
+        stuckWhere  :   'left',
+
         maximized   :   false,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
@@ -50,7 +55,23 @@ const windows = ref({
         active      :   false,
         position    :   [0,0],
         stuckToSide :   false,
+        stuckWhere  :   'left',
         maximized   :   false,
+        zIndex      :   1,
+        width   :   window.innerWidth  * (3/8),
+        height  :   window.innerHeight  * (8/13),
+        opacity :   1,
+        top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
+        left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
+    },
+    'contact' : {
+        title       :   'Contact',
+        minimized   :   false,
+        active      :   true,
+        position    :   [0,0],
+        stuckToSide :   false,
+        stuckWhere  :   'left',
+        maximized   :   true,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),
@@ -87,11 +108,20 @@ function setWindowState(window,state){
     }
 }
 
+function setLocalStorage(){
+    console.log('settign local storage')
+    // Store
+    localStorage.setItem("lastname", "Smith");
+    // Retrieve
+    document.getElementById("result").innerHTML = localStorage.getItem("lastname"); 
+}
+
 export {
     ripple,
     windows,
     setWindowState,
     dockStyle,
-    ZIndexMax
+    ZIndexMax,
+    setLocalStorage
 }
 

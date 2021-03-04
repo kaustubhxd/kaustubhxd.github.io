@@ -32,7 +32,7 @@ export default {
 .skill-icon{
     display     :   block;
     width       :   70px;
-    height      :   px;
+    height      :   70px;
     object-fit  :   contain;
 
     margin-top      :   20px;

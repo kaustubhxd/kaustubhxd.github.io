@@ -21,8 +21,10 @@
                 <div class="tab-space" id = "tab-space"  
                 @mousedown="dragMouseDown"
                 @dblclick="maxWindow()">
+                        <div class="box-title"><p> {{props.id}}</p></div>
 
                 </div>
+                
             </div>
             
             <div id = "main-window" class="window">
@@ -40,15 +42,11 @@
                         Systems theory says that a system can have properties that none of its underlying components have and could not have been predicted based on the parts. (An emergent property). 
                         Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
                         It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
-                        
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                            Why do we use it?
-                            
-                            It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
                     </p> -->
                     <Skills v-if="props.id == 'skills'" />
                     <Projects v-if="props.id == 'projects'"/>
                     <Who v-if="props.id == 'who'"/>
+                    <Contact v-if="props.id == 'contact'"/>
 
                 </div>
 
@@ -64,10 +62,11 @@ import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
 import Projects from './Projects'
 import Skills from './Skills'
 import Who from './Who'
+import Contact from './Contact'
 import {isSmartPhone} from '../assets/scripts'
 
 export default {
-    components: {ActionButtons,Projects,Skills,Who},
+    components: {ActionButtons,Projects,Skills,Who,Contact},
     props: ['title','id'],
     setup(props){
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
@@ -75,9 +74,6 @@ export default {
         console.log(props.id)
 
         const windowState = ref(windows.value[props.id])
-
-
-
 
         const boxWidth = ref(window.innerWidth  * (3/8))
         const boxHeight = ref(window.innerHeight  * (8/13))
@@ -316,6 +312,14 @@ export default {
 
 
         onMounted(() => {
+
+            if(windowState.value.maximized){
+                maxWindow()
+            }else if (windowState.value.stuckToSide){
+                windowState.value.stuckToSide = false;
+                stickToSide(windowState.value.stuckWhere)
+            }
+
             // ResizeObserver is used here to tackle issues while user manually resizes window using the mouse
             // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
             // without this, the window ignores manual resize shape and reverts back on component update
@@ -421,6 +425,18 @@ export default {
 
         .tab-space{
             z-index: 10;
+            overflow            :   hidden;
+
+        }
+
+        .box-title{
+            color       : black;
+            text-align  : end;
+            
+            p{
+                margin:0;
+                font-size: 18px;  
+            }
         }
 
     }

@@ -1,16 +1,16 @@
 
 const projects = {
     'be_project' : {
-        title : 'Final Year Project',
+        title : 'Odia Natural TTS',
         thumbnail : 'odia_tts.png',
         content : `Working on a TTS engine for Odia Language(Orissa) using Google's Tacotron 2 algorithm.`,
         link : 'https://kaustubh.app/odia_tts',
         languages : ['Python','PyTorch']
     },
     'website' : {
-        title : 'Portfolio Website Redesign',
+        title : 'Portfolio Website',
         thumbnail : 'beta.png',
-        content : 'Currently redesigning this website, planning to implement a brand new Desktop-style UI.',
+        content : `You're on it right now. I'm really proud of how the website turned out, and I'm glad you took the time to check it out!`,
         link : 'https://kaustubh.app/beta',
         languages : ['VueJS','HTML','CSS','JavaScript']
     },
