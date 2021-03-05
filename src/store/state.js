@@ -67,11 +67,11 @@ const windows = ref({
     'contact' : {
         title       :   'Contact',
         minimized   :   false,
-        active      :   true,
+        active      :   false,
         position    :   [0,0],
         stuckToSide :   false,
         stuckWhere  :   'left',
-        maximized   :   true,
+        maximized   :   false,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),

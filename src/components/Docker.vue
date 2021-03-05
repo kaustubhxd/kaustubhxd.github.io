@@ -5,7 +5,7 @@
         <DockIcon name='Skills' id='skills' icon="skills.svg"/>
         <DockIcon name='Who?' id='who' icon="who.svg"/>
         <DockIcon name='Projects' id='projects' icon="projects.svg" />
-        <DockIcon name='Contact' id='contact' icon="talk.svg" />
+        <DockIcon name='Hire Me' id='contact' icon="talk.svg" />
 
     </ul>
 </div>

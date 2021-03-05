@@ -1,4 +1,5 @@
 <template>
+    <!-- <p>I'm looking for Flutter or Vue jobs right now!</p> -->
     <form id="myForm" @submit.prevent="submitContactInfo">
         <input v-model="contactInfo.firstName" @input="validateInput('firstName','string')" type="text" id="first_name" name="first_name" class="required" placeholder="Your Name*" required>
         <input v-model="contactInfo.lastName" @input="validateInput('lastName','string')" type="text" id="last_name" name="last_name" class="required" placeholder="Your Last Name">
@@ -16,6 +17,7 @@
 </template>
 
 <script>
+// https://codepen.io/alecherryy/pen/LQXEXG
 import { ref } from 'vue'
 import {fireDB} from '../scripts/firebase'
 
@@ -96,6 +98,10 @@ export default {
 
 <style scoped lang='scss'>
 
+p{
+  text-align: center;
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -133,6 +139,10 @@ input {
 
     &:focus::placeholder {
         color: #808080;
+    }
+
+    &:hover::placeholder {
+        color: black;
     }
 
     &:focus {
