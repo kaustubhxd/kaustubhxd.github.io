@@ -1,25 +1,25 @@
 <template>
     <div class="dots-wrapper" id = "dots-wrapper" 
-    @mouseover.stop="dotsHovered()" 
-    @mouseout="dotsNotHovered()"
-    @mouseup="dotsHovered()">
-        <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" 
-            @mousedown="dotsClicked('close')" 
-            @mouseup="emit('close')"></div>
+        @mouseover.stop="dotsHovered()" 
+        @mouseout="dotsNotHovered()"
+        @mouseup="dotsHovered()">
+            <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" 
+                @mousedown="dotsClicked('close')" 
+                @mouseup="emit('close')"></div>
 
-        <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   
-            @mousedown="dotsClicked('min')"
-            @mouseup="setWindowState(props.id,'minimized')" ></div>
+            <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   
+                @mousedown="dotsClicked('min')"
+                @mouseup="setWindowState(props.id,'minimized')" ></div>
 
-        <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   
-            @mousedown="dotsClicked('max')"   
-            @mouseup="emit('maximize')"></div>
+            <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   
+                @mousedown="dotsClicked('max')"   
+                @mouseup="emit('maximize')"></div>
     </div>
 </template>
 
 <script>
 import { ref } from 'vue'
-import {K} from '../assets/constants'
+import {K,X} from '../assets/constants'
 import {setWindowState} from '../store/state'
 import {isSmartPhone} from '../assets/scripts'
 
@@ -27,7 +27,14 @@ import {isSmartPhone} from '../assets/scripts'
 export default {
     props: ['name','id'],
     setup(props,{emit}){
-        
+
+        // preload images
+        Object.entries(X).forEach(([_, image]) => {
+            let img = new Image();
+            img.src = image
+        });
+
+
         const closeDot  =   ref(K.closeDotNormal) 
         const minDot    =   ref(K.minimizeDotNormal)
         const maxDot    =   ref(K.maximizeDotNormal)  
@@ -68,7 +75,8 @@ export default {
             closeDot,
             props,
             setWindowState,
-            emit
+            emit,
+            X
         }
     }
 }

@@ -2,7 +2,7 @@
     <div class="cursor" :style="{ transform : cursorInnerTransform}"></div>
 
     <div id="cursor" :style="{ transform : cursorTransform}">
-        <div class="cursor-circle" :style="{ transform : cursorCircleTransform}"></div>
+        <div class="cursor-circle" :style="{ transform : cursorCircleTransform, width : cursorCircleWidth, height: cursorCircleHeight}"></div>
     </div>
 </template>
 
@@ -12,8 +12,12 @@ export default {
     setup(){
         
         const cursorInnerTransform  = ref('');
-        const cursorTransform      = ref('');
+        const cursorTransform       = ref('');
         const cursorCircleTransform = ref('');
+        
+        const cursorCircleWidth     = ref('64px')        
+        const cursorCircleHeight    = ref('64px')
+
 
         const mouse = { x: -100, y: -100 }; // mouse pointer's coordinates
         const pos = { x: 0, y: 0 };         // cursor's coordinates
@@ -76,20 +80,15 @@ export default {
 
         requestAnimationFrame(loop);
 
-        function handleMouseDown(){
-            console.log('mousedown')
-            speed = 1;
-        }
-
-        function handleMouseUp(){
-            console.log('mouseup')
-            speed = speedDefault;
-        }
+        function handleMouseDown()  { speed = 1; cursorCircleWidth.value = cursorCircleHeight.value = '32px' };
+        function handleMouseUp()    { speed = speedDefault; cursorCircleWidth.value = cursorCircleHeight.value = '64px' }
 
         return {
             cursorInnerTransform,
             cursorTransform,
-            cursorCircleTransform
+            cursorCircleTransform,
+            cursorCircleWidth,
+            cursorCircleHeight
         }
 
     }
@@ -151,8 +150,13 @@ export default {
       margin-left: -50%;
       border-radius: 50%;
       mix-blend-mode: difference;
-      border: solid 1px rgba(255, 255, 255, 1);
-      transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      border: solid 1.5px rgba(255, 255, 255, 1);
+      transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
+                  background-color 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
+                  border-color 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
+                  width 0.7s cubic-bezier(0.25, 1, 0.5, 1), 
+                  height 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    
     }
   }
 </style>

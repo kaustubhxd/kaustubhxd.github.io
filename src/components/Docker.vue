@@ -6,7 +6,6 @@
         <DockIcon name='Who?' id='who' icon="who.svg"/>
         <DockIcon name='Projects' id='projects' icon="projects.svg" />
         <DockIcon name='Hire Me' id='contact' icon="talk.svg" />
-
     </ul>
 </div>
 </div> 
@@ -21,7 +20,6 @@ import {windows} from '../store/state'
 export default {
     components: {DockIcon },
     setup(){
-
 
         var dockBottom = computed(() => (Object.entries(windows.value).filter(([k,v]) => v.maximized && !v.minimized)).length ? -90:0)
 

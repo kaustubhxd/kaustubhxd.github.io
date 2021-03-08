@@ -24,6 +24,7 @@ import { ref } from 'vue'
 import {windows,setWindowState} from '../store/state'
 import {isSmartPhone} from '../assets/scripts'
 
+
 export default {
     props: ['name','id','icon'],
 

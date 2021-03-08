@@ -10,8 +10,8 @@
           type="text" id="email" name="email" class="required" placeholder="example@email.com*" required>
         <input v-model="contactInfo.phone" @input="validateInput('phone','number')" type="text" id="phone" name="phone" class="required" placeholder="Phone Number" required>
         <textarea v-model="contactInfo.comments" v-autogrow id="comments" name="comments" rows="5" cols="30" placeholder="Say Hello!"></textarea>
+           <div id='helper'> <p>{{helperHint}}</p> </div>
       <input type="submit" name="submit" id="submit" value="Submit">
-      <p id='helper'> {{helperHint}} </p>
     </form>
     <div id="#results"></div>
 </template>
@@ -42,7 +42,17 @@ export default {
 
 
       function submitContactInfo(){
-        if(!invalidEmail.value && window.navigator.onLine){
+        if (invalidEmail.value){
+          console.log('invalid email')
+          helperHint.value = 'Invalid Email'
+        }else if(!window.navigator.onLine){
+          console.log('no internet')
+          helperHint.value = 'Check Internet Connection'
+        }else if(contactInfo.value.firstName == '' || contactInfo.value.email == '' ){
+            console.log('pls fill required')
+            helperHint.value = 'Please fill required details'
+        }
+        else{
             console.log('submit')
             fireCollection.add(contactInfo.value).then( (status) => {
               console.log(status)
@@ -51,12 +61,6 @@ export default {
                 console.error("Error adding document: ", error);
                 helperHint.value = `Error uploading data. Please try again later.`
             });
-        }else if (invalidEmail.value){
-          console.log('invalid email')
-          helperHint.value = 'Invalid Email'
-        }else if(!window.navigator.onLine){
-          console.log('no internet')
-          helperHint.value = 'Check Internet Connection'
         }
       }
 
@@ -66,15 +70,14 @@ export default {
           contactInfo.value[input] = contactInfo.value[input].replace(/[^a-zA-Z]+/g, "");
         }else if (type === 'number'){
           contactInfo.value[input] = contactInfo.value[input].replace(/[^0-9]+/g, "");
-        }else if(type === 'email' ){
+        }else if(type === 'email'){
            contactInfo.value[input] = contactInfo.value[input].trim()
-           if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(contactInfo.value[input]) || contactInfo.value[input].trim() == '' ){
+           if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(contactInfo.value[input]) && contactInfo.value[input] != '' ){
              console.log('valid')
              invalidEmail.value = false
              if(helperHint.value === 'Invalid Email'){
                helperHint.value = ''
              }
-            
            }else{
              console.log('invalid')
              helperHint.value = 'Invalid Email'
@@ -221,6 +224,7 @@ label.error {
   text-align: right;
   font-size: 22px;
   color: #ec7bb0;
+  height: 22px;
 }
 
 </style>

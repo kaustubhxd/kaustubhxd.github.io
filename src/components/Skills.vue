@@ -5,13 +5,23 @@
             <div class="skill-name">{{skill}}</div>
         </div>
     </div>
-
 </template>
 
 <script>
+import { onBeforeMount, onMounted } from 'vue'
 import {skills} from '../assets/content'
 export default {
     setup(){
+
+        onBeforeMount(() => {
+            {
+            console.log('before mount')
+        }
+        })
+        onMounted(() =>{
+            console.log('mounted')
+        })
+
         return {
             skills
         }
@@ -19,7 +29,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang='scss' scoped>
 .skills-wrapper{
     display                 :   grid;
     grid-template-columns   :   repeat(auto-fit, 200px);
@@ -38,6 +48,12 @@ export default {
     margin-top      :   20px;
     margin-left     :   auto;
     margin-right    :   auto;
+    transition      :   transform 0.3s ease ;
+
+    &:hover{
+        transform: rotate(-10deg)
+    }
+
 }
 
 .skill-name{

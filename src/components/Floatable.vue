@@ -1,57 +1,59 @@
 <template>
     <div >
-        <div id="floatable" class="floatable" ref="box"  
-          :style="{ width : boxWidth + 'px', 
-                    height : boxHeight + 'px',
-                    left: boxLeft + 'px', 
-                    top: boxTop + 'px',
-                    opacity: boxOpacity,
-                    zIndex: zIndex
-                }"
-          :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
-          @transitionend    ="animateWindowMinMax = false"    
-          @transitioncancel ="animateWindowMinMax = false"   
-          @animationend     ="animateSwashOut = false"
-          @animationcance   ="animateSwashOut = false"          
-        >
-            <div id="title-bar" class="title-bar">
+            <div id="floatable" class="floatable" ref="box"  
+            :style="{ width : boxWidth + 'px', 
+                        height : boxHeight + 'px',
+                        left: boxLeft + 'px', 
+                        top: boxTop + 'px',
+                        opacity: boxOpacity,
+                        zIndex: zIndex
+                    }"
+            :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
+            @transitionend    ="animateWindowMinMax = false"    
+            @transitioncancel ="animateWindowMinMax = false"   
+            @animationend     ="animateSwashOut = false"
+            @animationcance   ="animateSwashOut = false"          
+            >
+                <div id="title-bar" class="title-bar">
 
-                <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()' @close='closeWindow()'/>
+                    <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()' @close='closeWindow()'/>
 
-                <div class="tab-space" id = "tab-space"  
-                @mousedown="dragMouseDown"
-                @dblclick="maxWindow()">
-                        <div class="box-title"><p> {{props.id}}</p></div>
+                    <div class="tab-space" id = "tab-space"  
+                    @mousedown.left="dragMouseDown"
+                    @dblclick.left="maxWindow()">
+                            <div class="box-title"><p> {{props.id}}</p></div>
 
+                    </div>
+                    
                 </div>
-                
-            </div>
-            
-            <div id = "main-window" class="window">
-                <div class ="content">
-                    <!-- <p>
-                        {{boxHeightCustom}} {{boxWidthCustom}}
-                        <br>
-                        {{props.title}}
-                        <br>
-                        {{windowState}}
+                <smooth-scrollbar>
+                <div id = "main-window" class="window">
+                    <div class ="content">
+                        <!-- <p>
+                            {{boxHeightCustom}} {{boxWidthCustom}}
+                            <br>
+                            {{props.title}}
+                            <br>
+                            {{windowState}}
 
-                        <br>{{dockStyle}}<br>
+                            <br>{{dockStyle}}<br>
 
 
-                        Systems theory says that a system can have properties that none of its underlying components have and could not have been predicted based on the parts. (An emergent property). 
-                        Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
-                        It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
-                    </p> -->
-                    <Skills v-if="props.id == 'skills'" />
-                    <Projects v-if="props.id == 'projects'"/>
-                    <Who v-if="props.id == 'who'"/>
-                    <Contact v-if="props.id == 'contact'"/>
+                            Systems theory says that a system can have properties that none of its underlying components have and could not have been predicted based on the parts. (An emergent property). 
+                            Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
+                            It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
+                        </p> -->
 
+
+                        <Skills v-if="props.id == 'skills'" />
+                        <Projects v-if="props.id == 'projects'"/>
+                        <Who v-if="props.id == 'who'"/>
+                        <Contact v-if="props.id == 'contact'"/>
+                    </div>
                 </div>
+                </smooth-scrollbar>
 
-            </div>
-        </div> 
+            </div> 
     </div>
 </template>
 
@@ -59,14 +61,23 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
 import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
-import Projects from './Projects'
-import Skills from './Skills'
 import Who from './Who'
-import Contact from './Contact'
 import {isSmartPhone} from '../assets/scripts'
+import {defineAsyncComponent} from 'vue'
+import Loading from './Loading'
+
+const Projects = defineAsyncComponent(() => import('./Projects'))
+const Skills = defineAsyncComponent(() => import('./Skills'))
+const Contact = defineAsyncComponent(() => import('./Contact'))
 
 export default {
-    components: {ActionButtons,Projects,Skills,Who,Contact},
+    components: {   ActionButtons,
+                    Projects,
+                    Skills,
+                    Who,
+                    Contact,
+                    Loading
+                },
     props: ['title','id'],
     setup(props){
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
@@ -235,11 +246,13 @@ export default {
             setWindowState(props.id,'minimized')
             animateWindowMinMax.value = true
             
-            // boxWidthCustom.value      = parseInt(box.value.style.width)
-            // boxHeightCustom.value     = parseInt(box.value.style.height)
-            // boxTopCustom.value        = parseInt(box.value.style.top) 
-            // boxLeftCustom.value       = parseInt(box.value.style.left)  
-
+            if(!windowState.value.maximized && !windowState.value.stuckToSide){
+                boxWidthCustom.value      = parseInt(box.value.style.width)
+                boxHeightCustom.value     = parseInt(box.value.style.height)
+                boxTopCustom.value        = parseInt(box.value.style.top) 
+                boxLeftCustom.value       = parseInt(box.value.style.left)  
+            }
+ 
             boxWidth.value  = dockStyle.value.width
             boxHeight.value = dockStyle.value.height
             boxTop.value    = dockStyle.value.top
@@ -386,7 +399,8 @@ export default {
             setMaxIndex,
             zIndex,
             boxWidthCustom,
-            boxHeightCustom
+            boxHeightCustom,
+
         }
     }
 }
