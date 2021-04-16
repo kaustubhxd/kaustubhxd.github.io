@@ -6,3 +6,4 @@ import VueTextareaAutogrowDirective from 'vue-textarea-autogrow-directive'
 import SmoothScrollbar from 'vue-smooth-scrollbar'
 
 createApp(App).use(router).use(VBodyScrollLock).use(VueTextareaAutogrowDirective).use(SmoothScrollbar).mount('#app')
+document.title = `Kaustubh's Desktop` 

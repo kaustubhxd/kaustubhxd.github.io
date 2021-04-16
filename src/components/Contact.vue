@@ -10,8 +10,10 @@
           type="text" id="email" name="email" class="required" placeholder="example@email.com*" required>
         <input v-model="contactInfo.phone" @input="validateInput('phone','number')" type="text" id="phone" name="phone" class="required" placeholder="Phone Number" required>
         <textarea v-model="contactInfo.comments" v-autogrow id="comments" name="comments" rows="5" cols="30" placeholder="Say Hello!"></textarea>
+        <div class='submit-container'>
            <div id='helper'> <p>{{helperHint}}</p> </div>
-      <input type="submit" name="submit" id="submit" value="Submit">
+           <div> <input type="submit" name="submit" id="submit" value="Submit"></div>
+        </div>
     </form>
     <div id="#results"></div>
 </template>
@@ -20,6 +22,7 @@
 // https://codepen.io/alecherryy/pen/LQXEXG
 import { ref } from 'vue'
 import {fireDB} from '../scripts/firebase'
+import {DISCORD_WEBHOOK_LINK} from '../store/keys'
 
 export default {
     setup(){
@@ -40,6 +43,81 @@ export default {
        comments : '',
       })
 
+      function clearForm(){
+        contactInfo.value.firstName = contactInfo.value.lastName = contactInfo.value.email 
+          = contactInfo.value.phone = contactInfo.value.comments = ''
+      }
+
+
+      function getAdditionalDetails(){
+        let addressLink = `https://whatismyipaddress.com/ip/`
+
+        async function text(url) {
+          return fetch(url).then(res => res.text());
+        }
+
+        text('https://www.cloudflare.com/cdn-cgi/trace').then(data => {
+          // console.log(data)
+          // let ipRegex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/
+          // let ip = data.match(ipRegex)[0];
+          let dataObj = `{"` + data.trim().replace(/\n/g, `",\n"`).replace(/=/g, `":"`) + `"}`
+          // console.log(dataObj)
+          dataObj = JSON.parse(dataObj)
+          // console.log(dataObj)
+          let ip = dataObj.ip
+          // console.log(dataObj.ip);
+          addressLink = `${addressLink}${ip}&${data.replace(/\n/g, "&")}`.replace(/\s/g, '_')
+          // console.log(addressLink)
+          sendToDiscord(addressLink)
+        }).catch((e) => {
+          console.log('ERROR: could not get additional info')
+          console.log(e)
+          addressLink = ''
+          sendToDiscord(addressLink)
+        });
+      }
+
+      function sendToDiscord(addressLink){
+        // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
+        let fullname = contactInfo.value.lastName != '' ? `${contactInfo.value.lastName}, ` : ``
+        fullname = fullname + contactInfo.value.firstName 
+        fetch(
+          DISCORD_WEBHOOK_LINK,
+          {
+            method: 'post', headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              username: 'ash',
+              avatar_url: 'https://cdn.discordapp.com/attachments/832596849402839070/832596902074908672/ash_the_mailman.png',
+              embeds: [
+                { color: 171159, author: { name: fullname, url: addressLink}, title: 'Message',
+                  thumbnail: { url: 'https://cdn.discordapp.com/attachments/832596849402839070/832606302042980432/ashs_cat_.png'},
+                  description: contactInfo.value.comments,
+                  fields: [
+                    { name: 'Email', value: contactInfo.value.email},
+                    { name: 'Phone', value: contactInfo.value.phone, },
+            ],},],}),}
+          ).then(status => {
+            console.log('data sent to discord')
+            helperHint.value = `Submitted! I'll get back to you ASAP`
+            // console.log(status)
+            clearForm()
+          }).
+          catch((e) => {
+            console.log(`ERROR: could not send data to discord`)
+            console.log(e)
+          });
+      }
+
+      function sendToFirebase(){
+        fireCollection.add(contactInfo.value).then( (status) => {
+          console.log(status)
+          helperHint.value = `Submitted! I'll get back to you ASAP`
+        }).catch((error) => {
+            console.error("Error adding document: ", error);
+            helperHint.value = `Error uploading data. Please try again later.`
+        });
+      }
+
 
       function submitContactInfo(){
         if (invalidEmail.value){
@@ -54,13 +132,7 @@ export default {
         }
         else{
             console.log('submit')
-            fireCollection.add(contactInfo.value).then( (status) => {
-              console.log(status)
-              helperHint.value = `Submitted! I'll get back to you ASAP`
-            }).catch((error) => {
-                console.error("Error adding document: ", error);
-                helperHint.value = `Error uploading data. Please try again later.`
-            });
+            getAdditionalDetails()
         }
       }
 
@@ -101,10 +173,6 @@ export default {
 
 <style scoped lang='scss'>
 
-p{
-  text-align: center;
-}
-
 body {
   width: 100%;
   height: 100%;
@@ -114,7 +182,6 @@ body {
   padding: 0;
   padding: 6em 0;
 }
-
 
 form {
     margin: 0 auto;
@@ -224,7 +291,11 @@ label.error {
   text-align: right;
   font-size: 22px;
   color: #ec7bb0;
-  height: 22px;
+  height: auto;
+}
+
+#comments{
+  overflow-y:scroll;
 }
 
 </style>

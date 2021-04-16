@@ -14,8 +14,7 @@
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vue-smooth-scrollbar": "^0.1.2",
-    "vue-textarea-autogrow-directive": "^0.1.7",
-    "vuefire": "^2.2.5"
+    "vue-textarea-autogrow-directive": "^0.1.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -26,3 +25,4 @@
     "sass-loader": "^8.0.2"
   }
 }
+
