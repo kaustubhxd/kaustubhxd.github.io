@@ -100,7 +100,6 @@ export default {
             console.log('data sent to discord')
             helperHint.value = `Submitted! I'll get back to you ASAP`
             // console.log(status)
-            clearForm()
           }).
           catch((e) => {
             console.log(`ERROR: could not send data to discord`)
@@ -110,11 +109,14 @@ export default {
 
       function sendToFirebase(){
         fireCollection.add(contactInfo.value).then( (status) => {
-          console.log(status)
+          // console.log(status)
+          console.log('data sent to firestore')
           helperHint.value = `Submitted! I'll get back to you ASAP`
+          clearForm()
         }).catch((error) => {
             console.error("Error adding document: ", error);
             helperHint.value = `Error uploading data. Please try again later.`
+            clearForm()
         });
       }
 
@@ -133,6 +135,7 @@ export default {
         else{
             console.log('submit')
             getAdditionalDetails()
+            sendToFirebase()
         }
       }
 
