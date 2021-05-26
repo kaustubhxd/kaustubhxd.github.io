@@ -4,14 +4,14 @@ const projects = {
         title : 'Odia Natural TTS',
         thumbnail : 'odia_tts.jpg',
         content : `Working on a TTS engine for Odia Language(Orissa) using Google's Tacotron 2 algorithm.`,
-        link : 'http://www.ai4language.in/',
+        link : 'http://ai4language.kaustubh.app/',
         languages : ['Python','PyTorch','Svelte','ExpressJS']
     },
     'website' : {
         title : 'Portfolio Website',
         thumbnail : 'beta.jpg',
         content : `You're on it right now. I'm really proud of how the website turned out, and I'm glad you took the time to check it out!`,
-        link : 'https://kaustubh.app/beta',
+        link : 'https://kaustubh.app/',
         languages : ['VueJS','HTML','CSS','JavaScript']
     },
     'offlinetv' : {
