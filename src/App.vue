@@ -1,11 +1,15 @@
 
 <template>
-  <div v-for="(info,id) in activeWindows" :key="id"> 
-      <Floatable :title="info.title" :id='id'/>
+<!-- https://codepen.io/tn9nex/pen/aqvRbW -->
+  <Stars/>
+  <div class="god-container">
+    <div v-for="(info,id) in activeWindows" :key="id"> 
+        <Floatable :title="info.title" :id='id'/>
+    </div>
+    <AnimatedCursor v-if="!isSmartPhone()"/>
+    <Docker/>
+    <Ripple v-if="!isSmartPhone()"/>
   </div>
-  <AnimatedCursor v-if="!isSmartPhone()"/>
-  <Docker/>
-  <Ripple v-if="!isSmartPhone()"/>
 </template>
 
 <script>
@@ -16,9 +20,10 @@ import Ripple from './components/Ripple'
 import AnimatedCursor from './components/AnimatedCursor'
 import {windows} from './store/state'
 import {isSmartPhone} from '../src/assets/scripts'
+import Stars from './components/Stars'
 
 export default {
-  components: {Docker, Floatable,Ripple,AnimatedCursor},
+  components: {Docker, Floatable,Ripple,AnimatedCursor,Stars},
   setup(){
 
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -26,7 +31,7 @@ export default {
     // digs inside the dictionary 'windows' to find out which window has a state active == true, displays that
     var activeWindows = computed(() => Object.fromEntries(Object.entries(windows.value).filter(([k,v]) => v.active)))
     
-    document.body.style.backgroundImage =  `url(${require('@/assets/gifs/back.jpg')})`;
+    // document.body.style.backgroundImage =  `url(${require('@/assets/gifs/back.jpg')})`;
 
     // function randInt(min, max) {
     //   return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -60,7 +65,7 @@ export default {
 </script>
 
   
-<style>
+<style lang='scss'>
 *{
   cursor: none;
 }
@@ -75,4 +80,5 @@ html {
   height: 100%;
   overflow: hidden;
 }
+
 </style>

@@ -10,7 +10,7 @@
                             <h6 class="post-title">{{project.title}}</h6>
                             <p class="post-content">{{project.content}}</p>
                             <div class='post-lang'>
-                                <span v-for="lang in project.languages" :key='lang'>
+                                <span v-for="lang in project.languages" :key='lang' v-tooltip="lang" >
                                     <img class="lang-icon" :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')"/>
                                 </span>
                             </div>
@@ -23,9 +23,18 @@
 </template>
 
 <script>
+import { ref,onMounted } from 'vue'
+import {windows} from '../store/state'
+
 import {projects,skills} from '../assets/content'
 export default {
     setup(){
+
+        const projectsState = ref(windows.value['projects'])
+        onMounted(() =>{
+            projectsState.value.loaded = true;
+        })
+
 
         return {
             projects,

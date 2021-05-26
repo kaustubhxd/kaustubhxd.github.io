@@ -21,6 +21,7 @@ const ZIndexMax = ref(10);
 const windows = ref({
     'skills' : {
         title       :   'Skills',
+        loaded      :   false,
         minimized   :   false,
         active      :   false,
         stuckToSide :   false,
@@ -35,6 +36,7 @@ const windows = ref({
     },
     'who' : {
         title       :   'Who?',
+        loaded      :   true,
         minimized   :   false,
         active      :   true,
         position    :   [0,0],
@@ -51,6 +53,7 @@ const windows = ref({
     },    
     'projects' : {
         title       :   'Projects',
+        loaded      :   false,
         minimized   :   false,
         active      :   false,
         position    :   [0,0],
@@ -66,6 +69,7 @@ const windows = ref({
     },
     'contact' : {
         title       :   'Contact',
+        loaded      :   false,
         minimized   :   false,
         active      :   false,
         position    :   [0,0],

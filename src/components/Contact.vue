@@ -20,12 +20,20 @@
 
 <script>
 // https://codepen.io/alecherryy/pen/LQXEXG
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {fireDB} from '../scripts/firebase'
 import {DISCORD_WEBHOOK_LINK} from '../store/keys'
+import {windows} from '../store/state'
+
 
 export default {
     setup(){
+
+      const contactState = ref(windows.value['contact'])
+      onMounted(() =>{
+          contactState.value.loaded = true;
+      })
+
 
       // const docPath = 'contacts/AUPM1sdOVilTiwxq5UCW'
       const fireCollection = fireDB.collection('contacts')

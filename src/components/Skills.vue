@@ -1,25 +1,23 @@
 <template>
     <div class="skills-wrapper">
         <div class="skill" v-for="(icon,skill) in skills" :key='skill'>
-            <img class="skill-icon" :src="require('../assets/icons/skills/' + icon)">
+            <img class="skill-icon" :src="require('../assets/icons/skills/' + icon)" >
             <div class="skill-name">{{skill}}</div>
         </div>
     </div>
 </template>
 
 <script>
-import { onBeforeMount, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import {skills} from '../assets/content'
+import {windows} from '../store/state'
+
 export default {
     setup(){
 
-        onBeforeMount(() => {
-            {
-            console.log('before mount')
-        }
-        })
+        const skillState = ref(windows.value['skills'])
         onMounted(() =>{
-            console.log('mounted')
+            skillState.value.loaded = true;
         })
 
         return {

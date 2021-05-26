@@ -12,7 +12,7 @@
             @transitionend    ="animateWindowMinMax = false"    
             @transitioncancel ="animateWindowMinMax = false"   
             @animationend     ="animateSwashOut = false"
-            @animationcance   ="animateSwashOut = false"          
+            @animationcancel   ="animateSwashOut = false"          
             >
                 <div id="title-bar" class="title-bar">
 
@@ -21,6 +21,7 @@
                     <div class="tab-space" id = "tab-space"  
                     @mousedown.left="dragMouseDown"
                     @dblclick.left="maxWindow()">
+                            <img class="spinner" v-if="!windowState.loaded" :src="require('../assets/gifs/' + 'spinner.png')">
                             <div class="box-title"><p> {{props.id}}</p></div>
 
                     </div>
@@ -83,7 +84,6 @@ export default {
         // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
 
         console.log(props.id)
-
         const windowState = ref(windows.value[props.id])
 
         const boxWidth = ref(window.innerWidth  * (3/8))
@@ -441,17 +441,31 @@ export default {
             z-index: 10;
             overflow            :   hidden;
 
-        }
+            .spinner{
+                width: 100%;
+                max-width: 20px;
+                top: 50%;
+                // transform: translate( -50%, -50% ); /* center */
+                -webkit-animation: spinLoader 600ms steps(12, end) infinite;
+                animation: spinLoader 600ms steps(12, end) infinite;
+                filter: invert(1);
+                float : right;
+                margin-top : 12px;
+            }
 
-        .box-title{
-            color       : black;
-            text-align  : end;
-            
-            p{
-                margin:0;
-                font-size: 18px;  
+            .box-title{
+                color       : black;
+                text-align  : end;
+                width: max-content;
+                float : right;
+                
+                p{
+                    margin:0;
+                    font-size: 18px;  
+                }
             }
         }
+
 
     }
 }
@@ -494,7 +508,6 @@ export default {
     text-align      :   start;
     overflow      :   hidden;
     scrollbar-width :   thin;
-
     min-width       :   64px;
     min-height      :   64px;  
 
@@ -519,7 +532,7 @@ export default {
 
 .swashOut {
   animation-name: swashOut;
-  animation-duration: 0.7s;
+  animation-duration: 0.5s;
 }
 @keyframes swashOut {
   0% {
@@ -545,6 +558,11 @@ export default {
     -webkit-transform: scale(0, 0);
     transform: scale(0, 0);
   }
+}
+
+@keyframes spinLoader {
+  from { transform: translate( -50%, -50% ) rotate(0turn); }
+  to { transform: translate( -50%, -50% ) rotate(1turn); }
 }
 
 
