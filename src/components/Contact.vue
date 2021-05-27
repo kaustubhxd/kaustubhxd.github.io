@@ -89,6 +89,8 @@ export default {
         // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
         let fullname = contactInfo.value.lastName != '' ? `${contactInfo.value.lastName}, ` : ``
         fullname = fullname + contactInfo.value.firstName 
+
+
         fetch(
           DISCORD_WEBHOOK_LINK,
           {

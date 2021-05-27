@@ -26,3 +26,4 @@ dist.zip
 src/store/keys.js
 yarn.lock
 package-lock.json
+.env

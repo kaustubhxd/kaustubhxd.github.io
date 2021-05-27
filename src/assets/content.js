@@ -52,7 +52,7 @@ const projects = {
     'skribbl_plus' : {
         title : 'Skribbl Plus',
         thumbnail : 'skribbl.jpg',
-        content : 'Download Skribbl drawings with a single click. The days of janky screenshots is over. Made for my friends.',
+        content : 'Download Skribbl drawings with a single click. The days of janky screenshots is over.',
         link : 'https://addons.mozilla.org/en-US/firefox/addon/skribbl-plus-save-drawings/',
         languages: ['JavaScript']
     },
@@ -63,7 +63,13 @@ const projects = {
         link : 'https://addons.mozilla.org/en-US/firefox/addon/pop-culture-dictionary/',
         languages: ['JavaScript']
     },
-
+    'portfolio_v1' : {
+        title : 'Old Portfolio Website',
+        thumbnail : 'portfolio_v1.jpg',
+        content : `Old archived version of the portfolio you're currently on.`,
+        link : 'https://kaustubh.app/archives/portfolio_v1',
+        languages: ['JavaScript','HTML','CSS',]
+    },
 }
 
 const skills = {
