@@ -5,15 +5,15 @@
         @mouseup="dotsHovered()">
             <div id="red-dot"       class = "dot" :style="{ 'background-image' : closeDot  }" 
                 @mousedown="dotsClicked('close')" 
-                @mouseup="emit('close')"></div>
+                @click="emit('close')"></div>
 
             <div id="yellow-dot"    class = "dot" :style="{ 'background-image' : minDot  }"   
                 @mousedown="dotsClicked('min')"
-                @mouseup="setWindowState(props.id,'minimized')" ></div>
+                @click="setWindowState(props.id,'minimized')" ></div>
 
             <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   
                 @mousedown="dotsClicked('max')"   
-                @mouseup="emit('maximize')"></div>
+                @click="emit('maximize')"></div>
     </div>
 </template>
 
@@ -21,8 +21,7 @@
 import { ref } from 'vue'
 import {K,X} from '../assets/constants'
 import {setWindowState} from '../store/state'
-import {isSmartPhone} from '../assets/scripts'
-
+import {isSmartPhone} from '../assets/scripts'  
 
 export default {
     props: ['name','id'],

@@ -12,7 +12,7 @@
             @transitionend    ="animateWindowMinMax = false"    
             @transitioncancel ="animateWindowMinMax = false"   
             @animationend     ="animateSwashOut = false"
-            @animationcancel   ="animateSwashOut = false"          
+            @animationcancel   ="animateSwashOut = false"
             >
                 <div id="title-bar" class="title-bar">
 
