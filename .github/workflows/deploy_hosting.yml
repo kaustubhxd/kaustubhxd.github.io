@@ -1,4 +1,4 @@
-on: push
+on: release
 name: 🚀 Deploy website when pushed
 jobs:
   web-deploy:
