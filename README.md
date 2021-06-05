@@ -1,5 +1,9 @@
 # Kaustubh's Desktop
 
+### See live: https://itskaustubh.github.io/personal_website/
+
+Also Deployed on https://www.kaustubh.app
+
 ## Project setup
 ```
 yarn install
