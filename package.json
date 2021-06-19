@@ -13,6 +13,7 @@
     "v-body-scroll-lock": "^1.1.3",
     "v-tooltip": "^2.1.3",
     "vue": "^3.0.0",
+    "vue-image-previewer": "^0.1.4",
     "vue-router": "^4.0.0-0",
     "vue-smooth-scrollbar": "^0.1.2",
     "vue-textarea-autogrow-directive": "^0.1.7"

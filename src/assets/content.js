@@ -12,14 +12,28 @@ const projects = {
         thumbnail : 'beta.jpg',
         content : `You're on it right now. I'm really proud of how the website turned out, and I'm glad you took the time to check it out!`,
         link : 'https://kaustubh.app/',
-        languages : ['VueJS','HTML','CSS','JavaScript']
+        languages : ['VueJS','Firebase']
+    },
+    'neuboard' : {
+        title : 'Neuboard',
+        thumbnail : 'neuboard.jpg',
+        content : `A public message board to post messages, images and GIFs with a custom avatar maker.`,
+        link : 'https://neuboard.kaustubh.app',
+        languages : ['React','Firebase']
+    },
+    'basespace' : {
+        title : 'BaseSpace',
+        thumbnail : 'basespace.jpg',
+        content : `A website to help you browse through a list of warehouses to lease by applying different search filters.`,
+        link : 'https://neuboard.kaustubh.app',
+        languages : ['VueJS']
     },
     'offlinetv' : {
         title : 'OfflineTV Community',
         thumbnail : 'offlinetv.jpg',
         content : `A website dedicated to forming an online community for fans of the online streaming collective OfflineTV`,
-        link : 'https://offlinetv.kaustubh.app',
-        languages : ['VueJS','HTML','CSS','JavaScript']  
+        link : 'https://basespace.kaustubh.app',
+        languages : ['VueJS']  
     },
     'flutter_netflix' : {
         title : 'Netflix Responsive App UI',
@@ -77,11 +91,13 @@ const skills = {
     'C++' : 'c++.svg',
     'Java'  :   'java.svg',
     'JavaScript' : 'javascript.svg',
+    'React' : 'react.svg',
     'VueJS' : 'vuejs.svg',
     'Svelte' : 'svelte.svg',
     'ExpressJS' : 'expressjs.svg',
     'Flutter' : 'flutter.svg',
     'HTML/CSS/SCSS' : 'html.svg',
+    'Firebase' : 'firebase.svg'
 }
 
 export {
