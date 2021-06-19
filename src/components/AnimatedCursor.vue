@@ -125,7 +125,7 @@ export default {
     will-change: transform;
     mix-blend-mode: difference;
     transition: transform .05s linear;
-    z-index: 99;
+    z-index: 2020;
   }
   .cursor {
     top: -4px;
@@ -140,7 +140,7 @@ export default {
     transition: opacity .15s ease-in-out;
     mix-blend-mode: difference;
     pointer-events: none;
-    z-index: 99;
+    z-index: 2020;
   }
   @media (hover: hover) and (pointer: fine) {
     .cursor-circle {

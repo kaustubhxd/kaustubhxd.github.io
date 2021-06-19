@@ -3,10 +3,14 @@
         <div class="main-container">
             <h3 style="text-align: center">Some of my recent exploits</h3>
             <div class="post-wrapper">
-                
                     <div class="post" v-for='project in projects' :key='project'>
-                        <img class="thumbnail" :src="require('../assets/images/' + project.thumbnail)">
+                        <!-- <ExpandableImage :src="require('../assets/images/' + project.thumbnail)" /> -->
+                        <div class="images" v-viewer.static="imageViewerOpts">
+                            <img class="thumbnail" :src="require('../assets/images/' + project.thumbnail)">
+                        </div>
+                        <!-- <expandable-image :src="require('../assets/images/' + project.thumbnail)"/> -->
                         <div class="post-preview">
+                            
                             <h6 class="post-title">{{project.title}}</h6>
                             <p class="post-content">{{project.content}}</p>
                             <div class='post-lang'>
@@ -25,8 +29,8 @@
 <script>
 import { ref,onMounted } from 'vue'
 import {windows} from '../store/state'
-
 import {projects,skills} from '../assets/content'
+
 export default {
     setup(){
 
@@ -35,10 +39,15 @@ export default {
             projectsState.value.loaded = true;
         })
 
+        const imageViewerOpts =  { "button": true, "navbar": false, "title": false, "toolbar": false, 
+                                    "tooltip": false, "movable": true, "zoomable": true, "rotatable": false, "scalable": true, 
+                                    "transition": true, "keyboard": false} 
+
 
         return {
             projects,
-            skills
+            skills,
+            imageViewerOpts
         }
     }
 }

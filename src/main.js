@@ -6,6 +6,8 @@ import VueTextareaAutogrowDirective from 'vue-textarea-autogrow-directive'
 import SmoothScrollbar from 'vue-smooth-scrollbar'
 import tooltip from "./directives/tooltip.js";
 import "@/directives/tooltip.css";
+import 'viewerjs/dist/viewer.css'
+import VueViewer from 'v-viewer'
 
-createApp(App).use(router).use(VBodyScrollLock).use(VueTextareaAutogrowDirective).directive('tooltip',tooltip).use(SmoothScrollbar).mount('#app')
+createApp(App).use(router).use(VBodyScrollLock).use(VueTextareaAutogrowDirective).use(VueViewer).directive('tooltip',tooltip).use(SmoothScrollbar).mount('#app')
 document.title = `Kaustubh's Desktop` 
