@@ -1,7 +1,4 @@
 const DISCORD_WEBHOOK_LINK = process.env.VUE_APP_DISCORD_WEBHOOK_LINK
-
-console.log(process.env)
-
 const FIREBASE_CONFIG_OBJECT = JSON.parse(process.env.VUE_APP_FIREBASE_CONFIG_OBJECT)
 
 export {
