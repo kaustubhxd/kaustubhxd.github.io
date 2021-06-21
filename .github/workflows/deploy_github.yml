@@ -11,6 +11,10 @@ jobs:
         run: |
           yarn install
           yarn build
+        env:
+          CI: true
+          VUE_APP_DISCORD_WEBHOOK_LINK: ${{ secrets.VUE_APP_DISCORD_WEBHOOK_LINK }}
+          VUE_APP_FIREBASE_CONFIG_OBJECT: ${{ secrets.VUE_APP_FIREBASE_CONFIG_OBJECT }}
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
