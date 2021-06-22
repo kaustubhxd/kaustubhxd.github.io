@@ -31,7 +31,7 @@ export default {
         // ResizeObserver (in onMounted) observes the change in dock shape
         // see how window minimize transition works to get why we do it here
         function reportResize() {
-            console.log('dock resize triggered')
+            // console.log('dock resize triggered')
             if(dockElement.value){
                 dockStyle.value.width   = dockElement.value.offsetWidth
                 dockStyle.value.height  = dockElement.value.offsetHeight

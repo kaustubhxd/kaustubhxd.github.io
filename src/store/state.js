@@ -16,7 +16,6 @@ const ripple = ref({
     left    : 100,
 })
 
-const ZIndexMax = ref(10);
 
 const windows = ref({
     'skills' : {
@@ -85,7 +84,23 @@ const windows = ref({
     },
 })
 
+const ZIndexMax = (Object.keys(windows.value).length);
+
+var windowIndices = (Object.keys(windows.value).map(window => window))
+
+function setWindowIndexMax(window){
+    // console.log(`set max index: ${window}`)
+    windowIndices.splice(windowIndices.indexOf(window),1)
+    windowIndices.splice(ZIndexMax, 0 , window)
+    for(const xwindow in windows.value){
+        windows.value[xwindow].zIndex = windowIndices.indexOf(xwindow) + 1
+    }
+}
+
+// setWindowIndexMax('who')
+
 function setWindowState(window,state){
+    console.log(state)
     if (state == 'maximized'){
         windows.value[window].maximized = true
         windows.value[window].stuckToSide = false
@@ -104,10 +119,10 @@ function setWindowState(window,state){
         windows.value[window].zIndex = 1
         windows.value[window].minimized = true
     }else if(state == 'open' && !windows.value[window].active){
-        windows.value[window].zIndex = ZIndexMax.value + 1
-        ZIndexMax.value += 1
+        setWindowIndexMax(window)
         windows.value[window].active = true
     }else if(state == 'restore'){
+        setWindowIndexMax(window)
         windows.value[window].minimized = false
     }
 }
@@ -125,7 +140,7 @@ export {
     windows,
     setWindowState,
     dockStyle,
-    ZIndexMax,
-    setLocalStorage
+    setLocalStorage,
+    setWindowIndexMax,
 }
 

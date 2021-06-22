@@ -1,12 +1,12 @@
 <template>
     <div >
-            <div id="floatable" class="floatable" ref="box"  
+            <div :id=" `floatable-${props.id}`" class="floatable" ref="box"  
             :style="{ width : boxWidth + 'px', 
                         height : boxHeight + 'px',
                         left: boxLeft + 'px', 
                         top: boxTop + 'px',
                         opacity: boxOpacity,
-                        zIndex: zIndex
+                        zIndex: windowState.zIndex
                     }"
             :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
             @transitionend    ="animateWindowMinMax = false"    
@@ -15,7 +15,7 @@
             @animationcancel   ="animateSwashOut = false"
             >
                 <div id="title-bar" class="title-bar">
-
+                        
                     <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()' @close='closeWindow()'/>
 
                     <div class="tab-space" id = "tab-space"  
@@ -30,6 +30,7 @@
                 <smooth-scrollbar>
                 <div id = "main-window" class="window">
                     <div class ="content">
+
                         <!-- <p>
                             {{boxHeightCustom}} {{boxWidthCustom}}
                             <br>
@@ -44,6 +45,7 @@
                             Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
                             It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
                         </p> -->
+                            <!-- {{windowState.zIndex}}  -->
 
 
                         <Skills v-if="props.id == 'skills'" />
@@ -61,7 +63,7 @@
 <script>
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import ActionButtons from '../components/ActionButtons'
-import {ripple,windows,setWindowState,dockStyle,ZIndexMax} from '../store/state'
+import {ripple,windows,setWindowState,dockStyle,setWindowIndexMax} from '../store/state'
 import Who from './Who'
 import {isSmartPhone} from '../assets/scripts'
 import {defineAsyncComponent} from 'vue'
@@ -126,7 +128,9 @@ export default {
 
             // set the z-index of window as max so the clicked windows pops on top 
             // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
-            setMaxIndex()
+            // setMaxIndex()
+            setWindowIndexMax(props.id)
+            
 
             // get the mouse cursor position at startup:
             positions.value.clientX = event.clientX
@@ -337,7 +341,7 @@ export default {
             // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
             // without this, the window ignores manual resize shape and reverts back on component update
             function reportResize(){
-                console.log('---------------------- window resize')
+                // console.log('---------------------- window resize')
                 if(box.value){
                     if (boxWidth.value != parseInt(box.value.style.width) || boxHeight.value != parseInt(box.value.style.height)){
                             boxWidth.value      = parseInt(box.value.style.width)
@@ -362,13 +366,6 @@ export default {
             box.value.onanimationend = () => {
                 setWindowState(props.id,'killed')
             }
-        }
-
-        const zIndex = ref(windowState.value.zIndex)
-
-        function setMaxIndex(){
-            zIndex.value = ZIndexMax.value + 1
-            ZIndexMax.value += 1
         }
 
         onBeforeUnmount(() => {
@@ -396,8 +393,6 @@ export default {
             boxOpacity,
             closeWindow,
             animateSwashOut,
-            setMaxIndex,
-            zIndex,
             boxWidthCustom,
             boxHeightCustom,
 
@@ -411,7 +406,7 @@ export default {
 
 .floatable {
     position            :   absolute;
-    z-index             :   9;
+    // z-index             :   9;
     background-color    : #ffffff;
     border              :   1px solid #d3d3d3;
     border-radius       :   5px 5px 5px 5px;

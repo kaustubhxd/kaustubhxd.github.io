@@ -67,11 +67,11 @@ export default {
   
 <style lang='scss'>
 *{
-  cursor: none;
+  // cursor: none;
 }
 
 imput{
-  cursor:none;
+  // cursor:none;
 }
 
 html {
