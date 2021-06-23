@@ -18,7 +18,9 @@
                                     <img class="lang-icon" :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')"/>
                                 </span>
                             </div>
-                            <p><a class="post-link" target="_blank" :href="project.link">Check Out</a></p>
+                            <div v-if="project.link != ''"> 
+                                <p><a class="post-link" target="_blank" :href="project.link">Check Out</a></p>
+                            </div>
                         </div>
                     </div>
             </div>
