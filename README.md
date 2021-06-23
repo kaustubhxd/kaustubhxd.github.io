@@ -1,7 +1,6 @@
 # Kaustubh's Desktop
 
-### See live: https://itskaustubh.github.io/personal_website/
-
+https://itskaustubh.github.io/
 Also Deployed on https://www.kaustubh.app
 
 ## Project setup
