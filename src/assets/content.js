@@ -25,7 +25,6 @@ const projects = ref({
         title : 'Neuboard',
         thumbnail : 'neuboard.jpg',
         content : `A public message board to post messages, images and GIFs with a custom avatar maker.`,
-        klink : 'https://neuboard.kaustubh.app',
         gitlink : 'https://itskaustubh.github.io/neuboard/',
         link : '',
         languages : ['React','Firebase'],
