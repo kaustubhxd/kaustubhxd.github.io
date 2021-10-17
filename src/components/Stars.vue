@@ -1,13 +1,21 @@
 <template>
     <div id="stars-container">
-        <div id='stars'></div>
-        <div id='stars2'></div>
-        <div id='stars3'></div>
+        <div v-if='enableAnimations'>
+          <div id='stars'></div>
+          <div id='stars2'></div>
+          <div id='stars3'></div>
+        </div>
   </div>
 </template>
 
 <script>
+import {enableAnimations} from '../store/state'
 export default {
+  setup(){
+    return {
+      enableAnimations
+    }
+  }
 
 }
 </script>

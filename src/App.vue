@@ -6,7 +6,7 @@
     <div v-for="(info,id) in activeWindows" :key="id"> 
         <Floatable :title="info.title" :id='id'/>
     </div>
-    <AnimatedCursor v-if="!isSmartPhone()"/>
+    <AnimatedCursor v-if="!isSmartPhone() && enableAnimations"/>
     <Docker/>
     <Ripple v-if="!isSmartPhone()"/>
   </div>
@@ -18,7 +18,7 @@ import Docker from './components/Docker'
 import Floatable from './components/Floatable'
 import Ripple from './components/Ripple'
 import AnimatedCursor from './components/AnimatedCursor'
-import {windows} from './store/state'
+import {windows,enableAnimations} from './store/state'
 import {isSmartPhone} from '../src/assets/scripts'
 import Stars from './components/Stars'
 
@@ -55,8 +55,9 @@ export default {
 
       return {
     windows,
-    activeWindows ,
-    isSmartPhone
+    activeWindows,
+    isSmartPhone,
+    enableAnimations
   }
   }
 

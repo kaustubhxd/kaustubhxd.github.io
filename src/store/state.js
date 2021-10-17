@@ -16,6 +16,7 @@ const ripple = ref({
     left    : 100,
 })
 
+const enableAnimations = ref(false)
 
 const windows = ref({
     'skills' : {
@@ -26,6 +27,7 @@ const windows = ref({
         stuckToSide :   false,
         stuckWhere  :   'left',
         maximized   :   false,
+        isMaximizable : true,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),
@@ -37,12 +39,13 @@ const windows = ref({
         title       :   'Who?',
         loaded      :   true,
         minimized   :   false,
-        active      :   true,
+        active      :   false,
         position    :   [0,0],
         stuckToSide :   false,
         stuckWhere  :   'left',
 
         maximized   :   false,
+        isMaximizable : true,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),
@@ -59,6 +62,7 @@ const windows = ref({
         stuckToSide :   false,
         stuckWhere  :   'left',
         maximized   :   false,
+        isMaximizable : true,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),
@@ -75,9 +79,27 @@ const windows = ref({
         stuckToSide :   false,
         stuckWhere  :   'left',
         maximized   :   false,
+        isMaximizable : true,
         zIndex      :   1,
         width   :   window.innerWidth  * (3/8),
         height  :   window.innerHeight  * (8/13),
+        opacity :   1,
+        top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
+        left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
+    },   
+    'game' : {
+        title       :   'Flappy Bird',
+        loaded      :   true,
+        minimized   :   false,
+        active      :   true,
+        position    :   [0,0],
+        stuckToSide :   false,
+        stuckWhere  :   'left',
+        maximized   :   false,
+        isMaximizable : false,
+        zIndex      :   1,
+        width   :   320,
+        height  :   480 + 24,
         opacity :   1,
         top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
         left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
@@ -85,7 +107,6 @@ const windows = ref({
 })
 
 const ZIndexMax = (Object.keys(windows.value).length);
-
 var windowIndices = (Object.keys(windows.value).map(window => window))
 
 function setWindowIndexMax(window){
@@ -142,5 +163,6 @@ export {
     dockStyle,
     setLocalStorage,
     setWindowIndexMax,
+    enableAnimations
 }
 

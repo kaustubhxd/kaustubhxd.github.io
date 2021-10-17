@@ -11,7 +11,7 @@
                 @mousedown="dotsClicked('min')"
                 @click="setWindowState(props.id,'minimized')" ></div>
 
-            <div id="green-dot"     class = "dot" :style="{ 'background-image' : maxDot  }"   
+            <div id="green-dot" v-if="props.isMaximizable" class = "dot" :style="{ 'background-image' : maxDot  }"   
                 @mousedown="dotsClicked('max')"   
                 @click="emit('maximize')"></div>
     </div>
@@ -24,7 +24,7 @@ import {setWindowState} from '../store/state'
 import {isSmartPhone} from '../assets/scripts'  
 
 export default {
-    props: ['name','id'],
+    props: ['name','id','isMaximizable'],
     setup(props,{emit}){
 
         // preload images
@@ -58,7 +58,6 @@ export default {
             }
         }
 
-        
         function dotsClicked(dot){
             if      (dot === 'close')   {   closeDot.value  =   K.closeDotClicked }
             else if (dot === 'min')     {   minDot.value    =   K.minimizeDotClicked }

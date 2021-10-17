@@ -55,7 +55,7 @@ export default {
 
         const dockHovering = ref(false)
 
-        console.log(info.value.minimized)
+        // console.log(info.value.minimized)
 
         return {
             props,

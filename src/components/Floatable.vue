@@ -6,7 +6,8 @@
                         left: boxLeft + 'px', 
                         top: boxTop + 'px',
                         opacity: boxOpacity,
-                        zIndex: windowState.zIndex
+                        zIndex: windowState.zIndex,
+                        resize: windowState.isMaximizable ? 'both' : 'none'
                     }"
             :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
             @transitionend    ="animateWindowMinMax = false"    
@@ -16,13 +17,13 @@
             >
                 <div id="title-bar" class="title-bar">
                         
-                    <ActionButtons :name='props.title' :id='props.id' @maximize='maxWindow()' @close='closeWindow()'/>
+                    <ActionButtons :name='props.title' :id='props.id' :isMaximizable='windowState.isMaximizable' @maximize='maxWindow()' @close='closeWindow()'/>
 
                     <div class="tab-space" id = "tab-space"  
                     @mousedown.left="dragMouseDown"
                     @dblclick.left="maxWindow()">
                             <img class="spinner" v-if="!windowState.loaded" :src="require('../assets/gifs/' + 'spinner.png')">
-                            <div class="box-title"><p> {{props.id}}</p></div>
+                            <div class="box-title"><p> {{props.title.toLowerCase()}}</p></div>
 
                     </div>
                     
@@ -48,10 +49,11 @@
                             <!-- {{windowState.zIndex}}  -->
 
 
-                        <Skills v-if="props.id == 'skills'" />
-                        <Projects v-if="props.id == 'projects'"/>
-                        <Who v-if="props.id == 'who'"/>
-                        <Contact v-if="props.id == 'contact'"/>
+                        <Skills v-if="props.id == 'skills' && windowState.active" />
+                        <Projects v-if="props.id == 'projects' && windowState.active"/>
+                        <Who v-if="props.id == 'who' && windowState.active"/>
+                        <Contact v-if="props.id == 'contact' && windowState.active"/>
+                        <FlappyBird v-if="props.id == 'game' && windowState.active"/>
                     </div>
                 </div>
                 </smooth-scrollbar>
@@ -72,6 +74,8 @@ import Loading from './Loading'
 const Projects = defineAsyncComponent(() => import('./Projects'))
 const Skills = defineAsyncComponent(() => import('./Skills'))
 const Contact = defineAsyncComponent(() => import('./Contact'))
+const FlappyBird = defineAsyncComponent(() => import('./FlappyBird'))
+
 
 export default {
     components: {   ActionButtons,
@@ -79,7 +83,8 @@ export default {
                     Skills,
                     Who,
                     Contact,
-                    Loading
+                    Loading,
+                    FlappyBird
                 },
     props: ['title','id'],
     setup(props){
@@ -88,8 +93,8 @@ export default {
         console.log(props.id)
         const windowState = ref(windows.value[props.id])
 
-        const boxWidth = ref(window.innerWidth  * (3/8))
-        const boxHeight = ref(window.innerHeight  * (8/13))
+        const boxWidth = ref(windowState.value.width)
+        const boxHeight = ref(windowState.value.height)
         const boxTop = ref(Math.floor(Math.random() * ((window.innerHeight - (boxHeight.value + 100)) - 100) + 100))
         const boxLeft = ref(Math.floor(Math.random() * ((window.innerWidth - (boxWidth.value + 100)) - 100) + 100))
         const boxOpacity = ref(1)
@@ -214,6 +219,10 @@ export default {
         }
 
         function maxWindow(){
+            if(!windowState.value.isMaximizable){
+                return;
+            }
+
             if(animateWindowMinMax.value == true)   animateWindowMinMax.value = false
             animateWindowMinMax.value = true
 
@@ -267,6 +276,10 @@ export default {
         }
 
         function stickToSide(side){
+            if(!windowState.value.isMaximizable){
+                return;
+            }
+
             if(!windowState.value.stuckToSide){
                 if(!windowState.value.maximized){
                     boxWidthCustom.value    = boxWidth.value
@@ -413,7 +426,6 @@ export default {
               
 
     overflow            :   hidden;
-    resize              :   both;
     min-width           :   64px;
     min-height          :   64px ;
     /* resize              :   both ;

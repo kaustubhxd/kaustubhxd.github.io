@@ -6,6 +6,8 @@
         <DockIcon name='Who?' id='who' icon="who.svg"/>
         <DockIcon name='Projects' id='projects' icon="projects.svg" />
         <DockIcon name='Say Hello' id='contact' icon="talk.svg" />
+        <DockIcon name='Flappy Bird' id='game' icon="talk.svg" />
+
     </ul>
 </div>
 </div> 
