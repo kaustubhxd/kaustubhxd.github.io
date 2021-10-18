@@ -11,12 +11,21 @@ const catSprite = new Image()
 const sprite2 = new Image()
 const sprite3 = new Image()
 const medals = new Image()
+const blueSky = new Image()
+const sea = new Image()
+const mount = new Image()
+const clouds = new Image()
 
 sprite.src = require('../assets/game/sprite.png')
 catSprite.src = require('../assets/game/cat.png')
 sprite2.src = require('../assets/game/sprite_2.png')
 sprite3.src = require('../assets/game/sprite_3.png')
 medals.src = require('../assets/game/medal.png')
+blueSky.src = require('../assets/game/sky.png')
+sea.src = require('../assets/game/sea.png')
+mount.src = require('../assets/game/mount.png')
+clouds.src = require('../assets/game/clouds.png')
+
 
 const sfx = {
     point : new Audio( require('../assets/game/audio/sfx_point.wav') ),
@@ -47,22 +56,62 @@ let cvs = {
 }
 
 const background = {
+    props : {
+        sea :    { x : 0, dx : 1 },
+        clouds : { x : 0, dx : 0.4 },
+        mount : { x : 0, dx : 0.2 },
+    },
     sX: 0,
     sY: 0,
     w: 275,
     h: 226,
     x: 0,
-    dx: 2,
+    dx: 1,
     y: cvs.height - 226,
-    draw: function(ctx){ 
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h)
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + (2*this.w), this.y, this.w, this.h)
+    draw: function(ctx){
+        
+        // sky
+        ctx.drawImage(blueSky, 0,0, blueSky.width, blueSky.height, 0, 0, cvs.width, cvs.height)
+
+        
+        // mountains
+        ctx.drawImage(mount, 0,0, mount.width, mount.height, this.props.mount.x, 0, mount.width, mount.height)
+        ctx.drawImage(mount, 0,0, mount.width, mount.height, this.props.mount.x + mount.width - 1 , 0, mount.width, mount.height)
+
+        ctx.fillStyle = '#8cb2e8'
+        ctx.fillRect(0,mount.height,cvs.width, 60)
+
+        //clouds
+        ctx.drawImage(clouds, 0,0, clouds.width, clouds.height, this.props.clouds.x, 160, clouds.width, clouds.height)
+        ctx.drawImage(clouds, 0,0, clouds.width, clouds.height, this.props.clouds.x + clouds.width - 1, 160, clouds.width, clouds.height)
+
+
+        
+        // sea
+        ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x, cvs.height - 170, sea.width, sea.height)
+        ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (sea.width), cvs.height - 170, sea.width, sea.height)
+        ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (2 * sea.width), cvs.height - 170, sea.width, sea.height)
+        ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (3 * sea.width), cvs.height - 170, sea.width, sea.height)
+
+
+
 
         // moving bg illusion
         if(state.value.current === possibleStates.gameStarted){
-            this.x = this.x <= -this.w ? 0 : this.x - this.dx
+            this.props.sea.x = this.props.sea.x <= - (sea.width) ? 0 : this.props.sea.x - this.props.sea.dx // sea
+            this.props.clouds.x = this.props.clouds.x <= - (clouds.width) ? 0 : this.props.clouds.x - this.props.clouds.dx // sea
+            this.props.mount.x = this.props.mount.x <= - (mount.width) ? 0 : this.props.mount.x - this.props.mount.dx // sea
         }
+        
+
+        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
+        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h)
+        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + (2*this.w), this.y, this.w, this.h)
+
+        // // moving bg illusion
+        // if(state.value.current === possibleStates.gameStarted){
+        //     this.x = this.x <= -this.w ? 0 : this.x - this.dx
+        // }
     },
     reset: function(){
         this.x = 0;
@@ -80,13 +129,17 @@ const foreground = {
     draw: function(ctx){ 
         ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x, this.y, this.w , this.h)
         ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + this.w, this.y, this.w, this.h)
-        // ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
+        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
 
         // moving fg illusion
         if(state.value.current === possibleStates.gameStarted){
             this.x = this.x <= -this.w ? 0 : this.x - this.dx
         }
+    },
+    reset: function() {
+        this.x = 0
     } 
+
 }
 
 const cat = {
@@ -125,7 +178,7 @@ const cat = {
             this.y += this.speed
 
             let catBottom = this.y + (this.h/2)
-            catBottom -= 7            // add + to make it look more natural
+            catBottom -= 7            //  to make it look more natural
 
             let groundPosition = cvs.height - foreground.h
 
@@ -167,7 +220,7 @@ const pipes = {
     },
     w: 52, h: 319,
     wB: 52, hB: 319, 
-    gap: 90,
+    gap: 95,
     maxYPos: -150,
     dx: 2,
 
@@ -285,6 +338,7 @@ const getReadyMessage = {
     y: cvs.height/2 - 152/2,
     draw: function(ctx){ 
         // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
+        if (state.value.current !== possibleStates.getReady) return;
         const catPos = { offY: 50, sH: 40 }
         Object.values(this.pos).forEach((p) =>{
             ctx.drawImage(sprite, this.sX, this.sY + p.offY, this.w, p.sH, 

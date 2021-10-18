@@ -17,8 +17,6 @@ export default {
 
         // console.log(sprite)
         const draw = (frames) => {
-            ctx.fillStyle = '#67bccd'
-            ctx.fillRect(0,0,cvs.width,cvs.height)
             bg.draw(ctx)
             cat.draw(ctx,frames)
             cat.update()
@@ -41,11 +39,12 @@ export default {
 
         let frames = 0
         const loop = () => {
-            draw(frames)
             frames += 1
+            draw(frames)
 
             // requestAnimationFrame(loop)
-            loopId = requestAnimationFrame(loop);  
+            loopId = requestAnimationFrame(loop); 
+             
         }
 
         const handleUserTap = (evt) => {
@@ -68,6 +67,7 @@ export default {
                     cat.reset()
                     pipes.reset()
                     bg.reset()
+                    fg.reset()
                     score.latestScore = 0
                     break;
 
@@ -119,7 +119,7 @@ export default {
 <style lang='scss' scoped>
 #mycanvas{
     display: block;
-    background: pink;
+    background: black;
     cursor: pointer;
 }
 
