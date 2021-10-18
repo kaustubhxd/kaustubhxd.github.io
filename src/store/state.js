@@ -16,7 +16,7 @@ const ripple = ref({
     left    : 100,
 })
 
-const enableAnimations = ref(false)
+const enableAnimations = ref(true)
 
 const windows = ref({
     'skills' : {
@@ -88,7 +88,7 @@ const windows = ref({
         left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),
     },   
     'game' : {
-        title       :   'Flappy Bird',
+        title       :   'Fluffy Cat',
         loaded      :   true,
         minimized   :   false,
         active      :   true,

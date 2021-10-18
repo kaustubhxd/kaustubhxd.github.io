@@ -4,8 +4,8 @@
 
 <script>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { sprite,state,possibleStates, background as bg, foreground as fg, bird, 
-            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx } from '../store/birdData'
+import { state,possibleStates, background as bg, foreground as fg, cat, getHighScores,
+            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 
 
@@ -19,20 +19,20 @@ export default {
         const draw = (frames) => {
             ctx.fillStyle = '#67bccd'
             ctx.fillRect(0,0,cvs.width,cvs.height)
-            bg.draw(ctx,sprite)
-            bird.draw(ctx,sprite,frames)
-            bird.update()
+            bg.draw(ctx)
+            cat.draw(ctx,frames)
+            cat.update()
             pipes.draw(ctx)
             pipes.update(frames)
-            fg.draw(ctx,sprite)
+            fg.draw(ctx)
 
 
             switch(state.value.current){
                 case possibleStates.getReady:
-                    getReady.draw(ctx,sprite)
+                    getReady.draw(ctx)
                     break;
                 case possibleStates.gameOver:
-                    gameOver.draw(ctx,sprite)
+                    gameOver.draw(ctx)
                     break;
             }
             score.draw(ctx)
@@ -49,28 +49,30 @@ export default {
         }
 
         const handleUserTap = (evt) => {
-            console.log(evt.code, evt.type)
+            // console.log(evt.code, evt.type)
             if(!(evt.type === 'click' || evt.code === 'Space')) return;
-
+    
             switch(state.value.current){
                 case possibleStates.getReady:
                     sfx.swoosh.play()
+                    getHighScores()
                     state.value.current = possibleStates.gameStarted
                     break;
                 case possibleStates.gameStarted:
-                    bird.flap()
+                    cat.flap()
                     break;
                 case possibleStates.gameOver:
                     if( ! (evt.code === 'Space' || isTapInsideBoundary(evt,cvs)) ) return; 
                     state.value.current = possibleStates.gameStarted
                     sfx.swoosh.play()
-                    bird.reset()
+                    cat.reset()
                     pipes.reset()
+                    bg.reset()
                     score.latestScore = 0
                     break;
 
             }
-            console.log(state.value.current)
+            // console.log(state.value.current)
         }
 
         const handleExternalAnimations = (evt) => {

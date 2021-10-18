@@ -2,6 +2,7 @@
 <template>
 <!-- https://codepen.io/tn9nex/pen/aqvRbW -->
   <Stars/>
+  <!-- <Backdrop/> -->
   <div class="god-container">
     <div v-for="(info,id) in activeWindows" :key="id"> 
         <Floatable :title="info.title" :id='id'/>
@@ -13,7 +14,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import Docker from './components/Docker'
 import Floatable from './components/Floatable'
 import Ripple from './components/Ripple'
@@ -21,9 +22,11 @@ import AnimatedCursor from './components/AnimatedCursor'
 import {windows,enableAnimations} from './store/state'
 import {isSmartPhone} from '../src/assets/scripts'
 import Stars from './components/Stars'
+import Backdrop from './components/Backdrop'
+
 
 export default {
-  components: {Docker, Floatable,Ripple,AnimatedCursor,Stars},
+  components: {Docker, Floatable,Ripple,AnimatedCursor,Stars,Backdrop},
   setup(){
 
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -71,7 +74,7 @@ export default {
   // cursor: none;
 }
 
-imput{
+input{
   // cursor:none;
 }
 

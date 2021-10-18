@@ -53,7 +53,7 @@
                         <Projects v-if="props.id == 'projects' && windowState.active"/>
                         <Who v-if="props.id == 'who' && windowState.active"/>
                         <Contact v-if="props.id == 'contact' && windowState.active"/>
-                        <FlappyBird v-if="props.id == 'game' && windowState.active"/>
+                        <FluffyCat v-if="props.id == 'game' && windowState.active"/>
                     </div>
                 </div>
                 </smooth-scrollbar>
@@ -74,7 +74,7 @@ import Loading from './Loading'
 const Projects = defineAsyncComponent(() => import('./Projects'))
 const Skills = defineAsyncComponent(() => import('./Skills'))
 const Contact = defineAsyncComponent(() => import('./Contact'))
-const FlappyBird = defineAsyncComponent(() => import('./FlappyBird'))
+const FluffyCat = defineAsyncComponent(() => import('./FluffyCat'))
 
 
 export default {
@@ -84,7 +84,7 @@ export default {
                     Who,
                     Contact,
                     Loading,
-                    FlappyBird
+                    FluffyCat
                 },
     props: ['title','id'],
     setup(props){
