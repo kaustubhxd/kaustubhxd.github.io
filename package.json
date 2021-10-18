@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "d3-timer": "^3.0.1",
     "debounce": "^1.2.0",
     "firebase": "^8.2.9",
     "v-body-scroll-lock": "^1.1.3",

@@ -7,6 +7,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { state,possibleStates, background as bg, foreground as fg, cat, getHighScores,
             getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx } from '../store/catGame'
 import {enableAnimations} from '../store/state'
+import {timer} from 'd3-timer'
 
 
 export default {
@@ -36,16 +37,63 @@ export default {
             score.draw(ctx)
         }
 
+        // REDRAWNG CANVAS USING CONSISTENT FPS ACROSS DEVICES
+        // https://www.geeksforgeeks.org/how-to-control-fps-with-requestanimationframe/
 
+        var frameCount = 0;
+        var fpsInterval, startTime, now, then, elapsed;
+        let fps = 60
         let frames = 0
-        const loop = () => {
-            frames += 1
-            draw(frames)
 
-            // requestAnimationFrame(loop)
-            loopId = requestAnimationFrame(loop); 
-             
+    
+        function startAnimating(fps) {
+            fpsInterval = 1000 / fps;
+            then = Date.now();
+            startTime = then;
+            console.log(startTime);
+            animate();
         }
+
+        function animate() {
+            // request another frame
+    
+            requestAnimationFrame(animate);
+    
+            // calc elapsed time since the last loop
+            now = Date.now();
+            elapsed = now - then;
+    
+            // if enough time has elapsed, draw the next frame
+    
+            if (elapsed > fpsInterval) {
+                then = now - (elapsed % fpsInterval);
+    
+            // draw animating objects here...
+                frames += 1
+                draw(frames)
+                console.log(frames)
+    
+             // below code is used for testing, whether
+                // the frame is animating at the specified fps
+    
+                var sinceStart = now - startTime;
+                var currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+                // console.log("Elapsed time= " + Math.round((sinceStart / 1000) * 100) / 100 
+                //                 + " secs @ " + currentFps + " fps.")
+                // console.log(currentFps);
+            }
+        }
+
+
+
+
+        // let frames = 0
+        // const loop = () => {
+        //     // frames += 1
+        //     // draw(frames)
+
+        //     // loopId = requestAnimationFrame(loop); 
+        // }
 
         const handleUserTap = (evt) => {
             // console.log(evt.code, evt.type)
@@ -96,7 +144,8 @@ export default {
             cvs.addEventListener("mouseover",handleExternalAnimations)
             cvs.addEventListener("mouseout",handleExternalAnimations)
 
-            loop()
+            // loop()
+            startAnimating(fps);
         })
 
         onBeforeUnmount(() => {

@@ -158,6 +158,7 @@ const cat = {
     gravity: 0.25,
     jump: 4.6,
     draw: function(ctx,frames){
+        // console.log(frames)
         const kitty = this.animation[this.frame]
 
         ctx.drawImage(catSprite, kitty.sX, kitty.sY, this.sW, this.sH, this.x-this.sW/2, this.y-this.sH/2, this.w, this.h)
@@ -168,6 +169,8 @@ const cat = {
             this.frame += (frames % period) == 0 ? 1 : 0
             this.frame = this.frame % this.animation.length
         }
+        // console.log(this.frame)
+        // console.log(frames)
     },
     update: function(){
         if(state.value.current === possibleStates.getReady){
