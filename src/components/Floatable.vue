@@ -511,7 +511,7 @@ export default {
     margin-top      :   24px;
     width           :   inherit;
     height          :   inherit ;
-    border-radius   :   5px 5px 0 0;
+    /* border-radius   :   5px 5px 0 0; */
     text-align      :   start;
     overflow      :   hidden;
     scrollbar-width :   thin;

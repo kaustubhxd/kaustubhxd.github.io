@@ -5,7 +5,7 @@
 <script>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { state,possibleStates, background as bg, foreground as fg, cat, getHighScores, foregroundNew as fgNew,
-            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx } from '../store/catGame'
+            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 
 export default {
@@ -50,7 +50,6 @@ export default {
         var fpsInterval, startTime, now, then, elapsed;
         const FPS = 60
         let frames = 0
-
     
         function startAnimating(FPS) {
             fpsInterval = 1000 / FPS;
@@ -93,6 +92,8 @@ export default {
         const handleUserTap = (evt) => {
             // console.log(evt.code, evt.type)
             if(!(evt.type === 'click' || evt.code === 'Space')) return;
+            state.value.primaryController = evt.code === 'Space' ? 'Keyboard' : 'Tap' 
+            // console.log(state.value.primaryController)
     
             switch(state.value.current){
                 case possibleStates.getReady:
@@ -105,6 +106,7 @@ export default {
                     break;
                 case possibleStates.gameOver:
                     if( ! (evt.code === 'Space' || isTapInsideBoundary(evt,cvs)) ) return; 
+                    if( state.value.primaryController === 'Keyboard' && (performance.now() - collisionTimestamp < 1000)) return;
                     state.value.current = possibleStates.gameStarted
                     sfx.swoosh.play()
                     cat.reset()

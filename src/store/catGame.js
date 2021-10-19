@@ -4,8 +4,12 @@ import {fireDB} from '../scripts/firebase'
 
 
 const state = ref({
-    current: 0
+    current: 0,
+    primaryController : ''
 })
+
+let initialHSFetch = false
+
 const sprite = new Image()
 const catSprite = new Image()
 const sprite2 = new Image()
@@ -15,6 +19,7 @@ const blueSky = new Image()
 const sea = new Image()
 const mount = new Image()
 const clouds = new Image()
+const tileset = new Image()
 
 sprite.src = require('../assets/game/sprite.png')
 catSprite.src = require('../assets/game/cat.png')
@@ -25,6 +30,8 @@ blueSky.src = require('../assets/game/sky.png')
 sea.src = require('../assets/game/sea.png')
 mount.src = require('../assets/game/mount.png')
 clouds.src = require('../assets/game/clouds.png')
+tileset.src = require('../assets/game/tileset.png')
+
 
 
 const sfx = {
@@ -204,9 +211,14 @@ const cat = {
             if(catBottom >= groundPosition){
                 this.y = groundPosition - (this.h/2) + 7
                 if(state.value.current === possibleStates.gameStarted)
+                {
+                    console.log('grounded')
+                    collisionTimestamp = performance.now()
                     sfx.hit.play().then(() => {
                         sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
                     })
+
+                }
                 state.value.current = possibleStates.gameOver
                 
             }
@@ -225,6 +237,7 @@ const cat = {
     }
 }
 
+let collisionTimestamp = -1
 const pipes = {
     positions : [],
     top:{
@@ -280,6 +293,7 @@ const pipes = {
 
             if( catFront >  pos.x && catBack < (pos.x + this.w) && (catTop < topPipeHitY || catBottom > bottomPipeHitY) ){
                 console.log('collision!')
+                collisionTimestamp = performance.now()
                 sfx.hit.play().then(() => {
                     sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
                 })
@@ -393,10 +407,16 @@ const gameOverMessage = {
             ctx.drawImage(sprite, this.sX, this.sY + p.offY, this.w, p.sH, 
                 this.x, this.y + p.offY, this.w, p.sH)     
         })
-        ctx.drawImage(sprite, this.sX, this.sY + startBtnPos.offY, this.w, startBtnPos.sH, 
-            cvs.width/2 - (this.w * startBtnPos.scalar / 2), this.y + startBtnPos.offY, 
-            this.w * startBtnPos.scalar, startBtnPos.sH * startBtnPos.scalar)  
-        
+
+        // start button
+        const currentTimestamp = performance.now()
+        // console.log(currentTimestamp - collisionTimestamp )
+        if( state.value.primaryController !== 'Keyboard' || currentTimestamp - collisionTimestamp > 1000 ){
+            ctx.drawImage(sprite, this.sX, this.sY + startBtnPos.offY, this.w, startBtnPos.sH, 
+                cvs.width/2 - (this.w * startBtnPos.scalar / 2), this.y + startBtnPos.offY, 
+                this.w * startBtnPos.scalar, startBtnPos.sH * startBtnPos.scalar)  
+        }
+
         // console.log(score.latestScore, score.bestScore)
         // ctx.fillRect(110,310,100,37)
 
@@ -452,10 +472,10 @@ let lastUpdate = { medalType : '', score : 0 }
 let updateInProgress = false
 
 function sendScoreToFirebase(medalType, newScore){
+    if (!initialHSFetch) return;
     if ( updateInProgress ||  (medalType === lastUpdate.medalType && newScore === lastUpdate.score)) return; 
-
     if ( score.medalScores[medalType] > newScore ){
-        alert(`tried to update ${medalType} highscore from ${score.medalScores[medalType]} to ${newScore}. Why on earth?`)
+        alert(`tried to update ${medalType} highscore from ${score.medalScores[medalType]} to ${newScore}. Screenshot and send to developer.`)
         return;
     }
 
@@ -484,6 +504,7 @@ function getHighScores(){
         if (doc.exists) {
           console.log("High Scores:", doc.data());
           score.medalScores = doc.data()
+          initialHSFetch = true
         //   console.log(score.medalScores)
         } else {
           // doc.data() will be undefined in this case
@@ -494,10 +515,11 @@ function getHighScores(){
       });
 }
 getHighScores()
-// sendScoreToFirebase('bronze', 0)
 
 setTimeout(() => {
     // do something onMounted
+    // sendScoreToFirebase('gold', 25)
+
 },5000)
 
 export {
@@ -515,4 +537,5 @@ export {
     gameOverMessage,
     getHighScores,
     foregroundNew,
+    collisionTimestamp,
 }
