@@ -102,16 +102,6 @@ const background = {
             this.props.clouds.x = this.props.clouds.x <= - (clouds.width) ? 0 : this.props.clouds.x - this.props.clouds.dx // sea
             this.props.mount.x = this.props.mount.x <= - (mount.width) ? 0 : this.props.mount.x - this.props.mount.dx // sea
         }
-        
-
-        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h)
-        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h)
-        // ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + (2*this.w), this.y, this.w, this.h)
-
-        // // moving bg illusion
-        // if(state.value.current === possibleStates.gameStarted){
-        //     this.x = this.x <= -this.w ? 0 : this.x - this.dx
-        // }
     },
     reset: function(){
         this.x = 0;
@@ -119,6 +109,30 @@ const background = {
 }
 
 const foreground = {
+    sX: 457,
+    sY: 0,
+    sW : 260, sH: 87,
+    w: 260 * 1.2, h: 87 * 1.2,
+    x: 0,
+    y: cvs.height - (87 * 1.2),
+    dx: 2,
+    draw: function(ctx){ 
+        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x, this.y, this.w , this.h)
+        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + this.w, this.y, this.w, this.h)
+        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
+
+        // moving fg illusion
+        if(state.value.current === possibleStates.gameStarted){
+            this.x = this.x <= -this.w ? 0 : this.x - this.dx
+        }
+    },
+    reset: function() {
+        this.x = 0
+    } 
+
+}
+
+const foregroundNew = {
     sX: 457,
     sY: 0,
     sW : 260, sH: 87,
@@ -243,20 +257,19 @@ const pipes = {
         if(frames % 100 === 0){
             this.positions.push({
                 x: cvs.width,
-                y: this.maxYPos * ( Math.random() + 1)  
+                y: this.maxYPos * ( Math.random() + 1),
+                crossed : false
             })
         }
         
         // move existing pipes to the left by dx every frame 
         this.positions.forEach(pos => {
             pos.x -= this.dx
-
+            // console.log(this.positions.length)
             // if pipes left beyond the canvas, remove them
+
             if(pos.x + this.w <= 0){
                 this.positions.shift()
-                score.latestScore += 1
-                sfx.point.play()
-                score.bestScore = Math.max(score.latestScore, score.bestScore)
             }
 
             // collision detection
@@ -264,13 +277,22 @@ const pipes = {
                     catFront = cat.x + cat.radius,   catBack = cat.x - cat.radius     
             const topPipeHitY = pos.y + this.h
             const bottomPipeHitY = pos.y + this.h + this.gap
-            
+
             if( catFront >  pos.x && catBack < (pos.x + this.w) && (catTop < topPipeHitY || catBottom > bottomPipeHitY) ){
                 console.log('collision!')
                 sfx.hit.play().then(() => {
                     sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
                 })
                 state.value.current = possibleStates.gameOver
+            }
+        
+            // increase score immediately after crossing a pipe
+            if(pos.x + this.w < catBack && !pos.crossed){
+                    pos.crossed = true
+                    console.log('crossed')
+                    score.latestScore += 1
+                    sfx.point.play()
+                    score.bestScore = Math.max(score.latestScore, score.bestScore)
             }
 
         })
@@ -429,18 +451,23 @@ const fluffyCollection = fireDB.collection('fluffy_cat')
 let lastUpdate = { medalType : '', score : 0 }
 let updateInProgress = false
 
-function sendScoreToFirebase(medalType, score){
-    if ( updateInProgress ||  (medalType === lastUpdate.medalType && score === lastUpdate.score)) return; 
+function sendScoreToFirebase(medalType, newScore){
+    if ( updateInProgress ||  (medalType === lastUpdate.medalType && newScore === lastUpdate.score)) return; 
+
+    if ( score.medalScores[medalType] > newScore ){
+        alert(`tried to update ${medalType} highscore from ${score.medalScores[medalType]} to ${newScore}. Why on earth?`)
+        return;
+    }
 
     // console.log('in firestore')
     // console.log(lastUpdate, medalType, score)
     // lastUpdate = { medalType, score }
 
     updateInProgress = true
-    fluffyCollection.doc("medalScores").update({[medalType] : score}).then( (status) => {
+    fluffyCollection.doc("medalScores").update({[medalType] : newScore}).then( (status) => {
       // console.log(status)
-      console.log('data sent to firestore',medalType,score)
-      lastUpdate = { medalType, score }
+      console.log('data sent to firestore',medalType,newScore)
+      lastUpdate = { medalType, score: newScore }
       updateInProgress = false
       getHighScores()
     }).catch((error) => {
@@ -448,6 +475,7 @@ function sendScoreToFirebase(medalType, score){
         updateInProgress = false
     });
 }
+
 
 function getHighScores(){
     fluffyCollection.doc("SF").get()
@@ -466,7 +494,11 @@ function getHighScores(){
       });
 }
 getHighScores()
-// sendScoreToFirebase('bronze', 3)
+// sendScoreToFirebase('bronze', 0)
+
+setTimeout(() => {
+    // do something onMounted
+},5000)
 
 export {
     sprite,
@@ -481,5 +513,6 @@ export {
     isTapInsideBoundary,
     getReadyMessage,
     gameOverMessage,
-    getHighScores
+    getHighScores,
+    foregroundNew,
 }
