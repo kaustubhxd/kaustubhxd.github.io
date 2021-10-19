@@ -17,7 +17,8 @@
             >
                 <div id="title-bar" class="title-bar">
                         
-                    <ActionButtons :name='props.title' :id='props.id' :isMaximizable='windowState.isMaximizable' @maximize='maxWindow()' @close='closeWindow()'/>
+                    <ActionButtons :name='props.title' :id='props.id' :isMaximizable='windowState.isMaximizable' 
+                        @maximize='maxWindow()' @close='closeWindow()'/>
 
                     <div class="tab-space" id = "tab-space"  
                     @mousedown.left="dragMouseDown"

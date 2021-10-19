@@ -194,10 +194,10 @@ const cat = {
         // console.log(frames)
     },
     update: function(){
+        // console.log(this.speed)
         if(state.value.current === possibleStates.getReady){
             this.y = 150;
-        }else{
-            
+        }else {
             this.speed += this.gravity
             this.y += this.speed
 
@@ -303,7 +303,7 @@ const pipes = {
             // increase score immediately after crossing a pipe
             if(pos.x + this.w < catBack && !pos.crossed){
                     pos.crossed = true
-                    console.log('crossed')
+                    // console.log('crossed')
                     score.latestScore += 1
                     sfx.point.play()
                     score.bestScore = Math.max(score.latestScore, score.bestScore)

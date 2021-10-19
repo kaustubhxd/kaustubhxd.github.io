@@ -89,9 +89,9 @@ const windows = ref({
     },   
     'game' : {
         title       :   'Fluffy Cat',
-        loaded      :   true,
+        loaded      :   false,
         minimized   :   false,
-        active      :   true,
+        active      :   false,
         position    :   [0,0],
         stuckToSide :   false,
         stuckWhere  :   'left',
@@ -136,6 +136,7 @@ function setWindowState(window,state){
         windows.value[window].minimized     = false
         windows.value[window].maximized     = false
         windows.value[window].stuckToSide   = false
+        // console.log(windows.value[window])
     }else if(state == 'minimized'){
         windows.value[window].zIndex = 1
         windows.value[window].minimized = true

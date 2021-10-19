@@ -1,5 +1,7 @@
 <template>
+<div>
   <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
+</div>
 </template>
 
 <script>
@@ -7,9 +9,13 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { state,possibleStates, background as bg, foreground as fg, cat, getHighScores, foregroundNew as fgNew,
             getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
+import {windows} from '../store/state'
+
 
 export default {
     setup(){
+        const gameState = ref(windows.value['game'])
+
         let myCanvas = ref(null)
         let cvs,ctx = null
         let loopId = undefined
@@ -44,12 +50,13 @@ export default {
             score.draw(ctx)
         }
 
+        let frames = 0
         // REDRAWNG CANVAS USING CONSISTENT FPS ACROSS DEVICES
         // https://www.geeksforgeeks.org/how-to-control-fps-with-requestanimationframe/
+
         var frameCount = 0;
         var fpsInterval, startTime, now, then, elapsed;
         const FPS = 60
-        let frames = 0
     
         function startAnimating(FPS) {
             fpsInterval = 1000 / FPS;
@@ -62,7 +69,7 @@ export default {
         function animate() {
             // request another frame
     
-            requestAnimationFrame(animate);
+            loopId = requestAnimationFrame(animate);
     
             // calc elapsed time since the last loop
             now = Date.now();
@@ -84,9 +91,18 @@ export default {
                 var currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
                 // console.log("Elapsed time= " + Math.round((sinceStart / 1000) * 100) / 100 
                 //                 + " secs @ " + currentFps + " FPS.")
-                // console.log(currentFps);
+
+                if( currentFps <= 45 ){
+                    ctx.lineWidth = 2;
+                    ctx.fillStyle = '#100'
+                    ctx.fillStyle = currentFps < 30 ? 'red' : '#aeae07'
+                    ctx.font = "12px Finger Paint"
+                    ctx.fillText(Math.round(currentFps), 5, 12 )
+                }
             }
         }
+
+
 
 
         const handleUserTap = (evt) => {
@@ -132,6 +148,7 @@ export default {
         
         onMounted(() => {
             if(!myCanvas.value) return; 
+
             cvs = myCanvas.value
             ctx = cvs.getContext('2d')
             // console.log(cvs)
@@ -147,16 +164,24 @@ export default {
             }catch(e){
                 console.log('fix your errors:', e);
             }
+            gameState.value.loaded = true;
+            console.log('game mounted')
         })
 
+        
         onBeforeUnmount(() => {
             ctx.clearRect(0, 0, cvs.width, cvs.height);
+            state.value.current = possibleStates.getReady
+            cat.reset()
+            pipes.reset()
+            bg.reset()
+            fg.reset()
             cancelAnimationFrame(loopId)
             removeEventListener("click", handleUserTap)
             removeEventListener("keyup", handleUserTap)
             removeEventListener("mouseover",handleExternalAnimations)
             removeEventListener("mouseout",handleExternalAnimations)
-            console.log('game animation end')
+            console.log('game unmounted')
         })
 
         return{
