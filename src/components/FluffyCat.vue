@@ -6,7 +6,7 @@
 
 <script>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { state,possibleStates, background as bg, foreground as fg, cat, getHighScores, foregroundNew as fgNew,
+import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,
             getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 import {windows} from '../store/state'
@@ -20,6 +20,9 @@ export default {
         let cvs,ctx = null
         let loopId = undefined
 
+        let showFps = true
+        let currentFps = 0
+
         let ERROR_FLAG = false
 
         // console.log(sprite)
@@ -31,23 +34,21 @@ export default {
                 cat.update()
                 pipes.draw(ctx)
                 pipes.update(frames)
-                // fg.draw(ctx)
-                fgNew.draw(ctx)
+                fg.draw(ctx)
+
+                switch(state.value.current){
+                    case possibleStates.getReady:
+                        getReady.draw(ctx)
+                        break;
+                    case possibleStates.gameOver:
+                        gameOver.draw(ctx,frames)
+                        break;
+                }
+                score.draw(ctx)
             }catch(err){
                 ERROR_FLAG = true
                 console.log("Fix your error", err)
             }
-
-
-            switch(state.value.current){
-                case possibleStates.getReady:
-                    getReady.draw(ctx)
-                    break;
-                case possibleStates.gameOver:
-                    gameOver.draw(ctx)
-                    break;
-            }
-            score.draw(ctx)
         }
 
         let frames = 0
@@ -88,11 +89,12 @@ export default {
                 // the frame is animating at the specified FPS
     
                 var sinceStart = now - startTime;
-                var currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+                currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
                 // console.log("Elapsed time= " + Math.round((sinceStart / 1000) * 100) / 100 
                 //                 + " secs @ " + currentFps + " FPS.")
 
-                if( currentFps <= 45 ){
+                if( showFps && currentFps <= 45 ){
+                    // console.log(currentFps)
                     ctx.lineWidth = 2;
                     ctx.fillStyle = '#100'
                     ctx.fillStyle = currentFps < 30 ? 'red' : '#aeae07'
@@ -101,9 +103,6 @@ export default {
                 }
             }
         }
-
-
-
 
         const handleUserTap = (evt) => {
             // console.log(evt.code, evt.type)
@@ -121,6 +120,7 @@ export default {
                     cat.flap()
                     break;
                 case possibleStates.gameOver:
+                    console.log('game over')
                     if( ! (evt.code === 'Space' || isTapInsideBoundary(evt,cvs)) ) return; 
                     if( state.value.primaryController === 'Keyboard' && (performance.now() - collisionTimestamp < 1000)) return;
                     state.value.current = possibleStates.gameStarted
@@ -130,6 +130,9 @@ export default {
                     bg.reset()
                     fg.reset()
                     score.latestScore = 0
+
+                    // for some reason, if idle for some time, currentFps goes below 45 when it's clearly running above it. 
+                    if ( showFps && currentFps > 45) showFps = false
                     break;
 
             }

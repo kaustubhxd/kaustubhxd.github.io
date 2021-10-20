@@ -1,55 +1,15 @@
 
 import {ref} from 'vue'
 import {fireDB} from '../scripts/firebase'
+import { sprite, catSprite, sprite2, sprite3, sea, mount, clouds, tileset, medals, sfx } from './catData'
 
 
 const state = ref({
     current: 0,
-    primaryController : ''
+    primaryController : '',
 })
 
 let initialHSFetch = false
-
-const sprite = new Image()
-const catSprite = new Image()
-const sprite2 = new Image()
-const sprite3 = new Image()
-const medals = new Image()
-const blueSky = new Image()
-const sea = new Image()
-const mount = new Image()
-const clouds = new Image()
-const tileset = new Image()
-
-sprite.src = require('../assets/game/sprite.png')
-catSprite.src = require('../assets/game/cat.png')
-sprite2.src = require('../assets/game/sprite_2.png')
-sprite3.src = require('../assets/game/sprite_3.png')
-medals.src = require('../assets/game/medal.png')
-blueSky.src = require('../assets/game/sky.png')
-sea.src = require('../assets/game/sea.png')
-mount.src = require('../assets/game/mount.png')
-clouds.src = require('../assets/game/clouds.png')
-tileset.src = require('../assets/game/tileset.png')
-
-
-
-const sfx = {
-    point : new Audio( require('../assets/game/audio/sfx_point.wav') ),
-    flap : new Audio( require('../assets/game/audio/sfx_flap.wav') ),
-    swoosh : new Audio( require('../assets/game/audio/sfx_swooshing.wav') ),
-    hit : new Audio( require('../assets/game/audio/sfx_hit.wav') ),
-    die : new Audio( require('../assets/game/audio/sfx_die.wav') ),
-    meow : [
-        new Audio( require('../assets/game/audio/meow_1.wav')),
-        new Audio( require('../assets/game/audio/meow_2.wav')),
-        new Audio( require('../assets/game/audio/meow_3.wav')),
-        new Audio( require('../assets/game/audio/meow_4.wav')),
-        new Audio( require('../assets/game/audio/hiss.wav')),
-    ] 
-}
-sfx.flap.volume = 0.05
-sfx.meow.forEach(sound => sound.volume = 0.2)
 
 const possibleStates = {
     getReady: 0,
@@ -78,7 +38,8 @@ const background = {
     draw: function(ctx){
         
         // sky
-        ctx.drawImage(blueSky, 0,0, blueSky.width, blueSky.height, 0, 0, cvs.width, cvs.height)
+        ctx.fillStyle =  '#a1f2ec'
+        ctx.fillRect(0, 0, cvs.width, cvs.height)
 
         
         // mountains
@@ -99,9 +60,9 @@ const background = {
         ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (sea.width), cvs.height - 170, sea.width, sea.height)
         ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (2 * sea.width), cvs.height - 170, sea.width, sea.height)
         ctx.drawImage(sea, 0,0, sea.width, sea.height, this.props.sea.x + (3 * sea.width), cvs.height - 170, sea.width, sea.height)
-
-
-
+        
+        ctx.fillStyle = '#71baaa'
+        ctx.fillRect(0,(cvs.height - 170) + sea.height, cvs.width, cvs.height)
 
         // moving bg illusion
         if(state.value.current === possibleStates.gameStarted){
@@ -140,6 +101,10 @@ const foreground = {
 }
 
 const foregroundNew = {
+    tiles : {
+        start : { x:36, y:177, w:91, h: 110 },
+        usual : { x:306 + 4, y:186, w:29 - 4, h: 21 },
+    },
     sX: 457,
     sY: 0,
     sW : 260, sH: 87,
@@ -148,13 +113,35 @@ const foregroundNew = {
     y: cvs.height - (87 * 1.2),
     dx: 2,
     draw: function(ctx){ 
-        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x, this.y, this.w , this.h)
-        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + this.w, this.y, this.w, this.h)
-        ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
+        // ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x, this.y, this.w , this.h)
+        // ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + this.w, this.y, this.w, this.h)
+        // ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
+        
+        const startTile = this.tiles.start
+        const usualTile = this.tiles.usual
 
+        ctx.drawImage(tileset, startTile.x, startTile.y, startTile.w,startTile.h, 
+            this.x, cvs.height - startTile.h, startTile.w,startTile.h)
+        // ctx.drawImage(tileset, usualTile.x, usualTile.y, usualTile.w,usualTile.h, 
+        //     this.x + startTile.width, cvs.height - usualTile.h, usualTile.w,usualTile.h)
+                
+        let usualTileTotalW = 0
+        for(let i=0; i<10; i++){
+            ctx.drawImage(tileset, usualTile.x, usualTile.y, usualTile.w,usualTile.h, 
+                this.x + startTile.w + (i * usualTile.w), cvs.height - startTile.h + 9, usualTile.w,usualTile.h)
+            ctx.fillStyle = '#112024'
+            ctx.fillRect(startTile.w + (i * usualTile.w), cvs.height - startTile.h + usualTile.h + 9, 
+                            this.x + usualTile.w, startTile.h - usualTile.h)
+            usualTileTotalW += cvs.height - startTile.h + 9
+        }
+        
         // moving fg illusion
         if(state.value.current === possibleStates.gameStarted){
-            this.x = this.x <= -this.w ? 0 : this.x - this.dx
+            startTile.x = startTile.x + this.dx 
+            usualTile.x = usualTile.x <= -(usualTile.w) ? 0 : usualTile.x - this.dx   // usual tile 
+            
+            // this.props.sea.x = this.props.sea.x <= - (sea.width) ? 0 : this.props.sea.x - this.props.sea.dx // sea
+
         }
     },
     reset: function() {
@@ -217,7 +204,6 @@ const cat = {
                     sfx.hit.play().then(() => {
                         sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
                     })
-
                 }
                 state.value.current = possibleStates.gameOver
                 
@@ -349,7 +335,7 @@ const score = {
 }
 
 const drawHighScores = (ctx) => {
-    const medalWidth = medals.width / 3
+    const medalWidth = medals[0].width / 3
     const scalar = 0.3
     ctx.fillStyle = '#eafcdb'
     ctx.lineWidth = 2;
@@ -357,8 +343,8 @@ const drawHighScores = (ctx) => {
     const medalTypes = ['gold','silver','bronze']
 
     for(let i=0;i<medalTypes.length;i++){
-        ctx.drawImage(medals, medalWidth * i, 0, medalWidth, medals.height,
-                        10, cvs.height - 80 + (25 * i), medalWidth * scalar, medals.height * scalar)
+        ctx.drawImage(medals[0], medalWidth * i, 0, medalWidth, medals[0].height,
+                        10 + i, cvs.height - 80 + (25 * i), medalWidth * scalar, medals[0].height * scalar)
         if( score.medalScores[medalTypes[i]] !== -1 )
             ctx.fillText(score.medalScores[medalTypes[i]], 10 + (medalWidth * scalar) + 5,  cvs.height - 80 + (25 * i) + 20)
     }
@@ -390,6 +376,49 @@ const getReadyMessage = {
     } 
 }
 
+const drawline = (ctx, x1,y1,x2,y2, color='#543847') => {
+    ctx.beginPath();
+    ctx.strokeStyle = color || 'pink'
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke(); 
+}
+
+const drawBoard = (ctx,x,y,w,h) => {
+    const offset = 4  // edge offset 
+
+    const drawEdges = (ctx,x1,y1,x2,y2) => {
+
+        let x = 0; y = 0;
+        console.log(x,y)
+        if( y1 > y2 ){
+            // edge point on the left
+            // console.log('drawing edge')
+            x = x1; y = y1
+            // console.log(x,y)
+            drawline(ctx,x+1,y+1,x+4,y+1)
+            drawline(ctx,x+1,y+4,x+1,y+1)
+        }else{
+            // console.log('heeh')
+            // x = x2,y = y1
+            // drawline(ctx,x+1,y+1,x+4,y+1)
+            // drawline(ctx,x+1,y+4,x+1,y+1)
+        }
+
+    }
+
+    drawEdges(ctx,x, y + offset, x + offset, y)
+    drawline(ctx, x + offset,y, x + w - offset,y)
+
+    drawline(ctx, x + w,y + offset, x + w,y + h - offset)
+    drawline(ctx,x + w - offset,y+h,x + offset,y+h)
+    
+    drawline(ctx,x,y+h - offset ,x,y + offset)
+    
+    
+    drawEdges(ctx,x + w, y + h - offset, x + w - offset, y + h)
+}
+
 const gameOverMessage = {
     pos : {
         GOtext      : { offY: 0,  sH: 40 },
@@ -401,12 +430,17 @@ const gameOverMessage = {
     h: 202,
     x: cvs.width/2 - 225/2,
     y: cvs.height/2 - 202/2,
-    draw: function(ctx){ 
+    medalFrame : 0,
+    draw: function(ctx, frames){ 
         const startBtnPos = { offY: 40 + 120, sH: 50, scalar: 1.2 }
-        Object.values(this.pos).forEach((p) =>{
-            ctx.drawImage(sprite, this.sX, this.sY + p.offY, this.w, p.sH, 
-                this.x, this.y + p.offY, this.w, p.sH)     
-        })
+
+        // game over text
+        ctx.drawImage(sprite, this.sX, this.sY + this.pos.GOtext.offY, this.w, this.pos.GOtext.sH, 
+            this.x, this.y + this.pos.GOtext.offY, this.w, this.pos.GOtext.sH)    
+
+        // score board
+        ctx.drawImage(sprite2, 6, 518, 232 - 6, 632 - 518, 
+            this.x, this.y + this.pos.score.offY, this.w, this.pos.score.sH)   
 
         // start button
         const currentTimestamp = performance.now()
@@ -438,13 +472,23 @@ const gameOverMessage = {
             sendScoreToFirebase('bronze', score.latestScore)
         }
         
-        const medalWidth = medals.width / 3
-        if(medalWon !== null){
+        // every medal image has the same height and width
+        const medalWidth = medals[0].width / 3
+        const medalHeight = medals[0].height
+
+        //testing 
+        const TEST_MODE = true
+        if (TEST_MODE) medalWon = medal.GOLD
+
+        if(TEST_MODE || medalWon !== null){
             // console.log('drawing medal')
-            ctx.drawImage(medals, medalWidth * medalWon, 0, medalWidth, medals.height,
-                            this.x + medal.offX, this.y + medal.offY, medalWidth * 0.6, medals.height * 0.6)  
+            if(frames % 10 === 0) this.medalFrame = (this.medalFrame + 1) % 4
+            // console.log(this.medalFrame)
+            ctx.drawImage(medals[this.medalFrame], medalWidth * medalWon, 0, medalWidth, medalHeight,
+                            this.x + medal.offX, this.y + medal.offY, medalWidth * 0.6, medalHeight * 0.6)  
         }
         drawHighScores(ctx)
+        // drawBoard(ctx, 50,50, 200, 200)
     } 
 }
 
@@ -537,5 +581,5 @@ export {
     gameOverMessage,
     getHighScores,
     foregroundNew,
-    collisionTimestamp,
+    collisionTimestamp
 }
