@@ -3,13 +3,34 @@ import {ref} from 'vue'
 import {fireDB} from '../scripts/firebase'
 import { sprite, catSprite, sprite2, sprite3, sea, mount, clouds, tileset, medals, sfx } from './catData'
 
+import hash from 'object-hash'
+
+
 
 const state = ref({
     current: 0,
     primaryController : '',
+    gameOverState: 0,
+    nameInputRef: null,
+    showNameInput : false
 })
 
-let initialHSFetch = false
+let PLAYER_NAME = localStorage.getItem("PLAYER_NAME") || "ABCDEF"
+
+let scoreboard = {
+    1 : { name: "ABCDEF", score: 0 },
+    2 : { name: "ABCDEF", score: 0 },
+    3 : { name: "KASMCG", score: 0 },
+    4 : { name: "VSCSRT", score: 0 },
+    5 : { name: "SFXSFH", score: 0 },
+    6 : { name: "RGSCXS", score: 0 },
+    7 : { name: "RSGBXC", score: 0 },
+    8 : { name: "WRXGRH", score: 0 },
+    9 : { name: "ERGCST", score: 0 },
+    10 : { name: "EFCXSD", score: 0 },
+}
+
+let initialRankingFetchDone = false
 
 const possibleStates = {
     getReady: 0,
@@ -17,10 +38,20 @@ const possibleStates = {
     gameOver: 2
 }
 
+const possibleGameOverStates = {
+    inactive : 0,
+    active : 1,
+    highScores : 2
+}
+
 let cvs = {
     width : 320,
     height : 480
 }
+
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+  }
 
 const background = {
     props : {
@@ -130,8 +161,8 @@ const foregroundNew = {
             ctx.drawImage(tileset, usualTile.x, usualTile.y, usualTile.w,usualTile.h, 
                 this.x + startTile.w + (i * usualTile.w), cvs.height - startTile.h + 9, usualTile.w,usualTile.h)
             ctx.fillStyle = '#112024'
-            ctx.fillRect(startTile.w + (i * usualTile.w), cvs.height - startTile.h + usualTile.h + 9, 
-                            this.x + usualTile.w, startTile.h - usualTile.h)
+            // ctx.fillRect(startTile.w + (i * usualTile.w), cvs.height - startTile.h + usualTile.h + 9, 
+            //                 this.x + usualTile.w, startTile.h - usualTile.h)    // debug
             usualTileTotalW += cvs.height - startTile.h + 9
         }
         
@@ -200,6 +231,7 @@ const cat = {
                 if(state.value.current === possibleStates.gameStarted)
                 {
                     console.log('grounded')
+                    state.value.gameOverState = possibleGameOverStates.active
                     collisionTimestamp = performance.now()
                     sfx.hit.play().then(() => {
                         sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
@@ -279,6 +311,7 @@ const pipes = {
 
             if( catFront >  pos.x && catBack < (pos.x + this.w) && (catTop < topPipeHitY || catBottom > bottomPipeHitY) ){
                 console.log('collision!')
+                state.value.gameOverState = possibleGameOverStates.active
                 collisionTimestamp = performance.now()
                 sfx.hit.play().then(() => {
                     sfx.meow[Math.floor(Math.random() * sfx.meow.length)].play()
@@ -307,6 +340,7 @@ const pipes = {
 const score = {
     bestScore: localStorage.getItem("BEST_SCORE") || 0,
     latestScore: 0,
+    medalWon : null,
     medalScores : {
         gold: -1,
         silver: -1,
@@ -317,24 +351,30 @@ const score = {
         ctx.strokeStyle = '#000'
         if(state.value.current === possibleStates.gameStarted){
             ctx.lineWidth = 2;
-            ctx.font = "35px Finger Paint"
+            ctx.fillStyle = 'black'
+            ctx.font = "35px BitMicro"
             ctx.fillText(this.latestScore, cvs.width/2, 50 )
             // ctx.strokeText(this.latestScore, cvs.width/2, 50 )
         }else if(state.value.current === possibleStates.gameOver){
-            ctx.lineWidth = 2;
-            ctx.font = "25px Finger Paint"
-            ctx.fillText(this.latestScore, 225, 235 )
-            // ctx.strokeText(this.latestScore, 225, 235 )
-            ctx.fillText(this.bestScore, 220, 280 )
-            // ctx.strokeText(this.bestScore, 220, 280 )
+            if(state.value.gameOverState === possibleGameOverStates.active){
+                ctx.lineWidth = 2;
+                ctx.fillStyle = '#f98e66'
+                ctx.font = "30px BitMicro"
+                ctx.fillText(this.latestScore, 225, 235 )
+                // ctx.strokeText(this.latestScore, 225, 235 )
+                ctx.fillText(this.bestScore, 220, 280 )
+                // ctx.strokeText(this.bestScore, 220, 280 )
+            }
 
-            this.bestScore = Math.max(this.latestScore, this.bestScore)
-            localStorage.setItem("BEST_SCORE", this.bestScore)
+            if(this.bestScore > localStorage.getItem("BEST_SCORE")){
+                this.bestScore = Math.max(this.latestScore, this.bestScore)
+                localStorage.setItem("BEST_SCORE", this.bestScore)
+            }
         }
     }
 }
 
-const drawHighScores = (ctx) => {
+const drawTopThree = (ctx) => {
     const medalWidth = medals[0].width / 3
     const scalar = 0.3
     ctx.fillStyle = '#eafcdb'
@@ -371,58 +411,150 @@ const getReadyMessage = {
         })
         ctx.drawImage(catSprite, 0, 0, 48, 32, 
             cvs.width/2 - 48/2 + 5, this.y + catPos.offY, 48, 32)
-        drawHighScores(ctx)
+        drawTopThree(ctx)
 
     } 
 }
 
-const drawline = (ctx, x1,y1,x2,y2, color='#543847') => {
-    ctx.beginPath();
-    ctx.strokeStyle = color || 'pink'
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke(); 
-}
+const drawHighScoreBoard = (ctx) => {
+    const xpos = gameOverMessage
+    // console.log(cvs.height)
 
-const drawBoard = (ctx,x,y,w,h) => {
-    const offset = 4  // edge offset 
+    ctx.drawImage(sprite2, 6, 518 , 232 - 6, 10,            // top
+        xpos.x, 95 , xpos.w, 10)   
+    ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
+        xpos.x, 95 + 10, xpos.w, 90)  
+    ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
+        xpos.x, 95 + 10 + 90, xpos.w, 90)   
+    ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
+        xpos.x, 95 + 10 + 90 + 90, xpos.w, 90)     
+    ctx.drawImage(sprite2, 6, 518 + 105 , 232 - 6, 10,            // bottom
+        xpos.x, 95 + 10 + 90 + 90 + 90, xpos.w, 10)     
 
-    const drawEdges = (ctx,x1,y1,x2,y2) => {
+    ctx.fillStyle = '#ded895'
+    ctx.fillRect(xpos.x + 10, 95 + 10, 232 - 6 - 30, 290 - 20 )
 
-        let x = 0; y = 0;
-        console.log(x,y)
-        if( y1 > y2 ){
-            // edge point on the left
-            // console.log('drawing edge')
-            x = x1; y = y1
-            // console.log(x,y)
-            drawline(ctx,x+1,y+1,x+4,y+1)
-            drawline(ctx,x+1,y+4,x+1,y+1)
-        }else{
-            // console.log('heeh')
-            // x = x2,y = y1
-            // drawline(ctx,x+1,y+1,x+4,y+1)
-            // drawline(ctx,x+1,y+4,x+1,y+1)
-        }
+    ctx.fillStyle = '#f98e66'
+    ctx.strokeStyle = 'black'
+    ctx.lineWidth = 1.5;
+    ctx.font = "22px BitMicro"
 
+    const vertLineSpacing = 27 
+    for(let i=1;i<=10;i++){
+        ctx.fillText(`${i}.`, xpos.x + 10 + 10, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
+        // ctx.strokeText(`${i+1}.`, xpos.x + 10 + 10, 95 + 10 + 20 + (i * vertLineSpacing))
+
+
+        ctx.fillText(scoreboard[i].name, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
+        // ctx.strokeText(`DVDSDE`, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + (i * vertLineSpacing))
+
+        ctx.fillText(scoreboard[i].score, xpos.x + 10 + 20 + 90 + 60, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
+        // ctx.strokeText(`69`, xpos.x + 10 + 20 + 90 + 60, 95 + 10 + 20 + (i * vertLineSpacing))
     }
 
-    drawEdges(ctx,x, y + offset, x + offset, y)
-    drawline(ctx, x + offset,y, x + w - offset,y)
+    // Ok button
+    ctx.drawImage(sprite2, 923, 82 , 1004 - 923, 115 - 83,          
+        cvs.width/2 - (77 * 1.2 /2), 400, 77 * 1.2, 32 * 1.2)  
 
-    drawline(ctx, x + w,y + offset, x + w,y + h - offset)
-    drawline(ctx,x + w - offset,y+h,x + offset,y+h)
-    
-    drawline(ctx,x,y+h - offset ,x,y + offset)
-    
-    
-    drawEdges(ctx,x + w, y + h - offset, x + w - offset, y + h)
 }
+
+
+const drawGameOverScreen = (ctx,frames) => {
+    // game over text
+    const xpos = gameOverMessage
+
+    ctx.drawImage(sprite, xpos.sX, xpos.sY + xpos.pos.GOtext.offY, xpos.w, xpos.pos.GOtext.sH, 
+        xpos.x, xpos.y + xpos.pos.GOtext.offY, xpos.w, xpos.pos.GOtext.sH)    
+
+    // score board
+    ctx.drawImage(sprite2, 6, 518, 232 - 6, 632 - 518, 
+        xpos.x, xpos.y + xpos.pos.score.offY, xpos.w, xpos.pos.score.sH)   
+
+    // start button
+    const currentTimestamp = performance.now()
+    const startBtn = xpos.pos.startBtn
+    if( state.value.primaryController !== 'Keyboard' || currentTimestamp - collisionTimestamp > 1000 ){
+        ctx.drawImage(sprite, startBtn.sX, startBtn.sY, startBtn.sW, startBtn.sH, 
+            startBtn.x,startBtn.y, startBtn.w,startBtn.h)  
+    }
+
+    // view highscores button
+    const hsBtn = xpos.pos.HSBtn
+    ctx.drawImage(sprite2, 827,236,931 - 825,293 - 234,
+        hsBtn.x, hsBtn.y,hsBtn.w,hsBtn.h )
+
+    // console.log(score.latestScore, score.bestScore)
+    //  debug
+    // ctx.fillStyle = 'rgba(100,100,100,0.6'
+    // ctx.fillRect(startBtn.x,startBtn.y,startBtn.w,startBtn.h)
+
+    // CHECK IF THE SCORE IS IN THE TOP THREE. 
+    const medal ={
+        GOLD : 1, SILVER: 2, BRONZE: 3,
+        offX : 20, offY: 80,
+    }
+    
+    if(!fetchedScoresForThisInstance){
+        fetchedScoresForThisInstance = true
+        let lscore = score.latestScore
+        let isRankingChanged = false
+        getHighScores((scoreList) => {
+            let newRankings = {...scoreList}
+            for(let rank=1;rank<=10;rank++){
+                if (lscore > scoreList[rank].score) {
+                    for(let xrank=10;xrank>rank;xrank--){
+                        newRankings[xrank] = newRankings[xrank - 1]
+                    }
+                    newRankings[rank] = { name : 'ABCDEF', score: lscore }
+                    isRankingChanged = true
+                    score.medalWon = rank === 1 ? medal.GOLD : rank === 2 ? medal.SILVER : rank === 3 ? medal.BRONZE : 4
+                    console.log(score.medalWon ? score.medalWon : null)
+                    break;
+                }
+            }
+            if(isRankingChanged){
+                sendRankingsToFirebase(newRankings)
+            }
+            const oldHash = hash.sha1(scoreList).slice(-5)
+            const newHash = hash.sha1(newRankings).slice(-5)
+            if(isRankingChanged){
+                console.log('%c ✨ rankings changed!', 'background: #222; color: aquamarine')
+                console.log('oldRankings', oldHash);
+                console.log('newRankings', newHash)
+            }else{
+                console.log('rankings unchanged')
+            }
+        })
+    }
+    
+    // every medal image has the same height and width
+    const medalWidth = medals[0].width / 3
+    const medalHeight = medals[0].height
+
+    //testing 
+    const TEST_MODE = false
+    if (TEST_MODE) score.medalWon = medal.BRONZE
+
+    // console.log(score.medalWon)
+    if(TEST_MODE || score.medalWon !== null){
+        // console.log('drawing medal')
+        if(frames % 10 === 0) xpos.medalFrame = (xpos.medalFrame + 1) % 4
+        // console.log(xpos.medalFrame)
+        ctx.drawImage(medals[xpos.medalFrame], medalWidth * (score.medalWon - 1), 0, medalWidth, medalHeight,
+                        xpos.x + medal.offX, xpos.y + medal.offY, medalWidth * 0.6, medalHeight * 0.6)  
+    }
+
+    drawTopThree(ctx)
+}
+
 
 const gameOverMessage = {
     pos : {
         GOtext      : { offY: 0,  sH: 40 },
         score       : { offY: 40, sH: 120 },
+        startBtn    : { sX : 246, sY: 399, sW: 327 - 246, sH: 427 - 399, 
+                            x: cvs.width/2 - (81 * 1.2 /2) + 40, y: cvs.height/2 - 202/2 + 40 + 130, w: (327 - 246) * 1.2, h:(427 - 399) * 1.2 },
+        HSBtn      : {x : cvs.width/2 - ((104 * 0.6) / 2) - 60, y: 309,w : 104 * 0.6,h : 57 * 0.6}
     },
     sX: 175,
     sY: 228,
@@ -432,123 +564,105 @@ const gameOverMessage = {
     y: cvs.height/2 - 202/2,
     medalFrame : 0,
     draw: function(ctx, frames){ 
-        const startBtnPos = { offY: 40 + 120, sH: 50, scalar: 1.2 }
 
-        // game over text
-        ctx.drawImage(sprite, this.sX, this.sY + this.pos.GOtext.offY, this.w, this.pos.GOtext.sH, 
-            this.x, this.y + this.pos.GOtext.offY, this.w, this.pos.GOtext.sH)    
-
-        // score board
-        ctx.drawImage(sprite2, 6, 518, 232 - 6, 632 - 518, 
-            this.x, this.y + this.pos.score.offY, this.w, this.pos.score.sH)   
-
-        // start button
-        const currentTimestamp = performance.now()
-        // console.log(currentTimestamp - collisionTimestamp )
-        if( state.value.primaryController !== 'Keyboard' || currentTimestamp - collisionTimestamp > 1000 ){
-            ctx.drawImage(sprite, this.sX, this.sY + startBtnPos.offY, this.w, startBtnPos.sH, 
-                cvs.width/2 - (this.w * startBtnPos.scalar / 2), this.y + startBtnPos.offY, 
-                this.w * startBtnPos.scalar, startBtnPos.sH * startBtnPos.scalar)  
+        if( state.value.gameOverState === possibleGameOverStates.active ){
+            drawGameOverScreen(ctx,frames)
+            state.value.showNameInput = false
+        }else if( state.value.gameOverState === possibleGameOverStates.highScores ){
+            drawHighScoreBoard(ctx)
+            state.value.showNameInput = true
+            state.value.nameInputRef.focus()
+            state.value.nameInputRef.style.top = `${106 + (27 * 3)}px`
         }
 
-        // console.log(score.latestScore, score.bestScore)
-        // ctx.fillRect(110,310,100,37)
-
-        
-        const medal ={
-            GOLD : 0, SILVER: 1, BRONZE: 2,
-            offX : 20, offY: 80,
-        }
-
-        let medalWon = null
-        if(score.latestScore >= score.medalScores.gold){
-            medalWon = medal.GOLD
-            sendScoreToFirebase('gold', score.latestScore)
-        }else if( score.latestScore >= score.medalScores.silver ){
-            medalWon = medal.SILVER    
-            sendScoreToFirebase('silver', score.latestScore)
-        }else if( score.latestScore >= score.medalScores.bronze ){
-            medalWon = medal.BRONZE   
-            sendScoreToFirebase('bronze', score.latestScore)
-        }
-        
-        // every medal image has the same height and width
-        const medalWidth = medals[0].width / 3
-        const medalHeight = medals[0].height
-
-        //testing 
-        const TEST_MODE = true
-        if (TEST_MODE) medalWon = medal.GOLD
-
-        if(TEST_MODE || medalWon !== null){
-            // console.log('drawing medal')
-            if(frames % 10 === 0) this.medalFrame = (this.medalFrame + 1) % 4
-            // console.log(this.medalFrame)
-            ctx.drawImage(medals[this.medalFrame], medalWidth * medalWon, 0, medalWidth, medalHeight,
-                            this.x + medal.offX, this.y + medal.offY, medalWidth * 0.6, medalHeight * 0.6)  
-        }
-        drawHighScores(ctx)
-        // drawBoard(ctx, 50,50, 200, 200)
+        // ctx.fillRect(hsBtn.x, hsBtn.y, hsBtn.w, hsBtn.h)      //test fill
     } 
 }
 
-// use ctx.fillRect(110,310,100,37) to find correct positions 
-const startBtn = {
-    x: 110,
-    y: 310,
-    w: 100,
-    h: 37,
+
+const tappableIcons = {
+    startBtn : 0,
+    HSBtn   : 1,
 }
 
-const isTapInsideBoundary = (evt,canvas) => {
+const isTapInsideBoundary = (evt,canvas,expectedTap) => {
     let restartRect = canvas.getBoundingClientRect();
     let clickX = evt.clientX - restartRect.left
     let clickY = evt.clientY - restartRect.top
 
-    return ( clickX >= startBtn.x && clickX <= (startBtn.x + startBtn.w) 
-            && clickY >= startBtn.y && clickY <= startBtn.y + startBtn.h)
+    let iconToTap = null
+    const gameOverIcons = gameOverMessage.pos
+    switch(expectedTap){
+        case tappableIcons.startBtn:
+            iconToTap = gameOverIcons.startBtn
+            break;
+        case tappableIcons.HSBtn:
+            iconToTap = gameOverIcons.HSBtn
+            break;
+    }
+
+    const isTapInside = ( clickX >= iconToTap.x && clickX <= (iconToTap.x + iconToTap.w) 
+    && clickY >= iconToTap.y && clickY <= iconToTap.y + iconToTap.h )
+
+    if(isTapInside) console.log(`tapped on ${getKeyByValue(tappableIcons,expectedTap)}`)
+    
+    if(iconToTap === gameOverIcons.startBtn && isTapInside){
+        fetchedScoresForThisInstance = false
+        score.medalWon = null
+    }
+
+    return (isTapInside)
 }
 
 
 // Firebase Call
 const fluffyCollection = fireDB.collection('fluffy_cat')
-let lastUpdate = { medalType : '', score : 0 }
+let lastRankingsHash = null
 let updateInProgress = false
+let fetchedScoresForThisInstance = false
 
-function sendScoreToFirebase(medalType, newScore){
-    if (!initialHSFetch) return;
-    if ( updateInProgress ||  (medalType === lastUpdate.medalType && newScore === lastUpdate.score)) return; 
-    if ( score.medalScores[medalType] > newScore ){
-        alert(`tried to update ${medalType} highscore from ${score.medalScores[medalType]} to ${newScore}. Screenshot and send to developer.`)
-        return;
-    }
+function sendRankingsToFirebase(newRankings){
+    const newHash = hash.sha1(newRankings).slice(-5)
+    console.log('old hash: ', lastRankingsHash)
 
-    // console.log('in firestore')
-    // console.log(lastUpdate, medalType, score)
-    // lastUpdate = { medalType, score }
+    if (!initialRankingFetchDone) return;
+    if ( updateInProgress ||  (lastRankingsHash === newHash)) return; 
+
+    // console.log('SENT TO FIRESTORE: ', newHash)
+    // return;
 
     updateInProgress = true
-    fluffyCollection.doc("medalScores").update({[medalType] : newScore}).then( (status) => {
-      // console.log(status)
-      console.log('data sent to firestore',medalType,newScore)
-      lastUpdate = { medalType, score: newScore }
-      updateInProgress = false
-      getHighScores()
-    }).catch((error) => {
-        console.error("Error updating high score: ", error);
+    fluffyCollection.doc("highScores").set(newRankings).then( (status) => {
+        // console.log(status)
+        console.log('%c ️‍🔥 data sent to firestore: ','background: #222; color: orange', newHash)
+        lastRankingsHash = newHash
         updateInProgress = false
-    });
+        getHighScores()
+      }).catch((err) => {
+          console.error("Error updating high score: ", err);
+          updateInProgress = false
+      });
 }
 
 
-function getHighScores(){
+function getHighScores(callback){
     fluffyCollection.doc("SF").get()
 
-    fluffyCollection.doc("medalScores").get().then( (doc) => {
+    fluffyCollection.doc("highScores").get().then( (doc) => {
         if (doc.exists) {
-          console.log("High Scores:", doc.data());
-          score.medalScores = doc.data()
-          initialHSFetch = true
+            const freshScores = doc.data()
+            console.log("%c ⬇️ just fetched highscores:", 'background: #222; color: lightgoldenrodyellow', hash.sha1(freshScores).slice(-5));
+
+            if(callback){
+                callback(freshScores)
+            }
+            
+            score.medalScores['gold'] = freshScores[1].score
+            score.medalScores['silver'] = freshScores[2].score
+            score.medalScores['bronze'] = freshScores[3].score
+
+            scoreboard = freshScores
+            initialRankingFetchDone = true
         //   console.log(score.medalScores)
         } else {
           // doc.data() will be undefined in this case
@@ -560,10 +674,18 @@ function getHighScores(){
 }
 getHighScores()
 
+const resetHighScores = () => {
+    fluffyCollection.doc("highScores").set(scoreboard).then( (status) => {
+        console.log('reset scoreboard')
+    }).catch((err) => {
+          console.error("Error updating high score: ", err);
+    });
+}
+
+resetHighScores()
+
 setTimeout(() => {
     // do something onMounted
-    // sendScoreToFirebase('gold', 25)
-
 },5000)
 
 export {
@@ -577,9 +699,11 @@ export {
     score,
     sfx,
     isTapInsideBoundary,
+    tappableIcons,
     getReadyMessage,
     gameOverMessage,
     getHighScores,
     foregroundNew,
-    collisionTimestamp
+    collisionTimestamp,
+    possibleGameOverStates,
 }

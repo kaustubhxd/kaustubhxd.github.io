@@ -1,22 +1,33 @@
 <template>
-<div>
-  <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
+<div class='canvas-wrap'>
+    <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
+    <textarea id="nameInput" ref='nameInputRef' v-show="showNameInput" 
+        spellcheck="false" autocomplete="false" maxlength="6"></textarea>
 </div>
 </template>
 
 <script>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,
-            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,sfx,collisionTimestamp } from '../store/catGame'
+import { onBeforeUnmount, onMounted, ref,nextTick } from 'vue'
+import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,tappableIcons,possibleGameOverStates,
+            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,
+            sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 import {windows} from '../store/state'
 
 
 export default {
     setup(){
+        const nameInputRef = ref(state.value.nameInputRef) 
+        const showNameInput = ref(state.value.showNameInput)    
+        state.value.showNameInput = showNameInput
+        state.value.nameInputRef = nameInputRef
+
         const gameState = ref(windows.value['game'])
+        console.log(state.value)
 
         let myCanvas = ref(null)
+
+
         let cvs,ctx = null
         let loopId = undefined
 
@@ -101,7 +112,37 @@ export default {
                     ctx.font = "12px Finger Paint"
                     ctx.fillText(Math.round(currentFps), 5, 12 )
                 }
+                if (currentFps > 45) showFps = false
             }
+        }
+
+        const resolveGameOverTaps = (evt) => {
+
+            // check if user wants to play again
+            if((evt.code === 'Space' || isTapInsideBoundary(evt,cvs,tappableIcons.startBtn))){
+                if( state.value.primaryController === 'Keyboard' && (performance.now() - collisionTimestamp < 1000)) return;
+                if (state.value.gameOverState !== possibleGameOverStates.active) return;
+
+                state.value.gameOverState = possibleGameOverStates.inactive
+                state.value.current = possibleStates.gameStarted
+                sfx.swoosh.play()
+                cat.reset()
+                pipes.reset()
+                bg.reset()
+                fg.reset()
+                score.latestScore = 0
+                return true
+            }else if ( isTapInsideBoundary(evt,cvs, tappableIcons.HSBtn) ){
+                if( state.value.gameOverState === possibleGameOverStates.highScores ){
+                    state.value.gameOverState = possibleGameOverStates.active
+                    return;
+                }
+                state.value.gameOverState = possibleGameOverStates.highScores
+                console.log('show scoreboard')
+                return true
+            }
+
+            return false
         }
 
         const handleUserTap = (evt) => {
@@ -120,17 +161,10 @@ export default {
                     cat.flap()
                     break;
                 case possibleStates.gameOver:
+                    if(!possibleGameOverStates.active) return;
                     console.log('game over')
-                    if( ! (evt.code === 'Space' || isTapInsideBoundary(evt,cvs)) ) return; 
-                    if( state.value.primaryController === 'Keyboard' && (performance.now() - collisionTimestamp < 1000)) return;
-                    state.value.current = possibleStates.gameStarted
-                    sfx.swoosh.play()
-                    cat.reset()
-                    pipes.reset()
-                    bg.reset()
-                    fg.reset()
-                    score.latestScore = 0
-
+                    const isResolved =  resolveGameOverTaps(evt)
+                    if(!isResolved) state.value.gameOverState = possibleGameOverStates.active
                     // for some reason, if idle for some time, currentFps goes below 45 when it's clearly running above it. 
                     if ( showFps && currentFps > 45) showFps = false
                     break;
@@ -169,6 +203,13 @@ export default {
             }
             gameState.value.loaded = true;
             console.log('game mounted')
+
+            // showNameInput.value = true
+            console.log(nameInputRef.value)
+            nextTick(() => {
+                nameInputRef.value.focus()
+            });
+
         })
 
         
@@ -188,17 +229,52 @@ export default {
         })
 
         return{
-            myCanvas
+            myCanvas,
+            nameInputRef ,
+            showNameInput
         }
     }
 }
 </script>
 
 <style lang='scss' scoped>
-#mycanvas{
-    display: block;
-    background: black;
-    cursor: pointer;
+
+.canvas-wrap{
+    position: relative;
+    width: 320px;
+    height: 480px;
+    overflow: hidden;
+
+    & > * {
+        position: absolute
+    }
+
+    #mycanvas{
+        display: block;
+        background: black;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    #nameInput {
+        top: 106px;
+        left: 105.2px;
+        width: 70px;
+        height: 10px;
+        padding-bottom: 10px;
+        padding-top : -10px;
+        background-color: rgba(0,0,0,0);
+        resize: none;
+        overflow: hidden;
+        border: none;
+        outline: none;
+        font-family: 'BitMicro';
+        color: #f98e66;
+        font-size: 22px;
+        /* user-select: none; */
+    }
+
+
 }
 
 </style>
