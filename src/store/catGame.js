@@ -16,6 +16,8 @@ const state = ref({
     showStartButton : false,
 })
 
+localStorage.removeItem("PLAYER_NAME")      // debug
+
 let IS_PLAYER_NAME_SET = false
 let PLAYER_NAME = "PLAYER" + Math.round(Math.random() * 100)
 
@@ -430,6 +432,11 @@ const drawHighScoreBoard = (ctx) => {
     const xpos = gameOverMessage
     // console.log(cvs.height)
 
+    // ctx.lineWidth = 2;
+    // ctx.fillStyle = 'black'
+    // ctx.font = "22px BitMicro"
+    // ctx.fillText("NEW HIGHSCORE", 20, 80)
+
     ctx.drawImage(sprite2, 6, 518 , 232 - 6, 10,                 // top
         xpos.x, 95 , xpos.w, 10)   
     ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
@@ -495,6 +502,9 @@ const hasRankingChanged = (scoreListRef) => {
     return [false,null,null]
 }
 
+
+let blinkShowNewButton = true
+let showNewButton = false
 const drawGameOverScreen = (ctx,frames, showStartButton) => {
     // game over text
     const xpos = gameOverMessage
@@ -519,6 +529,15 @@ const drawGameOverScreen = (ctx,frames, showStartButton) => {
     ctx.drawImage(sprite2, 827,236,931 - 825,293 - 234,
         hsBtn.x, hsBtn.y,hsBtn.w,hsBtn.h )
 
+    // new label over highscores button
+    const newLabel = xpos.pos.newLabel
+    if(frames % 30 === 0){
+        blinkShowNewButton = !blinkShowNewButton
+    }
+    if(showNewButton && blinkShowNewButton)
+        ctx.drawImage(sprite2, 224,1002,255 - 224 ,1015 - 1002,
+            newLabel.x, newLabel.y,newLabel.w,newLabel.h )
+    
     // console.log(score.latestScore, score.bestScore)
     //  debug
     // ctx.fillStyle = 'rgba(100,100,100,0.6'
@@ -586,6 +605,7 @@ const gameOverMessage = {
                             x: cvs.width/2 - (81 * 1.2 /2) + 40, y: cvs.height/2 - 202/2 + 40 + 130, w: (327 - 246) * 1.2, h:(427 - 399) * 1.2 },
         showHSBtn      : {x : cvs.width/2 - ((104 * 0.6) / 2) - 60, y: 309,w : 104 * 0.6,h : 57 * 0.6},
         HSExit      : {x : cvs.width/2 - (77 * 1.2 /2),y: 400,w : 77 * 1.2,h: 25 * 1.2},
+        newLabel    : {x : cvs.width/2 - ((104 * 0.6) / 2) - 80, y: 304, w : 31,h: 13},
     },
     sX: 175,
     sY: 228,
@@ -610,6 +630,7 @@ const gameOverMessage = {
                             nameInputBoxPosition = rank - 1
                         }else{
                             console.log('new high scores!')
+                            showNewButton = true
                         }
                     }
                 })
@@ -678,21 +699,29 @@ const isTapInsideBoundary = (evt,canvas,expectedTap) => {
 
     const isTapInside = ( clickX >= iconToTap.x && clickX <= (iconToTap.x + iconToTap.w) 
     && clickY >= iconToTap.y && clickY <= iconToTap.y + iconToTap.h )
-
-    if(isTapInside) console.log(`tapped on ${getKeyByValue(tappableIcons,expectedTap)}`)
     
-    if(iconToTap === gameOverIcons.startBtn && isTapInside){
-        if (!state.value.showStartButton){
-            return false
+    if(isTapInside) console.log(`tapped on ${getKeyByValue(tappableIcons,expectedTap)}`)
+
+    if(isTapInside){
+        switch(iconToTap){
+            case gameOverIcons.startBtn:
+                if (!state.value.showStartButton){
+                    return false
+                }
+                fetchedScoresForThisInstance = false
+                score.medalWon = null
+                checkingIfScoreIsHS = false
+                break;
+            case gameOverIcons.HSExit:
+                updatePlayerName()
+                break;
+            case gameOverIcons.showHSBtn:
+                showNewButton = false
+
         }
-        fetchedScoresForThisInstance = false
-        score.medalWon = null
-        checkingIfScoreIsHS = false
     }
 
-    if(iconToTap === gameOverIcons.HSExit && isTapInside){
-        updatePlayerName()
-    }
+
 
     return (isTapInside)
 }
