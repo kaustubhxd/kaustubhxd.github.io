@@ -12,12 +12,22 @@ const state = ref({
     primaryController : '',
     gameOverState: 0,
     nameInputRef: null,
-    showNameInput : false
+    showNameInput : false,
+    showStartButton : false,
 })
 
-let PLAYER_NAME = localStorage.getItem("PLAYER_NAME") || "ABCDEF"
+let IS_PLAYER_NAME_SET = false
+let PLAYER_NAME = "PLAYER" + Math.round(Math.random() * 100)
 
-let scoreboard = {
+const setPlayerName = (name,saveNameToLocalStorage = false) => {
+    PLAYER_NAME = name
+    IS_PLAYER_NAME_SET = true
+    if(saveNameToLocalStorage) localStorage.setItem("PLAYER_NAME", name)
+}
+if(localStorage.getItem("PLAYER_NAME")) setPlayerName(localStorage.getItem("PLAYER_NAME"))
+
+
+let SCOREBOARD_STATE = {
     1 : { name: "ABCDEF", score: 0 },
     2 : { name: "ABCDEF", score: 0 },
     3 : { name: "KASMCG", score: 0 },
@@ -379,14 +389,14 @@ const drawTopThree = (ctx) => {
     const scalar = 0.3
     ctx.fillStyle = '#eafcdb'
     ctx.lineWidth = 2;
-    ctx.font = "22px Finger Paint"
+    ctx.font = "28px BitMicro"
     const medalTypes = ['gold','silver','bronze']
 
     for(let i=0;i<medalTypes.length;i++){
         ctx.drawImage(medals[0], medalWidth * i, 0, medalWidth, medals[0].height,
                         10 + i, cvs.height - 80 + (25 * i), medalWidth * scalar, medals[0].height * scalar)
         if( score.medalScores[medalTypes[i]] !== -1 )
-            ctx.fillText(score.medalScores[medalTypes[i]], 10 + (medalWidth * scalar) + 5,  cvs.height - 80 + (25 * i) + 20)
+            ctx.fillText(score.medalScores[medalTypes[i]], 10 + (medalWidth * scalar) + 5,  cvs.height - 80 + (25 * i) + 21)
     }
 }
 
@@ -420,7 +430,7 @@ const drawHighScoreBoard = (ctx) => {
     const xpos = gameOverMessage
     // console.log(cvs.height)
 
-    ctx.drawImage(sprite2, 6, 518 , 232 - 6, 10,            // top
+    ctx.drawImage(sprite2, 6, 518 , 232 - 6, 10,                 // top
         xpos.x, 95 , xpos.w, 10)   
     ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
         xpos.x, 95 + 10, xpos.w, 90)  
@@ -428,7 +438,7 @@ const drawHighScoreBoard = (ctx) => {
         xpos.x, 95 + 10 + 90, xpos.w, 90)   
     ctx.drawImage(sprite2, 6, 518 + 10 , 232 - 6, 90,            // middle
         xpos.x, 95 + 10 + 90 + 90, xpos.w, 90)     
-    ctx.drawImage(sprite2, 6, 518 + 105 , 232 - 6, 10,            // bottom
+    ctx.drawImage(sprite2, 6, 518 + 105 , 232 - 6, 10,           // bottom
         xpos.x, 95 + 10 + 90 + 90 + 90, xpos.w, 10)     
 
     ctx.fillStyle = '#ded895'
@@ -440,26 +450,52 @@ const drawHighScoreBoard = (ctx) => {
     ctx.font = "22px BitMicro"
 
     const vertLineSpacing = 27 
-    for(let i=1;i<=10;i++){
-        ctx.fillText(`${i}.`, xpos.x + 10 + 10, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
-        // ctx.strokeText(`${i+1}.`, xpos.x + 10 + 10, 95 + 10 + 20 + (i * vertLineSpacing))
-
-
-        ctx.fillText(scoreboard[i].name, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
-        // ctx.strokeText(`DVDSDE`, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + (i * vertLineSpacing))
-
-        ctx.fillText(scoreboard[i].score, xpos.x + 10 + 20 + 90 + 60, 95 + 10 + 20 + ((i-1) * vertLineSpacing))
-        // ctx.strokeText(`69`, xpos.x + 10 + 20 + 90 + 60, 95 + 10 + 20 + (i * vertLineSpacing))
+    // console.log(FETCHING_HIGHSCORES)
+    for(let xrank=1;xrank<=10;xrank++){
+        ctx.fillText(`${xrank}.`, xpos.x + 10 + 10, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing))                       // fill rank 
+        if ( xrank - 1 !== (nameInputBoxPosition) ){
+            ctx.fillText(SCOREBOARD_STATE[xrank].name, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing))       // fill name 
+            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 75, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
+        }else if (!FETCHING_HIGHSCORES && nameInputBoxPosition !== null){
+            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 75, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
+        }
     }
-
+    
     // Ok button
-    ctx.drawImage(sprite2, 923, 82 , 1004 - 923, 115 - 83,          
-        cvs.width/2 - (77 * 1.2 /2), 400, 77 * 1.2, 32 * 1.2)  
+    const okBtn = gameOverMessage.pos.HSExit
+    ctx.drawImage(sprite2, 923, 82 , 1004 - 923, 25,          
+        okBtn.x, okBtn.y, okBtn.w, okBtn.h)  
+
+    // position name input 
+    // console.log(`nameInputBoxPosition: ${nameInputBoxPosition}`)
+    if(nameInputBoxPosition !== null)    
+    {
+        state.value.showNameInput = true
+        state.value.nameInputRef.focus()
+        state.value.nameInputRef.style.top = `${106 + (27 * nameInputBoxPosition)}px`
+    }
 
 }
 
 
-const drawGameOverScreen = (ctx,frames) => {
+
+const hasRankingChanged = (scoreListRef) => {
+    const newRankings = {...scoreListRef}
+    let lscore = score.latestScore
+
+    for(let rank=1;rank<=10;rank++){
+        if (lscore > scoreListRef[rank].score) {
+            for(let xrank=10;xrank>rank;xrank--){
+                newRankings[xrank] = newRankings[xrank - 1]
+            }
+            newRankings[rank] = { name : PLAYER_NAME, score: lscore }
+            return [true, rank,newRankings]
+        }
+    }
+    return [false,null,null]
+}
+
+const drawGameOverScreen = (ctx,frames, showStartButton) => {
     // game over text
     const xpos = gameOverMessage
 
@@ -473,13 +509,13 @@ const drawGameOverScreen = (ctx,frames) => {
     // start button
     const currentTimestamp = performance.now()
     const startBtn = xpos.pos.startBtn
-    if( state.value.primaryController !== 'Keyboard' || currentTimestamp - collisionTimestamp > 1000 ){
+    if( (state.value.primaryController !== 'Keyboard' || currentTimestamp - collisionTimestamp > 1000) && showStartButton ){
         ctx.drawImage(sprite, startBtn.sX, startBtn.sY, startBtn.sW, startBtn.sH, 
             startBtn.x,startBtn.y, startBtn.w,startBtn.h)  
     }
 
     // view highscores button
-    const hsBtn = xpos.pos.HSBtn
+    const hsBtn = xpos.pos.showHSBtn
     ctx.drawImage(sprite2, 827,236,931 - 825,293 - 234,
         hsBtn.x, hsBtn.y,hsBtn.w,hsBtn.h )
 
@@ -489,30 +525,20 @@ const drawGameOverScreen = (ctx,frames) => {
     // ctx.fillRect(startBtn.x,startBtn.y,startBtn.w,startBtn.h)
 
     // CHECK IF THE SCORE IS IN THE TOP THREE. 
-    const medal ={
+    const MEDAL ={
         GOLD : 1, SILVER: 2, BRONZE: 3,
         offX : 20, offY: 80,
     }
-    
+
+
     if(!fetchedScoresForThisInstance){
         fetchedScoresForThisInstance = true
-        let lscore = score.latestScore
-        let isRankingChanged = false
         getHighScores((scoreList) => {
-            let newRankings = {...scoreList}
-            for(let rank=1;rank<=10;rank++){
-                if (lscore > scoreList[rank].score) {
-                    for(let xrank=10;xrank>rank;xrank--){
-                        newRankings[xrank] = newRankings[xrank - 1]
-                    }
-                    newRankings[rank] = { name : 'ABCDEF', score: lscore }
-                    isRankingChanged = true
-                    score.medalWon = rank === 1 ? medal.GOLD : rank === 2 ? medal.SILVER : rank === 3 ? medal.BRONZE : 4
-                    console.log(score.medalWon ? score.medalWon : null)
-                    break;
-                }
-            }
+            const [isRankingChanged,rank,newRankings] = hasRankingChanged(scoreList)
+
             if(isRankingChanged){
+                score.medalWon = rank === 1 ? MEDAL.GOLD : rank === 2 ? MEDAL.SILVER : rank === 3 ? MEDAL.BRONZE : 4
+                console.log(score.medalWon ? score.medalWon : null)
                 sendRankingsToFirebase(newRankings)
             }
             const oldHash = hash.sha1(scoreList).slice(-5)
@@ -533,7 +559,7 @@ const drawGameOverScreen = (ctx,frames) => {
 
     //testing 
     const TEST_MODE = false
-    if (TEST_MODE) score.medalWon = medal.BRONZE
+    if (TEST_MODE) score.medalWon = MEDAL.BRONZE
 
     // console.log(score.medalWon)
     if(TEST_MODE || score.medalWon !== null){
@@ -541,12 +567,16 @@ const drawGameOverScreen = (ctx,frames) => {
         if(frames % 10 === 0) xpos.medalFrame = (xpos.medalFrame + 1) % 4
         // console.log(xpos.medalFrame)
         ctx.drawImage(medals[xpos.medalFrame], medalWidth * (score.medalWon - 1), 0, medalWidth, medalHeight,
-                        xpos.x + medal.offX, xpos.y + medal.offY, medalWidth * 0.6, medalHeight * 0.6)  
+                        xpos.x + MEDAL.offX, xpos.y + MEDAL.offY, medalWidth * 0.6, medalHeight * 0.6)  
     }
 
     drawTopThree(ctx)
 }
 
+
+let checkingIfScoreIsHS = false
+let isScoreNewLocalHS = false
+let nameInputBoxPosition = null
 
 const gameOverMessage = {
     pos : {
@@ -554,7 +584,8 @@ const gameOverMessage = {
         score       : { offY: 40, sH: 120 },
         startBtn    : { sX : 246, sY: 399, sW: 327 - 246, sH: 427 - 399, 
                             x: cvs.width/2 - (81 * 1.2 /2) + 40, y: cvs.height/2 - 202/2 + 40 + 130, w: (327 - 246) * 1.2, h:(427 - 399) * 1.2 },
-        HSBtn      : {x : cvs.width/2 - ((104 * 0.6) / 2) - 60, y: 309,w : 104 * 0.6,h : 57 * 0.6}
+        showHSBtn      : {x : cvs.width/2 - ((104 * 0.6) / 2) - 60, y: 309,w : 104 * 0.6,h : 57 * 0.6},
+        HSExit      : {x : cvs.width/2 - (77 * 1.2 /2),y: 400,w : 77 * 1.2,h: 25 * 1.2},
     },
     sX: 175,
     sY: 228,
@@ -564,25 +595,66 @@ const gameOverMessage = {
     y: cvs.height/2 - 202/2,
     medalFrame : 0,
     draw: function(ctx, frames){ 
+        if(!checkingIfScoreIsHS){
+            isScoreNewLocalHS = score.latestScore > SCOREBOARD_STATE[10].score ? true : false
+            state.value.showStartButton = !isScoreNewLocalHS
+            checkingIfScoreIsHS = true
+            if(isScoreNewLocalHS) {
+                FETCHING_HIGHSCORES = true
+                getHighScores((fireScores) => {
+                    let [isRankingChanged, rank] = hasRankingChanged(fireScores)
+                    state.value.showStartButton = true
+                    if(isRankingChanged){
+                        if(!IS_PLAYER_NAME_SET){
+                            state.value.gameOverState = possibleGameOverStates.highScores
+                            nameInputBoxPosition = rank - 1
+                        }else{
+                            console.log('new high scores!')
+                        }
+                    }
+                })
+            }
+        }
 
         if( state.value.gameOverState === possibleGameOverStates.active ){
-            drawGameOverScreen(ctx,frames)
+            drawGameOverScreen(ctx,frames,state.value.showStartButton)
             state.value.showNameInput = false
         }else if( state.value.gameOverState === possibleGameOverStates.highScores ){
             drawHighScoreBoard(ctx)
-            state.value.showNameInput = true
-            state.value.nameInputRef.focus()
-            state.value.nameInputRef.style.top = `${106 + (27 * 3)}px`
         }
 
-        // ctx.fillRect(hsBtn.x, hsBtn.y, hsBtn.w, hsBtn.h)      //test fill
+        // const hsExitBtn = this.pos.HSExit                                    //test fill
+        // ctx.fillStyle = 'rgba(100,100,100,0.6'
+        // ctx.fillRect(hsExitBtn.x, hsExitBtn.y, hsExitBtn.w, hsExitBtn.h)      
     } 
 }
 
 
 const tappableIcons = {
     startBtn : 0,
-    HSBtn   : 1,
+    showHSBtn   : 1,
+    HSExit : 2
+}
+
+const setTextInput = (evt) => {
+    console.log(evt.target.value)
+    state.value.nameInputRef.value = state.value.nameInputRef.value.trim()
+}
+
+const updatePlayerName = () => {
+    const playerInputName = state.value.nameInputRef.value
+    if(playerInputName.trim() != ''){
+        setPlayerName(playerInputName,true)
+    }
+    SCOREBOARD_STATE[nameInputBoxPosition + 1].name = PLAYER_NAME
+    sendRankingsToFirebase(SCOREBOARD_STATE)
+
+    nameInputBoxPosition = null
+    state.value.nameInputRef.value = ''
+    // state.value.nameInputRef.disabled = true
+    // state.value.nameInputRef.disabled = false
+    document.activeElement.blur();
+    state.value.showNameInput = false
 }
 
 const isTapInsideBoundary = (evt,canvas,expectedTap) => {
@@ -596,8 +668,11 @@ const isTapInsideBoundary = (evt,canvas,expectedTap) => {
         case tappableIcons.startBtn:
             iconToTap = gameOverIcons.startBtn
             break;
-        case tappableIcons.HSBtn:
-            iconToTap = gameOverIcons.HSBtn
+        case tappableIcons.showHSBtn:
+            iconToTap = gameOverIcons.showHSBtn
+            break;
+        case tappableIcons.HSExit:
+            iconToTap = gameOverIcons.HSExit
             break;
     }
 
@@ -607,8 +682,16 @@ const isTapInsideBoundary = (evt,canvas,expectedTap) => {
     if(isTapInside) console.log(`tapped on ${getKeyByValue(tappableIcons,expectedTap)}`)
     
     if(iconToTap === gameOverIcons.startBtn && isTapInside){
+        if (!state.value.showStartButton){
+            return false
+        }
         fetchedScoresForThisInstance = false
         score.medalWon = null
+        checkingIfScoreIsHS = false
+    }
+
+    if(iconToTap === gameOverIcons.HSExit && isTapInside){
+        updatePlayerName()
     }
 
     return (isTapInside)
@@ -644,14 +727,16 @@ function sendRankingsToFirebase(newRankings){
       });
 }
 
-
+let FETCHING_HIGHSCORES = false
 function getHighScores(callback){
-    fluffyCollection.doc("SF").get()
-
+    FETCHING_HIGHSCORES = true
     fluffyCollection.doc("highScores").get().then( (doc) => {
         if (doc.exists) {
             const freshScores = doc.data()
             console.log("%c ⬇️ just fetched highscores:", 'background: #222; color: lightgoldenrodyellow', hash.sha1(freshScores).slice(-5));
+            SCOREBOARD_STATE = freshScores
+            initialRankingFetchDone = true
+            FETCHING_HIGHSCORES = false
 
             if(callback){
                 callback(freshScores)
@@ -660,33 +745,34 @@ function getHighScores(callback){
             score.medalScores['gold'] = freshScores[1].score
             score.medalScores['silver'] = freshScores[2].score
             score.medalScores['bronze'] = freshScores[3].score
-
-            scoreboard = freshScores
-            initialRankingFetchDone = true
         //   console.log(score.medalScores)
         } else {
           // doc.data() will be undefined in this case
           console.log("No such document!");
+          FETCHING_HIGHSCORES = false
         }
       }).catch(function(error) {
         console.log("Error getting highscores:", error);
+        FETCHING_HIGHSCORES = false
       });
 }
 getHighScores()
 
 const resetHighScores = () => {
-    fluffyCollection.doc("highScores").set(scoreboard).then( (status) => {
+    fluffyCollection.doc("highScores").set(SCOREBOARD_STATE).then( (status) => {
         console.log('reset scoreboard')
     }).catch((err) => {
           console.error("Error updating high score: ", err);
     });
 }
 
-resetHighScores()
+// resetHighScores()
 
 setTimeout(() => {
     // do something onMounted
 },5000)
+
+
 
 export {
     sprite,
@@ -706,4 +792,6 @@ export {
     foregroundNew,
     collisionTimestamp,
     possibleGameOverStates,
+    setTextInput,
+    updatePlayerName
 }

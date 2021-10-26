@@ -1,15 +1,15 @@
 <template>
 <div class='canvas-wrap'>
     <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
-    <textarea id="nameInput" ref='nameInputRef' v-show="showNameInput" 
-        spellcheck="false" autocomplete="false" maxlength="6"></textarea>
+    <textarea id="nameInput" ref='nameInputRef' @input="setTextInput"  @keyup.enter.exact="updatePlayerName" v-show="showNameInput " 
+        spellcheck="false" autocomplete="false" maxlength="9"></textarea>
 </div>
 </template>
 
 <script>
 import { onBeforeUnmount, onMounted, ref,nextTick } from 'vue'
 import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,tappableIcons,possibleGameOverStates,
-            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,
+            getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,setTextInput,updatePlayerName,
             sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 import {windows} from '../store/state'
@@ -17,10 +17,11 @@ import {windows} from '../store/state'
 
 export default {
     setup(){
-        const nameInputRef = ref(state.value.nameInputRef) 
-        const showNameInput = ref(state.value.showNameInput)    
+        const nameInputRef = ref(null) 
+        const showNameInput = ref(null)    
         state.value.showNameInput = showNameInput
         state.value.nameInputRef = nameInputRef
+
 
         const gameState = ref(windows.value['game'])
         console.log(state.value)
@@ -117,12 +118,14 @@ export default {
         }
 
         const resolveGameOverTaps = (evt) => {
-
+            console.log(state.value.gameOverState)
+            const GOState = state.value.gameOverState
             // check if user wants to play again
-            if((evt.code === 'Space' || isTapInsideBoundary(evt,cvs,tappableIcons.startBtn))){
+            if( GOState === possibleGameOverStates.active && (evt.code === 'Space' || isTapInsideBoundary(evt,cvs,tappableIcons.startBtn))){
                 if( state.value.primaryController === 'Keyboard' && (performance.now() - collisionTimestamp < 1000)) return;
                 if (state.value.gameOverState !== possibleGameOverStates.active) return;
 
+                console.log('tap resolved: game reset')
                 state.value.gameOverState = possibleGameOverStates.inactive
                 state.value.current = possibleStates.gameStarted
                 sfx.swoosh.play()
@@ -132,17 +135,22 @@ export default {
                 fg.reset()
                 score.latestScore = 0
                 return true
-            }else if ( isTapInsideBoundary(evt,cvs, tappableIcons.HSBtn) ){
-                if( state.value.gameOverState === possibleGameOverStates.highScores ){
-                    state.value.gameOverState = possibleGameOverStates.active
-                    return;
-                }
+            } // check if HS button is pressed
+            else if ( GOState === possibleGameOverStates.active && isTapInsideBoundary(evt,cvs, tappableIcons.showHSBtn) ){
+                console.log('tap inside: showHSBtn')
                 state.value.gameOverState = possibleGameOverStates.highScores
                 console.log('show scoreboard')
                 return true
+            } // when on HS Screen, check if user wants to return to GO screen
+            else if(GOState === possibleGameOverStates.highScores && 
+                        (evt.code === 'Enter' ||   isTapInsideBoundary(evt,cvs, tappableIcons.HSExit))){
+                console.log('tap inside: HS Okay')
+                state.value.gameOverState = possibleGameOverStates.active
+                return true
             }
-
-            return false
+            
+            console.log('tap invalid: do nothing and resolve')
+            return true
         }
 
         const handleUserTap = (evt) => {
@@ -230,8 +238,10 @@ export default {
 
         return{
             myCanvas,
-            nameInputRef ,
-            showNameInput
+            nameInputRef,
+            showNameInput,
+            setTextInput,
+            updatePlayerName
         }
     }
 }
@@ -259,7 +269,7 @@ export default {
     #nameInput {
         top: 106px;
         left: 105.2px;
-        width: 70px;
+        width: 120px;
         height: 10px;
         padding-bottom: 10px;
         padding-top : -10px;
