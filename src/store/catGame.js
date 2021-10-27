@@ -515,13 +515,17 @@ const drawHighScoreBoard = (ctx) => {
 }
 
 
-
 const hasRankingChanged = (scoreListRef) => {
     const newRankings = {...scoreListRef}
     let lscore = score.latestScore
 
+    const checkIfSamePlayerSameScore = (rank) => {
+        if(rank === 1) return true    
+        if(scoreListRef[rank-1].name === PLAYER_NAME && scoreListRef[rank-1].score === lscore ) return false
+    }
+
     for(let rank=1;rank<=10;rank++){
-        if (lscore > scoreListRef[rank].score) {
+        if (lscore > scoreListRef[rank].score &&  checkIfSamePlayerSameScore(rank)) {
             for(let xrank=10;xrank>rank;xrank--){
                 newRankings[xrank] = newRankings[xrank - 1]
             }
