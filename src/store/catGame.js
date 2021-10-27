@@ -838,9 +838,15 @@ const updateScoreboardWithNewData = (freshScores) => {
     score.medalScores['bronze'] = freshScores[3].score
 }
 
-const unsubFirebase = fluffyCollection.doc("highScores").onSnapshot((doc) => {
-    updateScoreboardWithNewData(doc.data())
-})
+let unsubFirebase = () => null
+const listenToFirestoreUpdates = () => {
+    console.log("%c 🙉 listening to live firestore updates", 'background: #222; color: pink');
+
+    unsubFirebase = fluffyCollection.doc("highScores").onSnapshot((doc) => {
+        updateScoreboardWithNewData(doc.data())
+    })
+
+}
 
 let FETCHING_HIGHSCORES = false
 function getHighScores(callback){
@@ -896,5 +902,6 @@ export {
     possibleGameOverStates,
     setTextInput,
     updatePlayerName,
+    listenToFirestoreUpdates,
     unsubFirebase
 }

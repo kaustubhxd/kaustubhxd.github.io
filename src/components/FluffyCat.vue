@@ -11,7 +11,7 @@
 import { onBeforeUnmount, onMounted, ref,nextTick } from 'vue'
 import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,tappableIcons,possibleGameOverStates,unsubFirebase,
             getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,setTextInput,updatePlayerName,
-            sfx,collisionTimestamp } from '../store/catGame'
+            sfx,collisionTimestamp,listenToFirestoreUpdates } from '../store/catGame'
 import {enableAnimations} from '../store/state'
 import {windows} from '../store/state'
 
@@ -213,6 +213,7 @@ export default {
             window.addEventListener("keyup", handleUserTap)
             cvs.addEventListener("mouseover",handleExternalAnimations)
             cvs.addEventListener("mouseout",handleExternalAnimations)
+            listenToFirestoreUpdates()
 
             // loop()
             try{
