@@ -31,16 +31,16 @@ if(localStorage.getItem("PLAYER_NAME")) setPlayerName(localStorage.getItem("PLAY
 
 
 let SCOREBOARD_STATE = {
-    1 : { name: "ABCDEF", score: 0 },
-    2 : { name: "ABCDEF", score: 0 },
-    3 : { name: "KASMCG", score: 0 },
-    4 : { name: "VSCSRT", score: 0 },
-    5 : { name: "SFXSFH", score: 0 },
-    6 : { name: "RGSCXS", score: 0 },
-    7 : { name: "RSGBXC", score: 0 },
-    8 : { name: "WRXGRH", score: 0 },
-    9 : { name: "ERGCST", score: 0 },
-    10 : { name: "EFCXSD", score: 0 },
+    1 : { name: "", score: 0 },
+    2 : { name: "", score: 0 },
+    3 : { name: "", score: 0 },
+    4 : { name: "", score: 0 },
+    5 : { name: "", score: 0 },
+    6 : { name: "", score: 0 },
+    7 : { name: "", score: 0 },
+    8 : { name: "", score: 0 },
+    9 : { name: "", score: 0 },
+    10 : { name: "", score: 0 },
 }
 
 let initialRankingFetchDone = false
