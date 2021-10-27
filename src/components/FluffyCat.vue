@@ -1,9 +1,10 @@
 <template>
-<div class='canvas-wrap'>
-    <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
-    <textarea id="nameInput" ref='nameInputRef' @input="setTextInput"  @keyup.enter.exact="updatePlayerName" v-show="showNameInput " 
-        spellcheck="false" autocomplete="false" maxlength="9"></textarea>
-</div>
+    <div class='canvas-wrap'>
+        <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
+        <textarea id="nameInput" ref='nameInputRef' @input="setTextInput"  @keyup.enter.exact="updatePlayerName" v-show="showNameInput " 
+            spellcheck="false" autocomplete="false" maxlength="9"></textarea>
+    </div>
+    <!-- <div class="free-space"></div> -->
 </template>
 
 <script>
@@ -161,6 +162,7 @@ export default {
     
             switch(state.value.current){
                 case possibleStates.getReady:
+                    state.value.isClientOnline = navigator.onLine
                     sfx.swoosh.play()
                     getHighScores()
                     state.value.current = possibleStates.gameStarted
@@ -189,14 +191,12 @@ export default {
                 enableAnimations.value = true
             }
         }
-
         
         onMounted(() => {
             if(!myCanvas.value) return; 
 
             cvs = myCanvas.value
             ctx = cvs.getContext('2d')
-            // console.log(cvs)
 
             cvs.addEventListener("click", handleUserTap)
             window.addEventListener("keyup", handleUserTap)
@@ -206,17 +206,11 @@ export default {
             // loop()
             try{
                 startAnimating(FPS);
-            }catch(e){
-                console.log('fix your errors:', e);
+            }catch(err){
+                console.log('fix your errors:', err);
             }
             gameState.value.loaded = true;
             console.log('game mounted')
-
-            // showNameInput.value = true
-            console.log(nameInputRef.value)
-            nextTick(() => {
-                nameInputRef.value.focus()
-            });
 
         })
 
@@ -254,6 +248,7 @@ export default {
     width: 320px;
     height: 480px;
     overflow: hidden;
+    background: #7e5f37;
 
     & > * {
         position: absolute
@@ -281,10 +276,15 @@ export default {
         font-family: 'BitMicro';
         color: #f98e66;
         font-size: 22px;
+        text-transform: uppercase;
         /* user-select: none; */
     }
+}
 
-
+.free-space{
+    width: 467px;
+    height: 485px;
+    background: #7e5f38;
 }
 
 </style>

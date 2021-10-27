@@ -100,6 +100,7 @@ const windows = ref({
         zIndex      :   1,
         width   :   320,
         height  :   480 + 24,
+        overrideSmartSize : true,
         opacity :   1,
         top     :   Math.floor(Math.random() * ((window.innerHeight - (window.innerHeight  * (8/13) + 100)) - 100) + 100),
         left    :   Math.floor(Math.random() * ((window.innerWidth - (window.innerWidth  * (3/8) + 100)) - 100) + 100),

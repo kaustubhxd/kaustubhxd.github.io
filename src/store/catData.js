@@ -10,6 +10,7 @@ const sea = new Image()
 const mount = new Image()
 const clouds = new Image()
 const tileset = new Image()
+const offline = new Image()
 const medals = {
     0 : new Image(),
     1 : new Image(),
@@ -30,6 +31,8 @@ medals[0].src = require('../assets/game/medals/0.png')
 medals[1].src = require('../assets/game/medals/1.png')
 medals[2].src = require('../assets/game/medals/2.png')
 medals[3].src = require('../assets/game/medals/3.png')
+offline.src = require('../assets/game/offline.png')
+
 
 
 const sfx = {
@@ -61,5 +64,6 @@ export {
     mount,
     clouds,
     tileset,
-    sfx
+    sfx,
+    offline
 }

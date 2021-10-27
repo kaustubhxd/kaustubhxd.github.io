@@ -1,10 +1,10 @@
 
 import {ref} from 'vue'
 import {fireDB} from '../scripts/firebase'
-import { sprite, catSprite, sprite2, sprite3, sea, mount, clouds, tileset, medals, sfx } from './catData'
+import { sprite, catSprite, sprite2, sprite3, sea, mount, clouds, tileset, medals, sfx, offline } from './catData'
+import {setWindowState} from '../store/state'
 
 import hash from 'object-hash'
-
 
 
 const state = ref({
@@ -14,17 +14,18 @@ const state = ref({
     nameInputRef: null,
     showNameInput : false,
     showStartButton : false,
+    isClientOnline : true
 })
 
-localStorage.removeItem("PLAYER_NAME")      // debug
+// localStorage.removeItem("PLAYER_NAME")      // debug
 
 let IS_PLAYER_NAME_SET = false
 let PLAYER_NAME = "PLAYER" + Math.round(Math.random() * 100)
 
 const setPlayerName = (name,saveNameToLocalStorage = false) => {
-    PLAYER_NAME = name
+    PLAYER_NAME = name.toUpperCase()
     IS_PLAYER_NAME_SET = true
-    if(saveNameToLocalStorage) localStorage.setItem("PLAYER_NAME", name)
+    if(saveNameToLocalStorage) localStorage.setItem("PLAYER_NAME", PLAYER_NAME)
 }
 if(localStorage.getItem("PLAYER_NAME")) setPlayerName(localStorage.getItem("PLAYER_NAME"))
 
@@ -83,7 +84,7 @@ const background = {
         // sky
         ctx.fillStyle =  '#a1f2ec'
         ctx.fillRect(0, 0, cvs.width, cvs.height)
-
+        
         
         // mountains
         ctx.drawImage(mount, 0,0, mount.width, mount.height, this.props.mount.x, 0, mount.width, mount.height)
@@ -106,6 +107,8 @@ const background = {
         
         ctx.fillStyle = '#71baaa'
         ctx.fillRect(0,(cvs.height - 170) + sea.height, cvs.width, cvs.height)
+        
+
 
         // moving bg illusion
         if(state.value.current === possibleStates.gameStarted){
@@ -122,15 +125,22 @@ const background = {
 const foreground = {
     sX: 457,
     sY: 0,
-    sW : 260, sH: 87,
-    w: 260 * 1.2, h: 87 * 1.2,
+    sW : 260, sH: 85,
+    w: 260 * 1.2, h: 85 * 1.2,
     x: 0,
-    y: cvs.height - (87 * 1.2),
+    y: cvs.height - (85 * 1.2),
     dx: 2,
     draw: function(ctx){ 
         ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x, this.y, this.w , this.h)
         ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + this.w, this.y, this.w, this.h)
         ctx.drawImage(sprite3, this.sX, this.sY, this.sW, this.sH, this.x + (2*this.w), this.y, this.w, this.h)
+
+        // offline icon
+        if(!state.value.isClientOnline){
+            ctx.drawImage(offline, 0,0, offline.width, offline.height, 
+                cvs.width - (offline.width * 0.6) - 5,  5, offline.width * 0.6, offline.height * 0.6)
+        }
+                
 
         // moving fg illusion
         if(state.value.current === possibleStates.gameStarted){
@@ -177,14 +187,13 @@ const foregroundNew = {
             //                 this.x + usualTile.w, startTile.h - usualTile.h)    // debug
             usualTileTotalW += cvs.height - startTile.h + 9
         }
-        
+
+
         // moving fg illusion
         if(state.value.current === possibleStates.gameStarted){
             startTile.x = startTile.x + this.dx 
             usualTile.x = usualTile.x <= -(usualTile.w) ? 0 : usualTile.x - this.dx   // usual tile 
-            
             // this.props.sea.x = this.props.sea.x <= - (sea.width) ? 0 : this.props.sea.x - this.props.sea.dx // sea
-
         }
     },
     reset: function() {
@@ -364,17 +373,17 @@ const score = {
         if(state.value.current === possibleStates.gameStarted){
             ctx.lineWidth = 2;
             ctx.fillStyle = 'black'
-            ctx.font = "35px BitMicro"
+            ctx.font = "28px BitMicro"
             ctx.fillText(this.latestScore, cvs.width/2, 50 )
             // ctx.strokeText(this.latestScore, cvs.width/2, 50 )
         }else if(state.value.current === possibleStates.gameOver){
             if(state.value.gameOverState === possibleGameOverStates.active){
                 ctx.lineWidth = 2;
                 ctx.fillStyle = '#f98e66'
-                ctx.font = "30px BitMicro"
+                ctx.font = "28px BitMicro"
                 ctx.fillText(this.latestScore, 225, 235 )
                 // ctx.strokeText(this.latestScore, 225, 235 )
-                ctx.fillText(this.bestScore, 220, 280 )
+                ctx.fillText(this.bestScore, 225, 280 )
                 // ctx.strokeText(this.bestScore, 220, 280 )
             }
 
@@ -391,14 +400,14 @@ const drawTopThree = (ctx) => {
     const scalar = 0.3
     ctx.fillStyle = '#eafcdb'
     ctx.lineWidth = 2;
-    ctx.font = "28px BitMicro"
+    ctx.font = "26px BitMicro"
     const medalTypes = ['gold','silver','bronze']
 
     for(let i=0;i<medalTypes.length;i++){
         ctx.drawImage(medals[0], medalWidth * i, 0, medalWidth, medals[0].height,
                         10 + i, cvs.height - 80 + (25 * i), medalWidth * scalar, medals[0].height * scalar)
         if( score.medalScores[medalTypes[i]] !== -1 )
-            ctx.fillText(score.medalScores[medalTypes[i]], 10 + (medalWidth * scalar) + 5,  cvs.height - 80 + (25 * i) + 21)
+            ctx.fillText(score.medalScores[medalTypes[i]], 10 + (medalWidth * scalar) + 5,  cvs.height - 80 + (25 * i) + 23)
     }
 }
 
@@ -428,14 +437,23 @@ const getReadyMessage = {
     } 
 }
 
+let dockerHidden = false
+const toggleDocker = (shouldHide) => {
+    if(dockerHidden && shouldHide) return;
+    if(shouldHide){
+        setWindowState('game','maximized')
+        dockerHidden = true
+    }else{
+        setWindowState('game','normal')
+        dockerHidden = false
+    }
+}
+
 const drawHighScoreBoard = (ctx) => {
     const xpos = gameOverMessage
     // console.log(cvs.height)
 
-    // ctx.lineWidth = 2;
-    // ctx.fillStyle = 'black'
-    // ctx.font = "22px BitMicro"
-    // ctx.fillText("NEW HIGHSCORE", 20, 80)
+
 
     ctx.drawImage(sprite2, 6, 518 , 232 - 6, 10,                 // top
         xpos.x, 95 , xpos.w, 10)   
@@ -477,9 +495,21 @@ const drawHighScoreBoard = (ctx) => {
     // console.log(`nameInputBoxPosition: ${nameInputBoxPosition}`)
     if(nameInputBoxPosition !== null)    
     {
+        // display : NEW HIGHSCORE and ENTER NAME
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'black'
+        ctx.font = "22px BitMicro"
+        ctx.fillText("NEW HIGHSCORE!", 70, 73)
+        ctx.font = "20px BitMicro"
+        ctx.fillText("ENTER NAME", 103, 91)
+
+
+        // open up the keyboard
         state.value.showNameInput = true
         state.value.nameInputRef.focus()
-        state.value.nameInputRef.style.top = `${106 + (27 * nameInputBoxPosition)}px`
+        state.value.nameInputRef.style.top = `${106 + (27 * nameInputBoxPosition)}px`   // adjust pos according to HS rank
+        toggleDocker(true)    // this hides the docker, so it doesn't obstruct the text input
+
     }
 
 }
@@ -666,6 +696,8 @@ const updatePlayerName = () => {
     const playerInputName = state.value.nameInputRef.value
     if(playerInputName.trim() != ''){
         setPlayerName(playerInputName,true)
+    }else{
+        setPlayerName(PLAYER_NAME,true)
     }
     SCOREBOARD_STATE[nameInputBoxPosition + 1].name = PLAYER_NAME
     sendRankingsToFirebase(SCOREBOARD_STATE)
@@ -676,6 +708,7 @@ const updatePlayerName = () => {
     // state.value.nameInputRef.disabled = false
     document.activeElement.blur();
     state.value.showNameInput = false
+    toggleDocker(false)
 }
 
 const isTapInsideBoundary = (evt,canvas,expectedTap) => {
@@ -705,6 +738,7 @@ const isTapInsideBoundary = (evt,canvas,expectedTap) => {
     if(isTapInside){
         switch(iconToTap){
             case gameOverIcons.startBtn:
+                state.value.isClientOnline = navigator.onLine
                 if (!state.value.showStartButton){
                     return false
                 }
@@ -746,13 +780,15 @@ function sendRankingsToFirebase(newRankings){
     updateInProgress = true
     fluffyCollection.doc("highScores").set(newRankings).then( (status) => {
         // console.log(status)
+        state.value.isClientOnline = navigator.onLine
         console.log('%c ️‍🔥 data sent to firestore: ','background: #222; color: orange', newHash)
         lastRankingsHash = newHash
         updateInProgress = false
         getHighScores()
       }).catch((err) => {
-          console.error("Error updating high score: ", err);
-          updateInProgress = false
+        state.value.isClientOnline = navigator.onLine
+        console.error("Error updating high score: ", err);
+        updateInProgress = false
       });
 }
 
@@ -761,6 +797,7 @@ function getHighScores(callback){
     FETCHING_HIGHSCORES = true
     fluffyCollection.doc("highScores").get().then( (doc) => {
         if (doc.exists) {
+            state.value.isClientOnline = navigator.onLine
             const freshScores = doc.data()
             console.log("%c ⬇️ just fetched highscores:", 'background: #222; color: lightgoldenrodyellow', hash.sha1(freshScores).slice(-5));
             SCOREBOARD_STATE = freshScores
@@ -776,11 +813,13 @@ function getHighScores(callback){
             score.medalScores['bronze'] = freshScores[3].score
         //   console.log(score.medalScores)
         } else {
+          state.value.isClientOnline = navigator.onLine
           // doc.data() will be undefined in this case
           console.log("No such document!");
           FETCHING_HIGHSCORES = false
         }
       }).catch(function(error) {
+        state.value.isClientOnline = navigator.onLine
         console.log("Error getting highscores:", error);
         FETCHING_HIGHSCORES = false
       });
@@ -794,12 +833,7 @@ const resetHighScores = () => {
           console.error("Error updating high score: ", err);
     });
 }
-
 // resetHighScores()
-
-setTimeout(() => {
-    // do something onMounted
-},5000)
 
 
 

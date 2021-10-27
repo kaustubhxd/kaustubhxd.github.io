@@ -101,8 +101,10 @@ export default {
         const boxOpacity = ref(1)
 
         if(isSmartPhone()){
-            boxWidth.value   =   (window.innerWidth * (7/8));
-            boxHeight.value  =   (window.innerHeight * (10/13));
+            if(!windowState.value.overrideSmartSize){
+                boxWidth.value   =   (window.innerWidth * (7/8));
+                boxHeight.value  =   (window.innerHeight * (10/13));
+            }
             boxTop.value     =   (window.innerHeight - boxHeight.value)/4;
             boxLeft.value    =   (window.innerWidth - boxWidth.value)/2;
         }
