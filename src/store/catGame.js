@@ -17,18 +17,21 @@ const state = ref({
     isClientOnline : true
 })
 
+
 // localStorage.removeItem("PLAYER_NAME")      // debug
 
 let IS_PLAYER_NAME_SET = false
-let PLAYER_NAME = "PLAYER" + Math.round(Math.random() * 100)
+let PLAYER_NAME = ''
+let PLAYER_NAME_PLACEHOLDER = "PLAYER" + Math.round(Math.random() * 100)
 
 const setPlayerName = (name,saveNameToLocalStorage = false) => {
     PLAYER_NAME = name.toUpperCase()
     IS_PLAYER_NAME_SET = true
     if(saveNameToLocalStorage) localStorage.setItem("PLAYER_NAME", PLAYER_NAME)
 }
-if(localStorage.getItem("PLAYER_NAME")) setPlayerName(localStorage.getItem("PLAYER_NAME"))
-
+if(localStorage.getItem("PLAYER_NAME")){
+    setPlayerName(localStorage.getItem("PLAYER_NAME"))
+}
 
 let SCOREBOARD_STATE = {
     1 : { name: "", score: 0 },
@@ -225,8 +228,8 @@ const cat = {
 
         // update flap animation
         if(state.value.current !== possibleStates.gameOver){
-            let period = state.value.current == possibleStates.getReady ? 15 : 10
-            this.frame += (frames % period) == 0 ? 1 : 0
+            let period = state.value.current === possibleStates.getReady ? 15 : 10
+            this.frame += (frames % period) === 0 ? 1 : 0
             this.frame = this.frame % this.animation.length
         }
         // console.log(this.frame)
@@ -514,22 +517,38 @@ const drawHighScoreBoard = (ctx) => {
 
 }
 
+const checkIfSamePlayerSameScore = (lscore,rank,scoreListRef) => {
+    if(rank === 1) return false    
+    
+    for(let srank=rank;srank>1;srank--){
+        const oneRankAboveThis = scoreListRef[srank-1] 
+        console.log(rank,oneRankAboveThis.name,PLAYER_NAME,oneRankAboveThis.score,lscore )
+        if(oneRankAboveThis.name === PLAYER_NAME && oneRankAboveThis.score === lscore ) return true
+    }
+    return false
+}
 
 const hasRankingChanged = (scoreListRef) => {
     const newRankings = {...scoreListRef}
     let lscore = score.latestScore
 
-    const checkIfSamePlayerSameScore = (rank) => {
-        if(rank === 1) return true    
-        if(scoreListRef[rank-1].name === PLAYER_NAME && scoreListRef[rank-1].score === lscore ) return false
-    }
-
     for(let rank=1;rank<=10;rank++){
-        if (lscore > scoreListRef[rank].score &&  checkIfSamePlayerSameScore(rank)) {
+        console.log(rank)
+        if (lscore > scoreListRef[rank].score) {
+            console.log('lscore > rankscore ', rank)
+
+            if(checkIfSamePlayerSameScore(lscore,rank,scoreListRef)){
+                return [false,null,null]
+            }
+
             for(let xrank=10;xrank>rank;xrank--){
+                console.log(`${xrank} ${newRankings[xrank - 1].name} ${newRankings[xrank - 1].score}`)
                 newRankings[xrank] = newRankings[xrank - 1]
             }
+            console.log(`${PLAYER_NAME} is now ranked ${rank} with score ${lscore}`)
             newRankings[rank] = { name : PLAYER_NAME, score: lscore }
+            console.log(newRankings)
+            console.log('returning from HRC')
             return [true, rank,newRankings]
         }
     }
@@ -590,8 +609,10 @@ const drawGameOverScreen = (ctx,frames, showStartButton) => {
             const [isRankingChanged,rank,newRankings] = hasRankingChanged(scoreList)
 
             if(isRankingChanged){
+                console.log('sending new rankings to firebase', newRankings)
                 score.medalWon = rank === 1 ? MEDAL.GOLD : rank === 2 ? MEDAL.SILVER : rank === 3 ? MEDAL.BRONZE : 4
                 console.log(score.medalWon ? score.medalWon : null)
+                console.log('sending to firebase')
                 sendRankingsToFirebase(newRankings)
             }
             const oldHash = hash.sha1(scoreList).slice(-5)
@@ -698,15 +719,23 @@ const setTextInput = (evt) => {
 
 const updatePlayerName = () => {
     const playerInputName = state.value.nameInputRef.value
-    if(playerInputName.trim() != ''){
+    console.log(`updating name from ${PLAYER_NAME} to ${playerInputName}`)
+    if(playerInputName.trim() != '' ){
         setPlayerName(playerInputName,true)
-    }else{
-        setPlayerName(PLAYER_NAME,true)
+    }else if(IS_PLAYER_NAME_SET){
+        setPlayerName(PLAYER_NAME)
+    }else if(nameInputBoxPosition !== null){
+        setPlayerName(PLAYER_NAME_PLACEHOLDER,true)
     }
-    SCOREBOARD_STATE[nameInputBoxPosition + 1].name = PLAYER_NAME
-    sendRankingsToFirebase(SCOREBOARD_STATE)
+    
+    if(nameInputBoxPosition !== null){
+        SCOREBOARD_STATE[nameInputBoxPosition + 1].name = PLAYER_NAME
+        console.log(PLAYER_NAME)
+        console.log('sending to firebase')
+        sendRankingsToFirebase(SCOREBOARD_STATE)
+        nameInputBoxPosition = null
+    }
 
-    nameInputBoxPosition = null
     state.value.nameInputRef.value = ''
     // state.value.nameInputRef.disabled = true
     // state.value.nameInputRef.disabled = false
@@ -751,7 +780,9 @@ const isTapInsideBoundary = (evt,canvas,expectedTap) => {
                 checkingIfScoreIsHS = false
                 break;
             case gameOverIcons.HSExit:
-                updatePlayerName()
+                if(state.value.showNameInput){
+                    updatePlayerName()
+                }
                 break;
             case gameOverIcons.showHSBtn:
                 showNewButton = false
@@ -788,7 +819,6 @@ function sendRankingsToFirebase(newRankings){
         console.log('%c ️‍🔥 data sent to firestore: ','background: #222; color: orange', newHash)
         lastRankingsHash = newHash
         updateInProgress = false
-        getHighScores()
       }).catch((err) => {
         state.value.isClientOnline = navigator.onLine
         console.error("Error updating high score: ", err);
@@ -796,26 +826,32 @@ function sendRankingsToFirebase(newRankings){
       });
 }
 
+const updateScoreboardWithNewData = (freshScores) => {
+    state.value.isClientOnline = navigator.onLine
+    console.log("%c ⬇️ just fetched highscores:", 'background: #222; color: lightgoldenrodyellow', hash.sha1(freshScores).slice(-5));
+    SCOREBOARD_STATE = freshScores
+    if (!initialRankingFetchDone) initialRankingFetchDone = true
+    if(FETCHING_HIGHSCORES) FETCHING_HIGHSCORES = false
+
+    score.medalScores['gold'] = freshScores[1].score
+    score.medalScores['silver'] = freshScores[2].score
+    score.medalScores['bronze'] = freshScores[3].score
+}
+
+const unsubFirebase = fluffyCollection.doc("highScores").onSnapshot((doc) => {
+    updateScoreboardWithNewData(doc.data())
+})
+
 let FETCHING_HIGHSCORES = false
 function getHighScores(callback){
     FETCHING_HIGHSCORES = true
     fluffyCollection.doc("highScores").get().then( (doc) => {
         if (doc.exists) {
-            state.value.isClientOnline = navigator.onLine
-            const freshScores = doc.data()
-            console.log("%c ⬇️ just fetched highscores:", 'background: #222; color: lightgoldenrodyellow', hash.sha1(freshScores).slice(-5));
-            SCOREBOARD_STATE = freshScores
-            initialRankingFetchDone = true
-            FETCHING_HIGHSCORES = false
-
+            updateScoreboardWithNewData(doc.data())
             if(callback){
-                callback(freshScores)
+                callback(doc.data())
             }
-            
-            score.medalScores['gold'] = freshScores[1].score
-            score.medalScores['silver'] = freshScores[2].score
-            score.medalScores['bronze'] = freshScores[3].score
-        //   console.log(score.medalScores)
+            //   console.log(score.medalScores)
         } else {
           state.value.isClientOnline = navigator.onLine
           // doc.data() will be undefined in this case
@@ -828,7 +864,6 @@ function getHighScores(callback){
         FETCHING_HIGHSCORES = false
       });
 }
-getHighScores()
 
 const resetHighScores = () => {
     fluffyCollection.doc("highScores").set(SCOREBOARD_STATE).then( (status) => {
@@ -860,5 +895,6 @@ export {
     collisionTimestamp,
     possibleGameOverStates,
     setTextInput,
-    updatePlayerName
+    updatePlayerName,
+    unsubFirebase
 }

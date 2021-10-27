@@ -9,7 +9,7 @@
 
 <script>
 import { onBeforeUnmount, onMounted, ref,nextTick } from 'vue'
-import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,tappableIcons,possibleGameOverStates,
+import { state,possibleStates, background as bg, cat, getHighScores, foreground as fg,tappableIcons,possibleGameOverStates,unsubFirebase,
             getReadyMessage as getReady, gameOverMessage as gameOver, pipes,score,isTapInsideBoundary,setTextInput,updatePlayerName,
             sfx,collisionTimestamp } from '../store/catGame'
 import {enableAnimations} from '../store/state'
@@ -234,6 +234,7 @@ export default {
             pipes.reset()
             bg.reset()
             fg.reset()
+            unsubFirebase()
             cancelAnimationFrame(loopId)
             removeEventListener("click", handleUserTap)
             removeEventListener("keyup", handleUserTap)
