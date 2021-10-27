@@ -370,17 +370,17 @@ const score = {
     draw: function(ctx){
         ctx.fillStyle = '#eafcdb'
         ctx.strokeStyle = '#000'
+        ctx.font = "26px SG10"
         if(state.value.current === possibleStates.gameStarted){
             ctx.lineWidth = 2;
             ctx.fillStyle = 'black'
-            ctx.font = "28px BitMicro"
             ctx.fillText(this.latestScore, cvs.width/2, 50 )
             // ctx.strokeText(this.latestScore, cvs.width/2, 50 )
         }else if(state.value.current === possibleStates.gameOver){
             if(state.value.gameOverState === possibleGameOverStates.active){
                 ctx.lineWidth = 2;
                 ctx.fillStyle = '#f98e66'
-                ctx.font = "28px BitMicro"
+                ctx.font = "26px SG10"
                 ctx.fillText(this.latestScore, 225, 235 )
                 // ctx.strokeText(this.latestScore, 225, 235 )
                 ctx.fillText(this.bestScore, 225, 280 )
@@ -400,7 +400,7 @@ const drawTopThree = (ctx) => {
     const scalar = 0.3
     ctx.fillStyle = '#eafcdb'
     ctx.lineWidth = 2;
-    ctx.font = "26px BitMicro"
+    ctx.font = "22px SG10"
     const medalTypes = ['gold','silver','bronze']
 
     for(let i=0;i<medalTypes.length;i++){
@@ -472,7 +472,7 @@ const drawHighScoreBoard = (ctx) => {
     ctx.fillStyle = '#f98e66'
     ctx.strokeStyle = 'black'
     ctx.lineWidth = 1.5;
-    ctx.font = "22px BitMicro"
+    ctx.font = "20px SG10"
 
     const vertLineSpacing = 27 
     // console.log(FETCHING_HIGHSCORES)
@@ -480,9 +480,9 @@ const drawHighScoreBoard = (ctx) => {
         ctx.fillText(`${xrank}.`, xpos.x + 10 + 10, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing))                       // fill rank 
         if ( xrank - 1 !== (nameInputBoxPosition) ){
             ctx.fillText(SCOREBOARD_STATE[xrank].name, xpos.x + 10 + 20 + 30, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing))       // fill name 
-            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 75, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
+            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 65, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
         }else if (!FETCHING_HIGHSCORES && nameInputBoxPosition !== null){
-            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 75, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
+            ctx.fillText(SCOREBOARD_STATE[xrank].score, xpos.x + 10 + 20 + 90 + 65, 95 + 10 + 20 + ((xrank-1) * vertLineSpacing)) // fill score
         }
     }
     
@@ -498,9 +498,9 @@ const drawHighScoreBoard = (ctx) => {
         // display : NEW HIGHSCORE and ENTER NAME
         ctx.lineWidth = 2;
         ctx.fillStyle = 'black'
-        ctx.font = "22px BitMicro"
+        ctx.font = "22px SG10"
         ctx.fillText("NEW HIGHSCORE!", 70, 73)
-        ctx.font = "20px BitMicro"
+        ctx.font = "20px SG10"
         ctx.fillText("ENTER NAME", 103, 91)
 
 

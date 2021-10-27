@@ -2,11 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Finger+Paint&display=swap');
 
 @font-face {
-  font-family: 'BitMicro';
-  src: url('~@/assets/fonts/sg10.ttf') format("truetype");;
-  
-  font-weight: normal;
-  font-style: normal;
+  font-family: 'SG10';
+  src: url('~@/assets/fonts/SG10.ttf') 
+  format("truetype");
 }
 
 html, body {

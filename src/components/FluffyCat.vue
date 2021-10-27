@@ -1,6 +1,6 @@
 <template>
     <div class='canvas-wrap'>
-        <canvas id='mycanvas' width="320" height='480' ref='myCanvas'></canvas>
+        <canvas id='mycanvas' class='disableSelection' width="320" height='480' ref='myCanvas'></canvas>
         <textarea id="nameInput" ref='nameInputRef' @input="setTextInput"  @keyup.enter.exact="updatePlayerName" v-show="showNameInput " 
             spellcheck="false" autocomplete="false" maxlength="9"></textarea>
     </div>
@@ -33,6 +33,7 @@ export default {
         let cvs,ctx = null
         let loopId = undefined
 
+        let FRAMES = 0
         let showFps = true
         let currentFps = 0
 
@@ -64,59 +65,69 @@ export default {
             }
         }
 
-        let frames = 0
         // REDRAWNG CANVAS USING CONSISTENT FPS ACROSS DEVICES
         // https://www.geeksforgeeks.org/how-to-control-fps-with-requestanimationframe/
-
-        var frameCount = 0;
-        var fpsInterval, startTime, now, then, elapsed;
-        const FPS = 60
-    
-        function startAnimating(FPS) {
-            fpsInterval = 1000 / FPS;
-            then = Date.now();
-            startTime = then;
-            console.log(startTime);
-            animate();
-        }
-
-        function animate() {
-            // request another frame
-    
-            loopId = requestAnimationFrame(animate);
-    
-            // calc elapsed time since the last loop
-            now = Date.now();
-            elapsed = now - then;
-    
-            // if enough time has elapsed, draw the next frame
-            if (elapsed > fpsInterval) {
-                then = now - (elapsed % fpsInterval);
-    
-                // draw animating objects here...
-                frames += 1
-                draw(frames)
-                // console.log(frames)
-    
-                // below code is used for testing, whether
-                // the frame is animating at the specified FPS
-    
-                var sinceStart = now - startTime;
-                currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
-                // console.log("Elapsed time= " + Math.round((sinceStart / 1000) * 100) / 100 
-                //                 + " secs @ " + currentFps + " FPS.")
-
-                if( showFps && currentFps <= 45 ){
-                    // console.log(currentFps)
-                    ctx.lineWidth = 2;
-                    ctx.fillStyle = '#100'
-                    ctx.fillStyle = currentFps < 30 ? 'red' : '#aeae07'
-                    ctx.font = "12px Finger Paint"
-                    ctx.fillText(Math.round(currentFps), 5, 12 )
-                }
-                if (currentFps > 45) showFps = false
+        const renderAtConsistentFPS = (FPS = 60) => {
+            var frameCount = 0;
+            var fpsInterval, startTime, now, then, elapsed;
+        
+            function startAnimating(FPS) {
+                fpsInterval = 1000 / FPS;
+                then = Date.now();
+                startTime = then;
+                console.log(startTime);
+                animate();
             }
+
+            function animate() {
+                // request another frame
+        
+                loopId = requestAnimationFrame(animate);
+        
+                // calc elapsed time since the last loop
+                now = Date.now();
+                elapsed = now - then;
+        
+                // if enough time has elapsed, draw the next frame
+                if (elapsed > fpsInterval) {
+                    then = now - (elapsed % fpsInterval);
+        
+                    // draw animating objects here...
+                    FRAMES += 1
+                    draw(FRAMES)
+                    // console.log(FRAMES)
+        
+                    // debug
+                    var sinceStart = now - startTime;
+                    currentFps = Math.round((1000 / (sinceStart / ++frameCount)) * 100) / 100;
+                    // console.log("Elapsed time= " + Math.round((sinceStart / 1000) * 100) / 100 
+                    //                 + " secs @ " + currentFps + " FPS.")
+
+                    if( showFps && currentFps <= 45 ){
+                        // console.log(currentFps)
+                        ctx.lineWidth = 2;
+                        ctx.fillStyle = '#100'
+                        ctx.fillStyle = currentFps < 30 ? 'red' : '#aeae07'
+                        ctx.font = "12px Finger Paint"
+                        ctx.fillText(Math.round(currentFps), 5, 12 )
+                    }
+                    if (currentFps > 45) showFps = false
+                }
+            }
+            startAnimating(FPS)
         }
+
+        // Simple RAF driven render loop. Best for performance.
+        const renderUsingClientFPS = () => {
+            const loop = () => {
+                FRAMES += 1
+                draw(FRAMES)
+
+                loopId = requestAnimationFrame(loop);  
+            }
+            loop()
+        }
+
 
         const resolveGameOverTaps = (evt) => {
             console.log(state.value.gameOverState)
@@ -205,7 +216,8 @@ export default {
 
             // loop()
             try{
-                startAnimating(FPS);
+                // renderAtConsistentFPS(60)
+                renderUsingClientFPS()
             }catch(err){
                 console.log('fix your errors:', err);
             }
@@ -262,6 +274,8 @@ export default {
     }
 
     #nameInput {
+        font-size: 20px;
+        font-family: 'SG10';
         top: 106px;
         left: 105.2px;
         width: 120px;
@@ -273,9 +287,7 @@ export default {
         overflow: hidden;
         border: none;
         outline: none;
-        font-family: 'BitMicro';
         color: #f98e66;
-        font-size: 22px;
         text-transform: uppercase;
         /* user-select: none; */
     }
@@ -285,6 +297,18 @@ export default {
     width: 467px;
     height: 485px;
     background: #7e5f38;
+}
+
+.disableSelection{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: 0;
+    -webkit-tap-highlight-color: transparent; 
+    -webkit-touch-callout: none;
 }
 
 </style>
