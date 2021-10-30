@@ -2,7 +2,7 @@
 
 https://itskaustubh.github.io/
 
-Also Deployed on https://www.kaustubh.app
+Also deployed on https://www.kaustubh.app
 
 ## Project setup
 ```
