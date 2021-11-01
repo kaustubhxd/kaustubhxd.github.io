@@ -39,7 +39,7 @@ export default {
 }
 
 p,a{
-    font-size: 26px;
+    font-size: 22px;
 }
 
 #resume{
@@ -73,6 +73,10 @@ p,a{
 
 .social-links{
     margin-top:15px
+}
+
+#spin{
+    font-size: 22px;
 }
 
 #spin:after {

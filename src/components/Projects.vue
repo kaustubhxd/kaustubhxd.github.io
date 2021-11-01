@@ -1,7 +1,7 @@
 <template>
   <section class="s1">
         <div class="main-container">
-            <h3 style="text-align: center">Some of my recent exploits</h3>
+            <h4 style="text-align: center">Some of my recent exploits</h4>
             <div class="post-wrapper">
                     <div class="post" v-for='project in projects' :key='project'>
                         <!-- <ExpandableImage :src="require('../assets/images/' + project.thumbnail)" /> -->
@@ -137,7 +137,7 @@ h6  {font-size      :   16px;}
 }
 
 .post-title{
-    font-size   :   24px;
+    font-size   :   22px;
     border-bottom: 1px solid #000;
     padding-bottom: 3px;
     border-color: #eaeaea;
@@ -153,7 +153,7 @@ h6  {font-size      :   16px;}
 
 .post-content{
     color           :   #4b5156;
-    font-size       :   22px;
+    font-size       :   20px;
     margin-bottom   :   0px;
 }
 

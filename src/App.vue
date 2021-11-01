@@ -71,11 +71,11 @@ export default {
   
 <style lang='scss'>
 *{
-  // cursor: none;
+  cursor: none;
 }
 
 input{
-  // cursor:none;
+   cursor:none;
 }
 
 html {

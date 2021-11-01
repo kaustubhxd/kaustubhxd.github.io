@@ -15,8 +15,8 @@ export default {
         const cursorTransform       = ref('');
         const cursorCircleTransform = ref('');
         
-        const cursorCircleWidth     = ref('64px')        
-        const cursorCircleHeight    = ref('64px')
+        const cursorCircleWidth     = ref('40px')        
+        const cursorCircleHeight    = ref('40px')
 
 
         const mouse = { x: -100, y: -100 }; // mouse pointer's coordinates
@@ -81,7 +81,7 @@ export default {
         requestAnimationFrame(loop);
 
         function handleMouseDown()  { speed = 1; cursorCircleWidth.value = cursorCircleHeight.value = '32px' };
-        function handleMouseUp()    { speed = speedDefault; cursorCircleWidth.value = cursorCircleHeight.value = '64px' }
+        function handleMouseUp()    { speed = speedDefault; cursorCircleWidth.value = cursorCircleHeight.value = '40px' }
 
         return {
             cursorInnerTransform,
@@ -125,7 +125,7 @@ export default {
     will-change: transform;
     mix-blend-mode: difference;
     transition: transform .05s linear;
-    z-index: 2020;
+    z-index: 99999;
   }
   .cursor {
     top: -4px;
@@ -144,8 +144,8 @@ export default {
   }
   @media (hover: hover) and (pointer: fine) {
     .cursor-circle {
-      width: 64px;
-      height: 64px;
+      width: 40px;
+      height: 40px;
       margin-top: -50%;
       margin-left: -50%;
       border-radius: 50%;

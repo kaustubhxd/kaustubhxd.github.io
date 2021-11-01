@@ -132,7 +132,7 @@ function setWebsiteLinks(key){
     for(const project in projects.value){
         if(projects.value[project].type == 'website' && projects.value[project][key] !== undefined && projects.value[project][key].length > 0){
             projects.value[project].link = projects.value[project][key] 
-            console.log(`${project}  :  ${projects.value[project].link}`)
+            // console.log(`${project}  :  ${projects.value[project].link}`)
         }
     }
 }
@@ -179,7 +179,6 @@ const skills = {
     'HTML/CSS/SCSS' : 'html.svg',
     'Firebase' : 'firebase.svg'
 }
-console.log('hehe')
 
 export {
     projects,
