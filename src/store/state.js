@@ -39,7 +39,7 @@ const windows = ref({
         title       :   'Who?',
         loaded      :   true,
         minimized   :   false,
-        active      :   false,
+        active      :   true,
         position    :   [0,0],
         stuckToSide :   false,
         stuckWhere  :   'left',
