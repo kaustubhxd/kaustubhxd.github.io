@@ -64,7 +64,7 @@ export default {
               username: 'ash',
               avatar_url: 'https://cdn.discordapp.com/attachments/832596849402839070/832596902074908672/ash_the_mailman.png',
               embeds: [
-                { color: 171159, author: { name: fullname, url: addressLink}, title: 'Message',
+                { color: 171159, author: { name: "Anonymous", url: addressLink}, title: 'Message',
                   thumbnail: { url: 'https://cdn.discordapp.com/attachments/832596849402839070/832606302042980432/ashs_cat_.png'},
                   description: "New Visitor!",
                   fields: [
