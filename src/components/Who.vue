@@ -51,6 +51,38 @@ export default {
           sendToDiscord(addressLink)
         });
       }
+      
+            function sendToDiscord(addressLink){
+        // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
+        let fullname = contactInfo.value.lastName != '' ? `${contactInfo.value.lastName}, ` : ``
+        fullname = fullname + contactInfo.value.firstName 
+        fetch(
+          DISCORD_WEBHOOK_LINK,
+          {
+            method: 'post', headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              username: 'ash',
+              avatar_url: 'https://cdn.discordapp.com/attachments/832596849402839070/832596902074908672/ash_the_mailman.png',
+              embeds: [
+                { color: 171159, author: { name: fullname, url: addressLink}, title: 'Message',
+                  thumbnail: { url: 'https://cdn.discordapp.com/attachments/832596849402839070/832606302042980432/ashs_cat_.png'},
+                  description: contactInfo.value.comments,
+                  fields: [
+                    { name: 'Email', value: contactInfo.value.email},
+                    { name: 'Phone', value: contactInfo.value.phone, },
+            ],},],}),}
+          ).then(status => {
+            console.log('data sent to discord')
+            helperHint.value = `Submitted! I'll get back to you ASAP`
+            // console.log(status)
+          }).
+          catch((e) => {
+            console.log(`ERROR: could not send data to discord`)
+            console.log(e)
+          });
+      }
+      
+      
       getAdditionalDetails()
       
 
