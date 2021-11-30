@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import {DISCORD_WEBHOOK_LINK} from '../store/keys'
+
 export default {
     setup(){
          function getAdditionalDetails(){
