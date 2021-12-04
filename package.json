@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@prismicio/client": "^5.1.0",
+    "bowser": "^2.11.0",
     "core-js": "^3.6.5",
     "d3-timer": "^3.0.1",
     "debounce": "^1.2.0",

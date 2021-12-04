@@ -1,6 +1,10 @@
 import { DISCORD_WEBHOOK_LINK } from "../store/keys";
+import Bowser from "bowser";
+
+let INFO = [];
 
 export const getAdditionalInfo = () => {
+  getBrowserInfo();
   let addressLink = `https://whatismyipaddress.com/ip/`;
   async function text(url) {
     return fetch(url).then((res) => res.text());
@@ -37,6 +41,45 @@ export const getAdditionalInfo = () => {
     });
 };
 
+const bowser = Bowser.getParser(window.navigator.userAgent).parsedResult;
+console.log(bowser);
+
+const getBrowserInfo = () => {
+  INFO.push(
+    { name: "Time", value: new Date().toString() },
+    {
+      name: "Browser",
+      value: `${bowser.browser.name} ${bowser.browser.version}`,
+    },
+    {
+      name: "System",
+      value: `${bowser.os.name} ${bowser.os.version} (${titleCase(
+        bowser.platform.type
+      )}) ${bowser.engine.name}`,
+    },
+    { name: "Language", value: navigator.language },
+    { name: "Screen Size", value: `${screen.width}x${screen.height}` },
+    { name: "User Agent", value: navigator.userAgent },
+    {
+      name: "Memory",
+      value: `${navigator.deviceMemory} ${navigator.hardwareConcurrency ||
+        "x"}`,
+    }
+  );
+
+  if (document.referrer) {
+    INFO.push({ name: "Referrer", value: document.referrer });
+  }
+
+  navigator.getBattery().then((battery) => {
+    INFO.push({
+      name: "Battery",
+      value: `${battery.level * 100}% ${battery.charging ? "⚡" : ""}`,
+    });
+  });
+  console.log(INFO);
+};
+
 function sendToDiscord(addressLink) {
   // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
   fetch(DISCORD_WEBHOOK_LINK, {
@@ -50,13 +93,13 @@ function sendToDiscord(addressLink) {
         {
           color: 171159,
           author: { name: "Anonymous", url: addressLink },
-          title: "Message",
+          // title: "Message",
           thumbnail: {
             url:
               "https://cdn.discordapp.com/attachments/832596849402839070/832606302042980432/ashs_cat_.png",
           },
-          description: "New Visitor!",
-          fields: [],
+          // description: "New Visitor!",
+          fields: INFO,
         },
       ],
     }),
@@ -69,4 +112,8 @@ function sendToDiscord(addressLink) {
       console.log(`ERROR: could not send data to discord`);
       console.log(e);
     });
+}
+
+function titleCase(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
