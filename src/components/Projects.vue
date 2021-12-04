@@ -1,7 +1,4 @@
 <template>
-  <h4 style="text-align: center" v-if="Object.keys(projects).length == 0">
-    Fetching Projects...
-  </h4>
   <section class="s1" v-if="Object.keys(projects).length !== 0">
     <div class="main-container">
       <h4 style="text-align: center">Some of my recent exploits</h4>
@@ -55,16 +52,20 @@ export default {
   setup() {
     const projectsState = ref(windows.value["projects"]);
     onMounted(() => {
-      const unwatchProjects = watch(
-        () => projects.value.website,
-        () => {
-          console.log(Object.keys(projects).length);
-          if (Object.keys(projects).length !== 0) {
-            projectsState.value.loaded = true;
-            unwatchProjects();
+      if (projects.value.length !== 0) {
+        projectsState.value.loaded = true;
+      } else {
+        const unwatchProjects = watch(
+          () => projects.value.website,
+          () => {
+            console.log(Object.keys(projects).length);
+            if (Object.keys(projects).length !== 0) {
+              projectsState.value.loaded = true;
+              unwatchProjects();
+            }
           }
-        }
-      );
+        );
+      }
     });
 
     const imageViewerOpts = {

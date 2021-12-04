@@ -4,7 +4,7 @@ import Prismic from "@prismicio/client";
 
 console.log(Prismic);
 
-const projects = ref({});
+const projects = ref([]);
 var apiEndpoint = "https://kaustubhportfolio.cdn.prismic.io/api/v2";
 
 function setWebsiteLinks(key) {
@@ -63,6 +63,9 @@ const skills = {
   Firebase: "firebase.svg",
 };
 
+let sort_order = [];
+let unsortedProjects = {};
+
 // fetching data from CMS
 const client = Prismic.client(apiEndpoint);
 client
@@ -72,18 +75,31 @@ client
     console.log(results);
     results.forEach((item) => {
       const data = item.data;
-      projects.value[item.uid] = {
-        title: data.title[0].text,
-        thumbnail: data.thumbnail.url,
-        content: data.content[0].text,
-        klink: data.klink.url === undefined ? "" : data.klink.url,
-        gitlink: data.gitlink.url === undefined ? "" : data.gitlink.url,
-        link: "",
-        languages: data.languages[0].text.split(","),
-        type: data.type[0].text,
-      };
+      if (item.type === "project") {
+        unsortedProjects[item.uid] = {
+          title: data.title[0].text,
+          thumbnail: data.thumbnail.url,
+          content: data.content[0].text,
+          klink: data.klink.url === undefined ? "" : data.klink.url,
+          gitlink: data.gitlink.url === undefined ? "" : data.gitlink.url,
+          link: "",
+          languages: data.languages[0].text.split(","),
+          type: data.type[0].text,
+        };
+      } else if (item.type === "project_or") {
+        item.data["sort_order"].forEach((sortItem) => {
+          sort_order.push(sortItem.text.trim());
+        });
+      }
     });
-    console.log(projects.value);
+    console.log(unsortedProjects);
+
+    sort_order.forEach((id) => {
+      // console.log(id);
+      // console.log(unsortedProjects[id]);
+      projects.value.push(unsortedProjects[id]);
+    });
+
     checkWebsiteStatus();
   })
   .catch((err) => {
@@ -91,3 +107,16 @@ client
   });
 
 export { projects, skills };
+
+// odia_tts
+// website
+// neuboard
+// basespace
+// offlinetv
+// flutter_netflix
+// flutter_food_delivery
+// flutter_budget
+// deep_dataset
+// skribbl_plus
+// pop_culture_dictionary
+// portfolio_v1

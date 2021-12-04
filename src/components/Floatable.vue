@@ -50,7 +50,6 @@
                             <!-- {{windowState.zIndex}}  -->
 
 
-                        <Skills v-if="props.id == 'skills' && windowState.active" />
                         <Projects v-if="props.id == 'projects' && windowState.active"/>
                         <Who v-if="props.id == 'who' && windowState.active"/>
                         <Contact v-if="props.id == 'contact' && windowState.active"/>
@@ -73,7 +72,6 @@ import {defineAsyncComponent} from 'vue'
 import Loading from './Loading'
 
 const Projects = defineAsyncComponent(() => import('./Projects'))
-const Skills = defineAsyncComponent(() => import('./Skills'))
 const Contact = defineAsyncComponent(() => import('./Contact'))
 const FluffyCat = defineAsyncComponent(() => import('./FluffyCat'))
 
@@ -81,7 +79,6 @@ const FluffyCat = defineAsyncComponent(() => import('./FluffyCat'))
 export default {
     components: {   ActionButtons,
                     Projects,
-                    Skills,
                     Who,
                     Contact,
                     Loading,
