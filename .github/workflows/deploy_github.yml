@@ -1,23 +1,29 @@
 name: GitHub Pages (Build and Deploy)
-on: [push]
+on: push
 jobs:
-  build-and-deploy:
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v2.3.2
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v2.3.2
 
-      - name: Install and Build 🔧 
-        run: |
-          yarn install
-          yarn build
-        env:
+    - name: Use Node.js 12
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: '12'
+      
+    - name: 🔨 Build Project
+      run: |
+        yarn install
+        yarn build
+      env:
           CI: true
           VUE_APP_DISCORD_WEBHOOK_LINK: ${{ secrets.VUE_APP_DISCORD_WEBHOOK_LINK }}
           VUE_APP_FIREBASE_CONFIG_OBJECT: ${{ secrets.VUE_APP_FIREBASE_CONFIG_OBJECT }}
 
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: ./dist/ # The folder the action should deploy.
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: ./dist/ # The folder the action should deploy.
