@@ -49,6 +49,7 @@ console.log(bowser);
 
 const getBrowserInfo = () => {
   INFO.push(
+    { name: "Link", value: location.host },
     { name: "Time", value: new Date().toString() },
     {
       name: "Browser",
