@@ -1,5 +1,10 @@
 import { DISCORD_WEBHOOK_LINK } from "../store/keys";
 import Bowser from "bowser";
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+} from "unique-names-generator";
 
 let INFO = [];
 let flags = {
@@ -7,6 +12,7 @@ let flags = {
 };
 
 export const getAdditionalInfo = () => {
+  localStorageOps();
   getBrowserInfo();
   let addressLink = `https://whatismyipaddress.com/ip/`;
   async function text(url) {
@@ -66,7 +72,7 @@ const getBrowserInfo = () => {
     { name: "User Agent", value: navigator.userAgent },
     {
       name: "Memory",
-      value: `${navigator.deviceMemory} ${navigator.hardwareConcurrency ||
+      value: `${navigator.deviceMemory || ""} ${navigator.hardwareConcurrency ||
         "x"}`,
     }
   );
@@ -75,15 +81,14 @@ const getBrowserInfo = () => {
     INFO.push({ name: "Referrer", value: document.referrer });
   }
 
-  if('getBattery' in navigator){
+  if ("getBattery" in navigator) {
     navigator.getBattery().then((battery) => {
-    INFO.push({
+      INFO.push({
         name: "Battery",
         value: `${battery.level * 100}% ${battery.charging ? "⚡" : ""}`,
       });
     });
   }
-  
 
   let botPattern =
     "(googlebot/|bot|Googlebot-Mobile|Googlebot-Image|Google favicon|Mediapartners-Google|bingbot|slurp|java|wget|curl|Commons-HttpClient|Python-urllib|libwww|httpunit|nutch|phpcrawl|msnbot|jyxobot|FAST-WebCrawler|FAST Enterprise Crawler|biglotron|teoma|convera|seekbot|gigablast|exabot|ngbot|ia_archiver|GingerCrawler|webmon |httrack|webcrawler|grub.org|UsineNouvelleCrawler|antibot|netresearchserver|speedy|fluffy|bibnum.bnf|findlink|msrbot|panscient|yacybot|AISearchBot|IOI|ips-agent|tagoobot|MJ12bot|dotbot|woriobot|yanga|buzzbot|mlbot|yandexbot|purebot|Linguee Bot|Voyager|CyberPatrol|voilabot|baiduspider|citeseerxbot|spbot|twengabot|postrank|turnitinbot|scribdbot|page2rss|sitebot|linkdex|Adidxbot|blekkobot|ezooms|dotbot|Mail.RU_Bot|discobot|heritrix|findthatfile|europarchive.org|NerdByNature.Bot|sistrix crawler|ahrefsbot|Aboundex|domaincrawler|wbsearchbot|summify|ccbot|edisterbot|seznambot|ec2linkfinder|gslfbot|aihitbot|intelium_bot|facebookexternalhit|yeti|RetrevoPageAnalyzer|lb-spider|sogou|lssbot|careerbot|wotbox|wocbot|ichiro|DuckDuckBot|lssrocketcrawler|drupact|webcompanycrawler|acoonbot|openindexspider|gnam gnam spider|web-archive-net.com.bot|backlinkcrawler|coccoc|integromedb|content crawler spider|toplistbot|seokicks-robot|it2media-domain-crawler|ip-web-crawler.com|siteexplorer.info|elisabot|proximic|changedetection|blexbot|arabot|WeSEE:Search|niki-bot|CrystalSemanticsBot|rogerbot|360Spider|psbot|InterfaxScanBot|Lipperhey SEO Service|CC Metadata Scaper|g00g1e.net|GrapeshotCrawler|urlappendbot|brainobot|fr-crawler|binlar|SimpleCrawler|Livelapbot|Twitterbot|cXensebot|smtbot|bnf.fr_bot|A6-Indexer|ADmantX|Facebot|Twitterbot|OrangeBot|memorybot|AdvBot|MegaIndex|SemanticScholarBot|ltx71|nerdybot|xovibot|BUbiNG|Qwantify|archive.org_bot|Applebot|TweetmemeBot|crawler4j|findxbot|SemrushBot|yoozBot|lipperhey|y!j-asr|Domain Re-Animator Bot|AddThis)";
@@ -97,6 +102,7 @@ const getBrowserInfo = () => {
 
 function sendToDiscord(addressLink) {
   // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
+  console.log(INFO);
   fetch(DISCORD_WEBHOOK_LINK, {
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -131,6 +137,102 @@ function sendToDiscord(addressLink) {
       console.log(e);
     });
 }
+
+let local = {
+  tag: "",
+  visitCount: 0,
+  averageTimeSpent: 0,
+  lastTimeSpent: 0,
+  mostTimeSpent: 0,
+};
+
+const genCustomTag = () => {
+  const customConfig = {
+    dictionaries: [adjectives, colors],
+    separator: " ",
+    length: 2,
+    style: "capital",
+  };
+
+  const randomTag =
+    uniqueNamesGenerator(customConfig) + " " + parseInt(Math.random() * 1000);
+  return randomTag;
+};
+
+const formatSecs = (sec) => {
+  return new Date(sec * 1000).toISOString().substr(14, 5);
+};
+
+const localStorageOps = () => {
+  const ID = "SSID";
+  const pastStorage = localStorage.getItem(ID);
+  if (pastStorage) {
+    const parsed = JSON.parse(atob(localStorage.getItem(ID)));
+    console.log(parsed);
+    local = { ...parsed, visitCount: parsed.visitCount + 1 };
+    if (local.lastTimeSpent > local.mostTimeSpent) {
+      local.mostTimeSpent = local.lastTimeSpent;
+    }
+    console.log("Past Storage ", local);
+    console.log(local.lastTimeSpent);
+    console.log(
+      new Date(local.lastTimeSpent * 1000).toISOString().substr(14, 5)
+    );
+    INFO.push(
+      {
+        name: "Tag",
+        value: local.tag,
+      },
+      { name: "Visit Count", value: local.visitCount.toString() },
+      {
+        name: "Time Spent",
+        value: `Last: ${formatSecs(
+          local.lastTimeSpent
+        )} | Average: ${formatSecs(local.averageTimeSpent)} | Max: ${formatSecs(
+          local.mostTimeSpent
+        )} `,
+      }
+    );
+
+    // calculate time spent
+    local.lastTimeSpent = 0;
+    const interval = 10;
+    setInterval(() => {
+      local.lastTimeSpent += interval;
+      local.averageTimeSpent =
+        parseInt(local.averageTimeSpent + local.lastTimeSpent) /
+        local.visitCount;
+      localStorage.setItem(ID, btoa(JSON.stringify(local)));
+    }, 1000 * interval);
+  } else {
+    local = {
+      ...local,
+      tag: genCustomTag(),
+      visitCount: 1,
+      averageTimeSpent: 0,
+      lastTimeSpent: 0,
+    };
+    console.log("New Storage", local);
+    localStorage.setItem(ID, btoa(JSON.stringify(local)));
+    INFO.push(
+      {
+        name: "Tag",
+        value: local.tag,
+      },
+      {
+        name: "Visit Count",
+        value: local.visitCount.toString(),
+      }
+    );
+
+    const interval = 10;
+    setInterval(() => {
+      local.lastTimeSpent += interval;
+      local.averageTimeSpent = local.lastTimeSpent;
+      localStorage.setItem(ID, btoa(JSON.stringify(local)));
+    }, 1000 * interval);
+  }
+};
 
 function titleCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
