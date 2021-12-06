@@ -19,12 +19,16 @@ export default {
 
     const sketch = (p5) => {
       p5.setup = () => {
-        POINTS = [];
         p5.createCanvas(w, h);
         p5.background(30, 30, 30);
         p5.angleMode(p5.DEGREES);
-        p5.noiseDetail(1);
+        p5.noiseDetail(2);
+        p5.resetSketch();
+      };
 
+      p5.resetSketch = () => {
+        p5.background(30, 30, 30);
+        p5.frameCount = 0;
         const DENSITY = 80;
         const SPACE = p5.width / DENSITY;
 
@@ -35,6 +39,7 @@ export default {
           endY: (p5.height - DOCKER_HEIGHT) / 2 + RADIUS,
         };
 
+        if (POINTS.length !== 0) POINTS = [];
         for (let x = POINT_LIMIT.startX; x < POINT_LIMIT.endX; x += SPACE) {
           for (let y = POINT_LIMIT.startY; y < POINT_LIMIT.endY; y += SPACE) {
             let p = p5.createVector(x + p5.random(-10, 10), y + p5.random(-10, 10));
@@ -59,6 +64,8 @@ export default {
         const MAX_POINTS_RENDERED = p5.frameCount <= POINTS.length ? p5.frameCount * POINTS_PER_FRAME : POINTS.length;
 
         for (let i = 0; i < MAX_POINTS_RENDERED; i++) {
+          // when mouseClicked() too fast, need to check
+          if (POINTS.length === 0) continue;
           const angle = p5.map(p5.noise(POINTS[i].x * SCALAR, POINTS[i].y * SCALAR), 0, 1, 0, 720);
 
           let r = p5.map(POINTS[i].x, 0, p5.width, COLORS.r1, COLORS.r2);
@@ -82,12 +89,15 @@ export default {
         }
       };
 
-      p5.mouseClicked = () => {
-        console.log("mouseClicked");
-        p5.setup();
+      p5.mouseClicked = (e) => {
+        if (e.target.className === "p5Canvas") p5.resetSketch();
       };
     };
     p5Canvas = new P5(sketch, "p5Canvas");
+
+    return {
+      // resetCanvas: p5Canvas.resetSketch,
+    };
   },
 };
 </script>
