@@ -4,6 +4,8 @@
 
 <script>
 import P5 from "p5";
+import { isSmartPhone } from "../assets/scripts";
+
 export default {
   setup() {
     console.log("hello");
@@ -13,7 +15,9 @@ export default {
 
     let POINTS = [];
     let SCALAR = 0.005;
-    const RADIUS = 220;
+
+    const OPTIMAL_RADIUS = 220;
+    const RADIUS = isSmartPhone() ? window.innerWidth : OPTIMAL_RADIUS;
     const COLORS = { r1: 0, r2: 0, g1: 0, g2: 0, b1: 0, b2: 0 };
     const DOCKER_HEIGHT = 80;
 
