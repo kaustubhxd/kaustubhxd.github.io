@@ -1,39 +1,44 @@
 <template>
-    <div >
-            <div :id=" `floatable-${props.id}`" class="floatable" ref="box"  
-            :style="{ width : boxWidth + 'px', 
-                        height : boxHeight + 'px',
-                        left: boxLeft + 'px', 
-                        top: boxTop + 'px',
-                        opacity: boxOpacity,
-                        zIndex: windowState.zIndex,
-                        resize: windowState.isMaximizable ? 'both' : 'none'
-                    }"
-            :class="{ 'window-animate-minmax' : animateWindowMinMax, 'swashOut' : animateSwashOut }"
-            @transitionend    ="animateWindowMinMax = false"    
-            @transitioncancel ="animateWindowMinMax = false"   
-            @animationend     ="animateSwashOut = false"
-            @animationcancel   ="animateSwashOut = false"
-            >
-                <div id="title-bar" class="title-bar">
-                        
-                    <ActionButtons :name='props.title' :id='props.id' :isMaximizable='windowState.isMaximizable' 
-                        @maximize='maxWindow()' @close='closeWindow()'/>
+  <div>
+    <div
+      :id="`floatable-${props.id}`"
+      class="floatable"
+      ref="box"
+      :style="{
+        width: boxWidth + 'px',
+        height: boxHeight + 'px',
+        left: boxLeft + 'px',
+        top: boxTop + 'px',
+        opacity: windowState.minimized ? 0 : boxOpacity,
+        zIndex: windowState.zIndex,
+        resize: windowState.isMaximizable ? 'both' : 'none',
+      }"
+      :class="{ 'window-animate-minmax': animateWindowMinMax, swashOut: animateSwashOut }"
+      @transitionend="animateWindowMinMax = false"
+      @transitioncancel="animateWindowMinMax = false"
+      @animationend="animateSwashOut = false"
+      @animationcancel="animateSwashOut = false"
+    >
+      <div id="title-bar" class="title-bar">
+        <ActionButtons
+          :name="props.title"
+          :id="props.id"
+          :isMaximizable="windowState.isMaximizable"
+          @maximize="maxWindow()"
+          @close="closeWindow()"
+        />
 
-                    <div class="tab-space" id = "tab-space"  
-                    @mousedown.left="dragMouseDown"
-                    @dblclick.left="maxWindow()">
-                            <img class="spinner" v-if="!windowState.loaded" :src="require('../assets/gifs/' + 'spinner.png')">
-                            <div class="box-title"><p> {{props.title.toLowerCase()}}</p></div>
-
-                    </div>
-                    
-                </div>
-                <smooth-scrollbar>
-                <div id = "main-window" class="window">
-                    <div class ="content">
-
-                        <!-- <p>
+        <div class="tab-space" id="tab-space" @mousedown.left="dragMouseDown" @dblclick.left="maxWindow()">
+          <img class="spinner" v-if="!windowState.loaded" :src="require('../assets/gifs/' + 'spinner.png')" />
+          <div class="box-title">
+            <p>{{ props.title.toLowerCase() }}</p>
+          </div>
+        </div>
+      </div>
+      <smooth-scrollbar>
+        <div id="main-window" class="window">
+          <div class="content">
+            <!-- <p>
                             {{boxHeightCustom}} {{boxWidthCustom}}
                             <br>
                             {{props.title}}
@@ -47,456 +52,436 @@
                             Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
                             It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
                         </p> -->
-                            <!-- {{windowState.zIndex}}  -->
+            <!-- {{windowState.zIndex}}  -->
 
-
-                        <Projects v-if="props.id == 'projects' && windowState.active"/>
-                        <Who v-if="props.id == 'who' && windowState.active"/>
-                        <Contact v-if="props.id == 'contact' && windowState.active"/>
-                        <FluffyCat v-if="props.id == 'game' && windowState.active"/>
-                    </div>
-                </div>
-                </smooth-scrollbar>
-
-            </div> 
+            <Projects v-if="props.id == 'projects' && windowState.active" />
+            <Who v-if="props.id == 'who' && windowState.active" />
+            <Contact v-if="props.id == 'contact' && windowState.active" />
+            <FluffyCat v-if="props.id == 'game' && windowState.active" />
+          </div>
+        </div>
+      </smooth-scrollbar>
     </div>
+  </div>
 </template>
 
 <script>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import ActionButtons from '../components/ActionButtons'
-import {ripple,windows,setWindowState,dockStyle,setWindowIndexMax} from '../store/state'
-import Who from './Who'
-import {isSmartPhone} from '../assets/scripts'
-import {defineAsyncComponent} from 'vue'
-import Loading from './Loading'
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import ActionButtons from "../components/ActionButtons";
+import { ripple, windows, setWindowState, dockStyle, setWindowIndexMax } from "../store/state";
+import Who from "./Who";
+import { isSmartPhone } from "../assets/scripts";
+import { defineAsyncComponent } from "vue";
+import Loading from "./Loading";
 
-const Projects = defineAsyncComponent(() => import('./Projects'))
-const Contact = defineAsyncComponent(() => import('./Contact'))
-const FluffyCat = defineAsyncComponent(() => import('./FluffyCat'))
-
+const Projects = defineAsyncComponent(() => import("./Projects"));
+const Contact = defineAsyncComponent(() => import("./Contact"));
+const FluffyCat = defineAsyncComponent(() => import("./FluffyCat"));
 
 export default {
-    components: {   ActionButtons,
-                    Projects,
-                    Who,
-                    Contact,
-                    Loading,
-                    FluffyCat
-                },
-    props: ['title','id'],
-    setup(props){
-        // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
+  components: { ActionButtons, Projects, Who, Contact, Loading, FluffyCat },
+  props: ["title", "id"],
+  setup(props) {
+    // https://dev.to/mandrewcito/vue-js-draggable-div-3mee
 
-        console.log(props.id)
-        const windowState = ref(windows.value[props.id])
+    console.log(props.id);
+    const windowState = ref(windows.value[props.id]);
 
-        const boxWidth = ref(windowState.value.width)
-        const boxHeight = ref(windowState.value.height)
-        const boxTop = ref(Math.floor(Math.random() * ((window.innerHeight - (boxHeight.value + 100)) - 100) + 100))
-        const boxLeft = ref(Math.floor(Math.random() * ((window.innerWidth - (boxWidth.value + 100)) - 100) + 100))
-        const boxOpacity = ref(1)
+    const boxWidth = ref(windowState.value.width);
+    const boxHeight = ref(windowState.value.height);
 
-        if(isSmartPhone()){
-            if(!windowState.value.overrideSmartSize){
-                boxWidth.value   =   (window.innerWidth * (7/8));
-                boxHeight.value  =   (window.innerHeight * (10/13));
-            }
-            boxTop.value     =   (window.innerHeight - boxHeight.value)/4;
-            boxLeft.value    =   (window.innerWidth - boxWidth.value)/2;
-        }
-        
-        const boxWidthCustom = ref(boxWidth.value)
-        const boxHeightCustom = ref(boxHeight.value)
-        
+    const boxTop = ref(null);
+    const boxLeft = ref(null);
+    const boxOpacity = ref(null);
 
-        const boxLeftCustom = ref(boxLeft.value)
-        const boxTopCustom = ref(boxTop.value)
+    const boxWidthCustom = ref(boxWidth.value);
+    const boxHeightCustom = ref(boxHeight.value);
 
-        const box = ref()
-        const animateWindowMinMax = ref(false)
+    const boxLeftCustom = ref(boxLeft.value);
+    const boxTopCustom = ref(boxTop.value);
 
-        var windowResizeObserver
+    const box = ref();
+    const animateWindowMinMax = ref(false);
 
-
-       const positions = ref({
-        clientX: undefined,
-        clientY: undefined,
-        movementX: 0,
-        movementY: 0
-      }) 
-
-        var ratioX;
-        function dragMouseDown (event) {
-            // console.log('click :',event)
-            event.preventDefault()
-
-            // set the z-index of window as max so the clicked windows pops on top 
-            // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
-            // setMaxIndex()
-            setWindowIndexMax(props.id)
-            
-
-            // get the mouse cursor position at startup:
-            positions.value.clientX = event.clientX
-            positions.value.clientY = event.clientY
-            document.onmousemove    = elementDrag
-            document.onmouseup      = closeDragElement
-        }
-
-        // on mousemove 
-        function elementDrag (event) {
-
-            if(windowState.value.maximized || windowState.value.stuckToSide){
-                
-                ratioX = (event.clientX - boxLeft.value) / boxWidth.value
-                // console.log(boxWidthCustom.value)
-                // console.log(ratioX)
-
-                boxWidth.value = boxWidthCustom.value
-                boxHeight.value = boxHeightCustom.value
-
-                console.log(boxWidthCustom.value,boxHeightCustom.value)
-                console.log(event.clientX - (boxWidthCustom.value * ratioX))
-
-                boxLeft.value = event.clientX - (boxWidthCustom.value * ratioX)
-                console.log(boxLeft.value)
-                setWindowState(props.id,'normal')
-                console.log('normalized on drag')
-            }else{
-
-                event.preventDefault()
-                positions.value.movementX = positions.value.clientX - event.clientX
-                positions.value.movementY = positions.value.clientY - event.clientY
-                positions.value.clientX = event.clientX
-                positions.value.clientY = event.clientY
-
-                // set the element's new position:
-                boxTop.value    = (box.value.offsetTop - positions.value.movementY)
-                boxLeft.value   = (box.value.offsetLeft - positions.value.movementX)      
-
-            }
-        }
-
-        function closeDragElement (event) {
-            document.onmouseup = null
-            document.onmousemove = null
-
-            let outOfBounds = false
-
-            // stick left
-            if  (boxLeft.value < 0)   
-            {
-                boxLeft.value = 0
-                outOfBounds = true
-                stickToSide('left')
-            }
-            // stick right
-            else if(event.clientX >= (window.innerWidth - 1))
-            {
-                outOfBounds = true
-                stickToSide('right')
-            }  
-            // maximize
-            else if  (boxTop.value  < 0) {
-                boxTop.value  = 0
-                outOfBounds = true
-                maxWindow()
-            }
-            // too far down
-            else if  (boxTop.value > window.innerHeight) 
-            {
-                boxTop.value = window.innerHeight - (boxHeight.value / 3)
-                outOfBounds = true
-            }
-  
-            if(outOfBounds) {
-                ripple.value.top  = event.clientY < 0 ? 0 : event.clientY >= window.innerHeight ? window.innerHeight : event.clientY
-                ripple.value.left = event.clientX < 0 ? 0 : event.clientX >= window.innerWidth ? window.innerWidth : event.clientX
-                ripple.value.active = true
-
-            }
-        }
-
-        function maxWindow(){
-            if(!windowState.value.isMaximizable){
-                return;
-            }
-
-            if(animateWindowMinMax.value == true)   animateWindowMinMax.value = false
-            animateWindowMinMax.value = true
-
-            if(boxWidth.value == window.innerWidth && boxHeight.value == window.innerHeight ){
-                boxWidth.value = boxWidthCustom.value
-                boxHeight.value = boxHeightCustom.value
-
-                boxLeft.value = boxLeftCustom.value
-                boxTop.value = boxTopCustom.value
-
-                setWindowState(props.id,'normal')
-                console.log('normalized')
-            }else{
-                if(!windowState.value.stuckToSide){
-                    boxWidthCustom.value = boxWidth.value
-                    boxHeightCustom.value = boxHeight.value
-                    boxLeftCustom.value = boxLeft.value
-                    boxTopCustom.value = boxTop.value
-                }
-
-                boxWidth.value = window.innerWidth
-                boxHeight.value = window.innerHeight
-                boxLeft.value = 0
-                boxTop.value = 0
-
-                setWindowState(props.id,'maximized')
-                console.log('maximize window')
-
-            }
-
-        }
-
-        function minWindow(){
-            setWindowState(props.id,'minimized')
-            animateWindowMinMax.value = true
-            
-            if(!windowState.value.maximized && !windowState.value.stuckToSide){
-                boxWidthCustom.value      = parseInt(box.value.style.width)
-                boxHeightCustom.value     = parseInt(box.value.style.height)
-                boxTopCustom.value        = parseInt(box.value.style.top) 
-                boxLeftCustom.value       = parseInt(box.value.style.left)  
-            }
- 
-            boxWidth.value  = dockStyle.value.width
-            boxHeight.value = dockStyle.value.height
-            boxTop.value    = dockStyle.value.top
-            boxLeft.value   = dockStyle.value.left - dockStyle.value.width/2
-            boxOpacity.value = 0
-            console.log(`minimized`)
-
-        }
-
-        function stickToSide(side){
-            if(!windowState.value.isMaximizable){
-                return;
-            }
-
-            if(!windowState.value.stuckToSide){
-                if(!windowState.value.maximized){
-                    boxWidthCustom.value    = boxWidth.value
-                    boxHeightCustom.value   = boxHeight.value
-                }
-                animateWindowMinMax.value = true
-                if(side == 'left'){
-                    boxTop.value = 0
-                    boxLeft.value = 0
-                    boxHeight.value = window.innerHeight
-                    boxWidth.value = window.innerWidth / 2
-                    console.log(`stick ${side}`)
-
-                }else if (side == 'right'){
-
-                    if (windowState.value.maximized){
-                        console.log('shits maximized bruh')
-
-                    }
-
-                    boxTop.value = 0
-                    boxLeft.value = window.innerWidth / 2
-                    boxHeight.value = window.innerHeight
-                    boxWidth.value = window.innerWidth / 2
-                    console.log(`stick ${side}`)
-                }
-
-                setWindowState(props.id,'stuckToSide')
-            }
-        }
-
-        if (windowState.value.maximized){
-            console.log('maximized')
-        }
-
-        // 'watching' changes to store's minimized value and acting on it here.
-        // why? two separate components(ActionButtons and DockIcon) can call minimize.
-        // since Floatable.vue has access to all variables, this seemed like a good idea 
-        const unwatchMinimized = watch(() => windowState.value.minimized, (isMinimized) => {
-            if(isMinimized == false){
-                animateWindowMinMax.value = true
-                if(windowState.value.maximized){
-                    boxWidth.value = window.innerWidth
-                    boxHeight.value = window.innerHeight
-                    boxLeft.value = 0
-                    boxTop.value = 0                
-                }else{
-                    boxWidth.value = boxWidthCustom.value  
-                    boxHeight.value = boxHeightCustom.value   
-                    boxTop.value = boxTopCustom.value      
-                    boxLeft.value = boxLeftCustom.value      
-                }
-
-                boxOpacity.value = 1
-            }else if (isMinimized == true){
-                minWindow()
-            }
-
-        });
-
-
-        onMounted(() => {
-
-            if(windowState.value.maximized){
-                maxWindow()
-            }else if (windowState.value.stuckToSide){
-                windowState.value.stuckToSide = false;
-                stickToSide(windowState.value.stuckWhere)
-            }
-
-            // ResizeObserver is used here to tackle issues while user manually resizes window using the mouse
-            // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen  
-            // without this, the window ignores manual resize shape and reverts back on component update
-            function reportResize(){
-                // console.log('---------------------- window resize')
-                if(box.value){
-                    if (boxWidth.value != parseInt(box.value.style.width) || boxHeight.value != parseInt(box.value.style.height)){
-                            boxWidth.value      = parseInt(box.value.style.width)
-                            boxHeight.value     = parseInt(box.value.style.height)
-                            boxWidthCustom.value = parseInt(box.value.style.width)
-                            boxHeightCustom.value = parseInt(box.value.style.height)
-
-                    }
-
-                }
-            }
-            windowResizeObserver = new ResizeObserver(reportResize)
-            windowResizeObserver.observe(box.value)
-
-        })
-
-        const animateSwashOut = ref(false)
-        function closeWindow(){
-            animateSwashOut.value = true
-            boxOpacity.value = 0
-
-            box.value.onanimationend = () => {
-                setWindowState(props.id,'killed')
-            }
-        }
-
-        onBeforeUnmount(() => {
-            windowResizeObserver.disconnect()
-            unwatchMinimized()
-            console.log('floatable unmounted')
-        })
-
-
-        return {
-            box,
-            boxWidth,       
-            boxHeight,
-            boxLeft,
-            boxTop,
-            dragMouseDown,
-            elementDrag,
-            closeDragElement,
-            props,
-            maxWindow,
-            animateWindowMinMax,  
-            windowState,
-            minWindow,
-            dockStyle,
-            boxOpacity,
-            closeWindow,
-            animateSwashOut,
-            boxWidthCustom,
-            boxHeightCustom,
-
-        }
+    if (windowState.value.minimized) {
+    } else {
+      boxTop.value = Math.floor(Math.random() * (window.innerHeight - (boxHeight.value + 100) - 100) + 100);
+      boxLeft.value = Math.floor(Math.random() * (window.innerWidth - (boxWidth.value + 100) - 100) + 100);
+      boxOpacity.value = 1;
     }
-}
+
+    if (isSmartPhone()) {
+      if (!windowState.value.overrideSmartSize) {
+        boxWidth.value = window.innerWidth * (7 / 8);
+        boxHeight.value = window.innerHeight * (10 / 13);
+      }
+      boxTop.value = (window.innerHeight - boxHeight.value) / 4;
+      boxLeft.value = (window.innerWidth - boxWidth.value) / 2;
+    }
+
+    var windowResizeObserver;
+
+    const positions = ref({
+      clientX: undefined,
+      clientY: undefined,
+      movementX: 0,
+      movementY: 0,
+    });
+
+    var ratioX;
+    function dragMouseDown(event) {
+      // console.log('click :',event)
+      event.preventDefault();
+
+      // set the z-index of window as max so the clicked windows pops on top
+      // so that when window comes from fullscreen/sticky mode to normal, the cursor has the window under it
+      // setMaxIndex()
+      setWindowIndexMax(props.id);
+
+      // get the mouse cursor position at startup:
+      positions.value.clientX = event.clientX;
+      positions.value.clientY = event.clientY;
+      document.onmousemove = elementDrag;
+      document.onmouseup = closeDragElement;
+    }
+
+    // on mousemove
+    function elementDrag(event) {
+      if (windowState.value.maximized || windowState.value.stuckToSide) {
+        ratioX = (event.clientX - boxLeft.value) / boxWidth.value;
+        // console.log(boxWidthCustom.value)
+        // console.log(ratioX)
+
+        boxWidth.value = boxWidthCustom.value;
+        boxHeight.value = boxHeightCustom.value;
+
+        console.log(boxWidthCustom.value, boxHeightCustom.value);
+        console.log(event.clientX - boxWidthCustom.value * ratioX);
+
+        boxLeft.value = event.clientX - boxWidthCustom.value * ratioX;
+        console.log(boxLeft.value);
+        setWindowState(props.id, "normal");
+        console.log("normalized on drag");
+      } else {
+        event.preventDefault();
+        positions.value.movementX = positions.value.clientX - event.clientX;
+        positions.value.movementY = positions.value.clientY - event.clientY;
+        positions.value.clientX = event.clientX;
+        positions.value.clientY = event.clientY;
+
+        // set the element's new position:
+        boxTop.value = box.value.offsetTop - positions.value.movementY;
+        boxLeft.value = box.value.offsetLeft - positions.value.movementX;
+      }
+    }
+
+    function closeDragElement(event) {
+      document.onmouseup = null;
+      document.onmousemove = null;
+
+      let outOfBounds = false;
+
+      // stick left
+      if (boxLeft.value < 0) {
+        boxLeft.value = 0;
+        outOfBounds = true;
+        stickToSide("left");
+      }
+      // stick right
+      else if (event.clientX >= window.innerWidth - 1) {
+        outOfBounds = true;
+        stickToSide("right");
+      }
+      // maximize
+      else if (boxTop.value < 0) {
+        boxTop.value = 0;
+        outOfBounds = true;
+        maxWindow();
+      }
+      // too far down
+      else if (boxTop.value > window.innerHeight) {
+        boxTop.value = window.innerHeight - boxHeight.value / 3;
+        outOfBounds = true;
+      }
+
+      if (outOfBounds) {
+        ripple.value.top =
+          event.clientY < 0 ? 0 : event.clientY >= window.innerHeight ? window.innerHeight : event.clientY;
+        ripple.value.left =
+          event.clientX < 0 ? 0 : event.clientX >= window.innerWidth ? window.innerWidth : event.clientX;
+        ripple.value.active = true;
+      }
+    }
+
+    function maxWindow() {
+      if (!windowState.value.isMaximizable) {
+        return;
+      }
+
+      if (animateWindowMinMax.value == true) animateWindowMinMax.value = false;
+      animateWindowMinMax.value = true;
+
+      // if already max, minimize
+      if (boxWidth.value == window.innerWidth && boxHeight.value == window.innerHeight) {
+        boxWidth.value = boxWidthCustom.value;
+        boxHeight.value = boxHeightCustom.value;
+
+        boxLeft.value = boxLeftCustom.value;
+        boxTop.value = boxTopCustom.value;
+
+        setWindowState(props.id, "normal");
+        console.log("normalized");
+      } else {
+        if (!windowState.value.stuckToSide) {
+          boxWidthCustom.value = boxWidth.value;
+          boxHeightCustom.value = boxHeight.value;
+          boxLeftCustom.value = boxLeft.value;
+          boxTopCustom.value = boxTop.value;
+        }
+
+        boxWidth.value = window.innerWidth;
+        boxHeight.value = window.innerHeight;
+        boxLeft.value = 0;
+        boxTop.value = 0;
+
+        setWindowState(props.id, "maximized");
+        console.log("maximize window");
+      }
+    }
+
+    function minWindow() {
+      setWindowState(props.id, "minimized");
+      animateWindowMinMax.value = true;
+
+      if (!windowState.value.maximized && !windowState.value.stuckToSide) {
+        boxWidthCustom.value = parseInt(box.value.style.width);
+        boxHeightCustom.value = parseInt(box.value.style.height);
+        boxTopCustom.value = parseInt(box.value.style.top);
+        boxLeftCustom.value = parseInt(box.value.style.left);
+      }
+
+      boxWidth.value = dockStyle.value.width;
+      boxHeight.value = dockStyle.value.height;
+      boxTop.value = dockStyle.value.top;
+      boxLeft.value = dockStyle.value.left - dockStyle.value.width / 2;
+      boxOpacity.value = 0;
+      console.log(`minimized`);
+    }
+
+    function stickToSide(side) {
+      if (!windowState.value.isMaximizable) {
+        return;
+      }
+
+      if (!windowState.value.stuckToSide) {
+        if (!windowState.value.maximized) {
+          boxWidthCustom.value = boxWidth.value;
+          boxHeightCustom.value = boxHeight.value;
+        }
+        animateWindowMinMax.value = true;
+        if (side == "left") {
+          boxTop.value = 0;
+          boxLeft.value = 0;
+          boxHeight.value = window.innerHeight;
+          boxWidth.value = window.innerWidth / 2;
+          console.log(`stick ${side}`);
+        } else if (side == "right") {
+          if (windowState.value.maximized) {
+            console.log("shits maximized bruh");
+          }
+
+          boxTop.value = 0;
+          boxLeft.value = window.innerWidth / 2;
+          boxHeight.value = window.innerHeight;
+          boxWidth.value = window.innerWidth / 2;
+          console.log(`stick ${side}`);
+        }
+
+        setWindowState(props.id, "stuckToSide");
+      }
+    }
+
+    if (windowState.value.maximized) {
+      console.log("maximized");
+    }
+
+    // 'watching' changes to store's minimized value and acting on it here.
+    // why? two separate components(ActionButtons and DockIcon) can call minimize.
+    // since Floatable.vue has access to all variables, this seemed like a good idea
+    const unwatchMinimized = watch(
+      () => windowState.value.minimized,
+      (isMinimized) => {
+        if (isMinimized == false) {
+          animateWindowMinMax.value = true;
+          if (windowState.value.maximized) {
+            boxWidth.value = window.innerWidth;
+            boxHeight.value = window.innerHeight;
+            boxLeft.value = 0;
+            boxTop.value = 0;
+          } else {
+            // restores the window
+            console.log(windowState.value);
+            console.log(boxTopCustom.value, boxLeftCustom.value);
+            if (!boxTopCustom.value && !boxLeftCustom.value) {
+              boxTopCustom.value = windowState.value.top;
+              boxLeftCustom.value = windowState.value.left;
+            }
+            boxTop.value = boxTopCustom.value;
+            boxLeft.value = boxLeftCustom.value;
+            boxWidth.value = boxWidthCustom.value;
+            boxHeight.value = boxHeightCustom.value;
+          }
+
+          boxOpacity.value = 1;
+        } else if (isMinimized == true) {
+          minWindow();
+        }
+      }
+    );
+
+    onMounted(() => {
+      if (windowState.value.maximized) {
+        maxWindow();
+      } else if (windowState.value.minimized) {
+        minWindow();
+      } else if (windowState.value.stuckToSide) {
+        windowState.value.stuckToSide = false;
+        stickToSide(windowState.value.stuckWhere);
+      }
+
+      // ResizeObserver is used here to tackle issues while user manually resizes window using the mouse
+      // feeds the manual resize dimensions to boxWidth and boxHeight, which doesn't automatically happen
+      // without this, the window ignores manual resize shape and reverts back on component update
+      function reportResize() {
+        // console.log('---------------------- window resize')
+        if (box.value) {
+          if (
+            boxWidth.value != parseInt(box.value.style.width) ||
+            boxHeight.value != parseInt(box.value.style.height)
+          ) {
+            boxWidth.value = parseInt(box.value.style.width);
+            boxHeight.value = parseInt(box.value.style.height);
+            boxWidthCustom.value = parseInt(box.value.style.width);
+            boxHeightCustom.value = parseInt(box.value.style.height);
+          }
+        }
+      }
+      windowResizeObserver = new ResizeObserver(reportResize);
+      windowResizeObserver.observe(box.value);
+    });
+
+    const animateSwashOut = ref(false);
+    function closeWindow() {
+      animateSwashOut.value = true;
+      boxOpacity.value = 0;
+
+      box.value.onanimationend = () => {
+        setWindowState(props.id, "killed");
+      };
+    }
+
+    onBeforeUnmount(() => {
+      windowResizeObserver.disconnect();
+      unwatchMinimized();
+      console.log("floatable unmounted");
+    });
+
+    return {
+      box,
+      boxWidth,
+      boxHeight,
+      boxLeft,
+      boxTop,
+      dragMouseDown,
+      elementDrag,
+      closeDragElement,
+      props,
+      maxWindow,
+      animateWindowMinMax,
+      windowState,
+      minWindow,
+      dockStyle,
+      boxOpacity,
+      closeWindow,
+      animateSwashOut,
+      boxWidthCustom,
+      boxHeightCustom,
+    };
+  },
+};
 </script>
 
-
-<style lang='scss' scoped>
-
+<style lang="scss" scoped>
 .floatable {
-    position            :   absolute;
-    // z-index             :   9;
-    background-color    : #ffffff;
-    border              :   1px solid #d3d3d3;
-    border-radius       :   5px 5px 5px 5px;
-              
+  position: absolute;
+  // z-index             :   9;
+  background-color: #ffffff;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px 5px 5px 5px;
 
-    overflow            :   hidden;
-    min-width           :   64px;
-    min-height          :   64px ;
-    /* resize              :   both ;
+  overflow: hidden;
+  min-width: 64px;
+  min-height: 64px;
+  /* resize              :   both ;
     min-width           :   64px;
     min-height          :   24px ; */
 
-    .title-bar {    
-        position            :   fixed;
-        z-index             :   10;
-        background-color    :   #eaeaea;
-        /* background-color    :   #2c3e50; */
-        color               :   #fff;
-        height              :   24px;
-        border-radius       :   4px 4px 0 0 ;
-        cursor              :   initial;
-        width               :   inherit;
-        display             :   flex ;
+  .title-bar {
+    position: fixed;
+    z-index: 10;
+    background-color: #eaeaea;
+    /* background-color    :   #2c3e50; */
+    color: #fff;
+    height: 24px;
+    border-radius: 4px 4px 0 0;
+    cursor: initial;
+    width: inherit;
+    display: flex;
 
-        .tab-space{
-            z-index: 10;
-            overflow            :   hidden;
+    .tab-space {
+      z-index: 10;
+      overflow: hidden;
 
-            .spinner{
-                width: 100%;
-                max-width: 20px;
-                top: 50%;
-                // transform: translate( -50%, -50% ); /* center */
-                -webkit-animation: spinLoader 600ms steps(12, end) infinite;
-                animation: spinLoader 600ms steps(12, end) infinite;
-                filter: invert(1);
-                float : right;
-                margin-top : 12px;
-            }
+      .spinner {
+        width: 100%;
+        max-width: 20px;
+        top: 50%;
+        // transform: translate( -50%, -50% ); /* center */
+        -webkit-animation: spinLoader 600ms steps(12, end) infinite;
+        animation: spinLoader 600ms steps(12, end) infinite;
+        filter: invert(1);
+        float: right;
+        margin-top: 12px;
+      }
 
-            .box-title{
-                color       : black;
-                text-align  : end;
-                width: max-content;
-                float : right;
-                
-                p{
-                    margin:0;
-                    font-size: 18px;  
-                }
-            }
+      .box-title {
+        color: black;
+        text-align: end;
+        width: max-content;
+        float: right;
+
+        p {
+          margin: 0;
+          font-size: 18px;
         }
-
-
+      }
     }
+  }
 }
 
-.window-animate-minmax{
-    transition: top 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), 
-                left 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), 
-                transform 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1),
-                opacity      1.0s;
-
+.window-animate-minmax {
+  transition: top 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), left 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1),
+    transform 0.5s 0s cubic-bezier(0.1, 1.2, 0.3, 1), opacity 1s;
 }
 
-.window-animate-open{
-    /* transition: top         2s      0s      cubic-bezier(0.1, 1.2, 0.3, 1), 
+.window-animate-open {
+  /* transition: top         2s      0s      cubic-bezier(0.1, 1.2, 0.3, 1), 
                 transform   0.5s    0s      cubic-bezier(0.1, 1.2, 0.3, 1), 
                 width       0.2s    0.2s    cubic-bezier(0.1, 1.2, 0.3, 1), 
                 opacity     1.0s; */
 
-    transition: top          1s      0s      cubic-bezier(0.1, 1.2, 0.3, 1),
-                left         1s      0s      cubic-bezier(0.1, 1.2, 0.3, 1),
-                opacity      1.0s;
-
+  transition: top 1s 0s cubic-bezier(0.1, 1.2, 0.3, 1), left 1s 0s cubic-bezier(0.1, 1.2, 0.3, 1), opacity 1s;
 }
-
 
 /* .minimize {
     top: 100%;
@@ -507,34 +492,33 @@ export default {
 }
  */
 
-.window{
-    margin-top      :   24px;
-    width           :   inherit;
-    height          :   inherit ;
-    /* border-radius   :   5px 5px 0 0; */
-    text-align      :   start;
-    overflow      :   hidden;
-    scrollbar-width :   thin;
-    min-width       :   64px;
-    min-height      :   64px;  
+.window {
+  margin-top: 24px;
+  width: inherit;
+  height: inherit;
+  /* border-radius   :   5px 5px 0 0; */
+  text-align: start;
+  overflow: hidden;
+  scrollbar-width: thin;
+  min-width: 64px;
+  min-height: 64px;
 
-    .content{  
-        overflow-y      :   auto;
-        overflow-x      :   hidden;
-        scrollbar-width :   thin;
+  .content {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
 
-        height          :   inherit;
-        width           :   inherit;
-        min-width: 64px;
-        min-height: 64px;
-        padding         :   0;
-    }
-}   
+    height: inherit;
+    width: inherit;
+    min-width: 64px;
+    min-height: 64px;
+    padding: 0;
+  }
+}
 
-
-.tab-space{
-    width       :   inherit ;
-    height      :   inherit ;
+.tab-space {
+  width: inherit;
+  height: inherit;
 }
 
 .swashOut {
@@ -568,9 +552,11 @@ export default {
 }
 
 @keyframes spinLoader {
-  from { transform: translate( -50%, -50% ) rotate(0turn); }
-  to { transform: translate( -50%, -50% ) rotate(1turn); }
+  from {
+    transform: translate(-50%, -50%) rotate(0turn);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
 }
-
-
 </style>

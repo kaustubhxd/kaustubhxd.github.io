@@ -32,23 +32,15 @@ const windows = ref({
     width: window.innerWidth * (3 / 8),
     height: window.innerHeight * (8 / 13),
     opacity: 1,
-    top: Math.floor(
-      Math.random() *
-        (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) +
-        100
-    ),
-    left: Math.floor(
-      Math.random() *
-        (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) +
-        100
-    ),
+    top: Math.floor(Math.random() * (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) + 100),
+    left: Math.floor(Math.random() * (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) + 100),
   },
   who: {
     title: "Who?",
     loaded: true,
-    minimized: false,
-    active: false,
-    position: [0, 0],
+    minimized: true,
+    active: true,
+    position: [window.innerWidth / 2, window.innerHeight],
     stuckToSide: false,
     stuckWhere: "left",
 
@@ -58,16 +50,8 @@ const windows = ref({
     width: window.innerWidth * (3 / 8),
     height: window.innerHeight * (8 / 13),
     opacity: 1,
-    top: Math.floor(
-      Math.random() *
-        (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) +
-        100
-    ),
-    left: Math.floor(
-      Math.random() *
-        (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) +
-        100
-    ),
+    top: Math.floor(Math.random() * (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) + 100),
+    left: Math.floor(Math.random() * (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) + 100),
   },
   projects: {
     title: "Projects",
@@ -83,16 +67,8 @@ const windows = ref({
     width: window.innerWidth * (3 / 8),
     height: window.innerHeight * (8 / 13),
     opacity: 1,
-    top: Math.floor(
-      Math.random() *
-        (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) +
-        100
-    ),
-    left: Math.floor(
-      Math.random() *
-        (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) +
-        100
-    ),
+    top: Math.floor(Math.random() * (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) + 100),
+    left: Math.floor(Math.random() * (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) + 100),
   },
   contact: {
     title: "Contact",
@@ -108,16 +84,8 @@ const windows = ref({
     width: window.innerWidth * (3 / 8),
     height: window.innerHeight * (8 / 13),
     opacity: 1,
-    top: Math.floor(
-      Math.random() *
-        (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) +
-        100
-    ),
-    left: Math.floor(
-      Math.random() *
-        (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) +
-        100
-    ),
+    top: Math.floor(Math.random() * (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) + 100),
+    left: Math.floor(Math.random() * (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) + 100),
   },
   game: {
     title: "Fluffy Cat",
@@ -134,16 +102,8 @@ const windows = ref({
     height: 480 + 24,
     overrideSmartSize: true,
     opacity: 1,
-    top: Math.floor(
-      Math.random() *
-        (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) +
-        100
-    ),
-    left: Math.floor(
-      Math.random() *
-        (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) +
-        100
-    ),
+    top: Math.floor(Math.random() * (window.innerHeight - (window.innerHeight * (8 / 13) + 100) - 100) + 100),
+    left: Math.floor(Math.random() * (window.innerWidth - (window.innerWidth * (3 / 8) + 100) - 100) + 100),
   },
 });
 
@@ -195,17 +155,15 @@ function setLocalStorage() {
   // Store
   localStorage.setItem("lastname", "Smith");
   // Retrieve
-  document.getElementById("result").innerHTML = localStorage.getItem(
-    "lastname"
-  );
+  document.getElementById("result").innerHTML = localStorage.getItem("lastname");
 }
 
-export {
-  ripple,
-  windows,
-  setWindowState,
-  dockStyle,
-  setLocalStorage,
-  setWindowIndexMax,
-  enableAnimations,
+const TIMEOUT_SECONDS = 3;
+const executeAfterTimeout = () => {
+  setTimeout(() => {
+    // setWindowState("who", "restore");
+  }, 1000 * TIMEOUT_SECONDS);
 };
+executeAfterTimeout();
+
+export { ripple, windows, setWindowState, dockStyle, setLocalStorage, setWindowIndexMax, enableAnimations };
