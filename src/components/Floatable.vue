@@ -320,8 +320,8 @@ export default {
             boxTop.value = 0;
           } else {
             // restores the window
-            console.log(windowState.value);
-            console.log(boxTopCustom.value, boxLeftCustom.value);
+            // console.log(windowState.value);
+            // console.log(boxTopCustom.value, boxLeftCustom.value);
             if (!boxTopCustom.value && !boxLeftCustom.value) {
               boxTopCustom.value = windowState.value.top;
               boxLeftCustom.value = windowState.value.left;

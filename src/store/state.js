@@ -164,6 +164,14 @@ const executeAfterTimeout = () => {
     setWindowState("who", "restore");
   }, 1000 * TIMEOUT_SECONDS);
 };
-executeAfterTimeout();
 
-export { ripple, windows, setWindowState, dockStyle, setLocalStorage, setWindowIndexMax, enableAnimations };
+export {
+  ripple,
+  windows,
+  setWindowState,
+  dockStyle,
+  setLocalStorage,
+  setWindowIndexMax,
+  enableAnimations,
+  executeAfterTimeout,
+};

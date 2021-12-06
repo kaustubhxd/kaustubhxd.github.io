@@ -5,10 +5,15 @@
 <script>
 import P5 from "p5";
 import { isSmartPhone } from "../assets/scripts";
+import { executeAfterTimeout } from "../store/state";
+import { onMounted } from "vue";
 
 export default {
   setup() {
-    console.log("hello");
+    onMounted(() => {
+      executeAfterTimeout();
+    }),
+      console.log("hello");
     let p5Canvas = null;
     let w = window.innerWidth;
     let h = window.innerHeight;
@@ -98,10 +103,6 @@ export default {
       };
     };
     p5Canvas = new P5(sketch, "p5Canvas");
-
-    return {
-      // resetCanvas: p5Canvas.resetSketch,
-    };
   },
 };
 </script>
