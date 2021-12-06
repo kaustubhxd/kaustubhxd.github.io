@@ -60,7 +60,7 @@ export default {
         p5.noStroke();
         p5.fill(255);
 
-        const POINTS_PER_FRAME = 2;
+        const POINTS_PER_FRAME = 1;
         const MAX_POINTS_RENDERED = p5.frameCount <= POINTS.length ? p5.frameCount * POINTS_PER_FRAME : POINTS.length;
 
         for (let i = 0; i < MAX_POINTS_RENDERED; i++) {

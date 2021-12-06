@@ -161,7 +161,7 @@ function setLocalStorage() {
 const TIMEOUT_SECONDS = 3;
 const executeAfterTimeout = () => {
   setTimeout(() => {
-    // setWindowState("who", "restore");
+    setWindowState("who", "restore");
   }, 1000 * TIMEOUT_SECONDS);
 };
 executeAfterTimeout();
