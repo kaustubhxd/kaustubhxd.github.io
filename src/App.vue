@@ -1,39 +1,50 @@
-  
 <template>
-<!-- https://codepen.io/tn9nex/pen/aqvRbW -->
-  <Stars/>
+  <!-- https://codepen.io/tn9nex/pen/aqvRbW -->
+  <!-- <Stars /> -->
   <!-- <Backdrop/> -->
+  <FlowField />
   <div class="god-container">
-    <div v-for="(info,id) in activeWindows" :key="id"> 
-        <Floatable :title="info.title" :id='id'/>
+    <div v-for="(info, id) in activeWindows" :key="id">
+      <Floatable :title="info.title" :id="id" />
     </div>
-    <AnimatedCursor v-if="!isSmartPhone() && enableAnimations"/>
-    <Docker/>
-    <Ripple v-if="!isSmartPhone()"/>
+    <!-- <AnimatedCursor v-if="!isSmartPhone() && enableAnimations" /> -->
+    <Docker />
+    <Ripple v-if="!isSmartPhone()" />
   </div>
 </template>
 
 <script>
-import { computed } from 'vue'
-import Docker from './components/Docker'
-import Floatable from './components/Floatable'
-import Ripple from './components/Ripple'
-import AnimatedCursor from './components/AnimatedCursor'
-import {windows,enableAnimations} from './store/state'
-import {isSmartPhone} from '../src/assets/scripts'
-import Stars from './components/Stars'
-import Backdrop from './components/Backdrop'
-
+import { computed } from "vue";
+import Docker from "./components/Docker";
+import Floatable from "./components/Floatable";
+import Ripple from "./components/Ripple";
+import AnimatedCursor from "./components/AnimatedCursor";
+import { windows, enableAnimations } from "./store/state";
+import { isSmartPhone } from "../src/assets/scripts";
+import Stars from "./components/Stars";
+import Backdrop from "./components/Backdrop";
+import FlowField from "./components/FlowField.vue";
 
 export default {
-  components: {Docker, Floatable,Ripple,AnimatedCursor,Stars,Backdrop},
-  setup(){
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
+  components: {
+    Docker,
+    Floatable,
+    Ripple,
+    AnimatedCursor,
+    Stars,
+    Backdrop,
+    FlowField,
+  },
+  setup() {
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
 
     // digs inside the dictionary 'windows' to find out which window has a state active == true, displays that
-    var activeWindows = computed(() => Object.fromEntries(Object.entries(windows.value).filter(([k,v]) => v.active)))
-    
+    var activeWindows = computed(() =>
+      Object.fromEntries(
+        Object.entries(windows.value).filter(([k, v]) => v.active)
+      )
+    );
+
     // document.body.style.backgroundImage =  `url(${require('@/assets/gifs/back.jpg')})`;
 
     // function randInt(min, max) {
@@ -49,33 +60,29 @@ export default {
     //   }
     // })
 
-
     // setInterval(() => {
     //   try{
     //     document.body.style.backgroundImage =  `url(${require(`@/assets/gifs/${randInt(1,83)}.gif`)})`;
     //   }catch(err){}
     // },30000)
 
-      return {
-    windows,
-    activeWindows,
-    isSmartPhone,
-    enableAnimations
-  }
-  }
-
-
-}
+    return {
+      windows,
+      activeWindows,
+      isSmartPhone,
+      enableAnimations,
+    };
+  },
+};
 </script>
 
-  
-<style lang='scss'>
-*{
-  cursor: none;
+<style lang="scss">
+* {
+  // cursor: none;
 }
 
-input{
-   cursor:none;
+input {
+  cursor: none;
 }
 
 html {
@@ -84,5 +91,4 @@ html {
   height: 100%;
   overflow: hidden;
 }
-
 </style>

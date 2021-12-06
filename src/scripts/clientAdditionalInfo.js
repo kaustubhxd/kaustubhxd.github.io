@@ -12,6 +12,8 @@ let flags = {
 };
 
 export const getAdditionalInfo = () => {
+  if (localStorage.getItem("NO_LS")) return;
+
   localStorageOps();
   getBrowserInfo();
   let addressLink = `https://whatismyipaddress.com/ip/`;

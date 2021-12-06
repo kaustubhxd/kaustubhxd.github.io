@@ -47,7 +47,7 @@ const windows = ref({
     title: "Who?",
     loaded: true,
     minimized: false,
-    active: true,
+    active: false,
     position: [0, 0],
     stuckToSide: false,
     stuckWhere: "left",
