@@ -1,5 +1,5 @@
 name: kaustubh.app (Build and Deploy)
-on: push
+on: release
 jobs:
   web-deploy:
     name: 🎉 Deploy
