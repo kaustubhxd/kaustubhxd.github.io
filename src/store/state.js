@@ -158,7 +158,7 @@ function setLocalStorage() {
   document.getElementById("result").innerHTML = localStorage.getItem("lastname");
 }
 
-const TIMEOUT_SECONDS = 3;
+const TIMEOUT_SECONDS = 2;
 const executeAfterTimeout = () => {
   setTimeout(() => {
     setWindowState("who", "restore");

@@ -9,14 +9,20 @@ var apiEndpoint = "https://kaustubhportfolio.cdn.prismic.io/api/v2";
 
 function setWebsiteLinks(key) {
   console.log("setting web links");
+  console.log(projects.value);
   for (const project in projects.value) {
-    if (
-      projects.value[project].type == "website" &&
-      projects.value[project][key] !== undefined &&
-      projects.value[project][key].length > 0
-    ) {
-      projects.value[project].link = projects.value[project][key];
-      // console.log(`${project}  :  ${projects.value[project].link}`)
+    try {
+      if (
+        typeof projects.value[project] !== undefined &&
+        projects.value[project].type == "website" &&
+        projects.value[project][key] !== undefined &&
+        projects.value[project][key].length > 0
+      ) {
+        projects.value[project].link = projects.value[project][key];
+        // console.log(`${project}  :  ${projects.value[project].link}`)
+      }
+    } catch (err) {
+      continue;
     }
   }
 }
@@ -61,6 +67,8 @@ const skills = {
   Flutter: "flutter.svg",
   "HTML/CSS/SCSS": "html.svg",
   Firebase: "firebase.svg",
+  MongoDB: "mongodb.svg",
+  PostgresSQL: "postgressql.svg",
 };
 
 let sort_order = [];
@@ -95,10 +103,11 @@ client
     console.log(unsortedProjects);
 
     sort_order.forEach((id) => {
-      // console.log(id);
-      // console.log(unsortedProjects[id]);
-      projects.value.push(unsortedProjects[id]);
+      if (typeof unsortedProjects[id] !== "undefined") {
+        projects.value.push(unsortedProjects[id]);
+      }
     });
+    console.log(projects.value);
 
     checkWebsiteStatus();
   })
@@ -107,16 +116,3 @@ client
   });
 
 export { projects, skills };
-
-// odia_tts
-// website
-// neuboard
-// basespace
-// offlinetv
-// flutter_netflix
-// flutter_food_delivery
-// flutter_budget
-// deep_dataset
-// skribbl_plus
-// pop_culture_dictionary
-// portfolio_v1

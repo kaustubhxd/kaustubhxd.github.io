@@ -14,26 +14,13 @@
             <h6 class="post-title">{{ project.title }}</h6>
             <p class="post-content">{{ project.content }}</p>
             <div class="post-lang">
-              <span
-                v-for="lang in project.languages"
-                :key="lang"
-                v-tooltip="lang"
-              >
-                <img
-                  class="lang-icon"
-                  :src="
-                    require('../assets/icons/skills/' +
-                      lang.toLowerCase() +
-                      '.svg')
-                  "
-                />
+              <span v-for="lang in project.languages" :key="lang" v-tooltip="lang">
+                <img class="lang-icon" :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')" />
               </span>
             </div>
             <div v-if="project.link != ''">
               <p>
-                <a class="post-link" target="_blank" :href="project.link"
-                  >Check Out</a
-                >
+                <a class="post-link" target="_blank" :href="project.link">Check Out</a>
               </p>
             </div>
           </div>
@@ -168,6 +155,7 @@ h6 {
   width: 200px;
   height: 200px;
   object-fit: contain;
+  cursor: pointer;
 
   margin-top: 20px;
   margin-left: auto;

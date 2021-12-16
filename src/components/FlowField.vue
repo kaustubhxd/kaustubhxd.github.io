@@ -64,7 +64,7 @@ export default {
       };
 
       p5.draw = () => {
-        if (POINTS.length === 0) return;
+        if (POINTS.length === 0 || p5.frameRate() < 50) return;
 
         p5.noStroke();
         p5.fill(255);
