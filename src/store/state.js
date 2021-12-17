@@ -8,7 +8,11 @@ const dockStyle = ref({
   left: 0,
   width: 0,
   height: 0,
+  hidden: false,
 });
+const hideDocker = (shouldHide) => {
+  dockStyle.value.hidden = shouldHide;
+};
 
 const ripple = ref({
   active: false,
@@ -123,28 +127,28 @@ function setWindowIndexMax(window) {
 
 function setWindowState(window, state) {
   console.log(state);
-  if (state == "maximized") {
+  if (state === "maximized") {
     windows.value[window].maximized = true;
     windows.value[window].stuckToSide = false;
-  } else if (state == "stuckToSide") {
+  } else if (state === "stuckToSide") {
     windows.value[window].maximized = false;
     windows.value[window].stuckToSide = true;
-  } else if (state == "normal") {
+  } else if (state === "normal") {
     windows.value[window].maximized = false;
     windows.value[window].stuckToSide = false;
-  } else if (state == "killed") {
+  } else if (state === "killed") {
     windows.value[window].active = false;
     windows.value[window].minimized = false;
     windows.value[window].maximized = false;
     windows.value[window].stuckToSide = false;
     // console.log(windows.value[window])
-  } else if (state == "minimized") {
+  } else if (state === "minimized") {
     windows.value[window].zIndex = 1;
     windows.value[window].minimized = true;
-  } else if (state == "open" && !windows.value[window].active) {
+  } else if (state === "open" && !windows.value[window].active) {
     setWindowIndexMax(window);
     windows.value[window].active = true;
-  } else if (state == "restore") {
+  } else if (state === "restore") {
     setWindowIndexMax(window);
     windows.value[window].minimized = false;
   }
@@ -174,4 +178,5 @@ export {
   setWindowIndexMax,
   enableAnimations,
   executeAfterTimeout,
+  hideDocker,
 };

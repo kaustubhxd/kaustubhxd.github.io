@@ -14,15 +14,17 @@ export default {
       executeAfterTimeout();
     }),
       console.log("hello");
-    let p5Canvas = null;
+    var p5Canvas = null;
     let w = window.innerWidth;
     let h = window.innerHeight;
+    const MAX_SECONDS_PER_FIELD = 20 * 1000;
+    let drawInterval = null;
 
     let POINTS = [];
     let SCALAR = 0.005;
 
     const OPTIMAL_RADIUS = 220;
-    const RADIUS = isSmartPhone() ? window.innerWidth : OPTIMAL_RADIUS;
+    const RADIUS = isSmartPhone ? window.innerWidth : OPTIMAL_RADIUS;
     const COLORS = { r1: 0, r2: 0, g1: 0, g2: 0, b1: 0, b2: 0 };
     const DOCKER_HEIGHT = 80;
 
@@ -61,6 +63,15 @@ export default {
         // Adding more randomness in the flow field
         for (const color in COLORS) COLORS[color] = p5.random(255);
         SCALAR = p5.random(SCALAR, 0.01);
+
+        clearInterval(drawInterval);
+        drawInterval = setInterval(() => {
+          p5.noLoop();
+          clearInterval(drawInterval);
+          console.log("Flow field stopped");
+        }, MAX_SECONDS_PER_FIELD);
+
+        p5.loop();
       };
 
       p5.draw = () => {
@@ -70,7 +81,8 @@ export default {
         p5.fill(255);
 
         const POINTS_PER_FRAME = 1;
-        const MAX_POINTS_RENDERED = p5.frameCount <= POINTS.length ? p5.frameCount * POINTS_PER_FRAME : POINTS.length;
+        const MAX_POINTS_RENDERED =
+          p5.frameCount <= POINTS.length ? p5.frameCount * POINTS_PER_FRAME : POINTS.length;
 
         for (let i = 0; i < MAX_POINTS_RENDERED; i++) {
           // when mouseClicked() too fast, need to check

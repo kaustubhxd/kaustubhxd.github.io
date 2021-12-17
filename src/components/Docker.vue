@@ -25,9 +25,8 @@ export default {
   components: { DockIcon },
   setup() {
     var dockBottom = computed(() =>
-      Object.entries(windows.value).filter(
-        ([k, v]) => v.maximized && !v.minimized
-      ).length
+      Object.entries(windows.value).filter(([k, v]) => v.maximized && !v.minimized).length ||
+      dockStyle.value.hidden
         ? -90
         : 0
     );

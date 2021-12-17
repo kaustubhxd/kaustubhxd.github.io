@@ -1,15 +1,13 @@
 <template>
   <!-- https://codepen.io/tn9nex/pen/aqvRbW -->
-  <!-- <Stars /> -->
-  <!-- <Backdrop/> -->
   <FlowField />
   <div class="god-container">
     <div v-for="(info, id) in activeWindows" :key="id">
       <Floatable :title="info.title" :id="id" />
     </div>
-    <!-- <AnimatedCursor v-if="!isSmartPhone() && enableAnimations" /> -->
+    <AnimatedCursor v-if="!isSmartPhone && enableAnimations" />
     <Docker />
-    <Ripple v-if="!isSmartPhone()" />
+    <Ripple v-if="!isSmartPhone" />
   </div>
 </template>
 
@@ -21,8 +19,6 @@ import Ripple from "./components/Ripple";
 import AnimatedCursor from "./components/AnimatedCursor";
 import { windows, enableAnimations } from "./store/state";
 import { isSmartPhone } from "../src/assets/scripts";
-import Stars from "./components/Stars";
-import Backdrop from "./components/Backdrop";
 import FlowField from "./components/FlowField.vue";
 
 export default {
@@ -31,8 +27,6 @@ export default {
     Floatable,
     Ripple,
     AnimatedCursor,
-    Stars,
-    Backdrop,
     FlowField,
   },
   setup() {
@@ -40,9 +34,7 @@ export default {
 
     // digs inside the dictionary 'windows' to find out which window has a state active == true, displays that
     var activeWindows = computed(() =>
-      Object.fromEntries(
-        Object.entries(windows.value).filter(([k, v]) => v.active)
-      )
+      Object.fromEntries(Object.entries(windows.value).filter(([k, v]) => v.active))
     );
 
     // document.body.style.backgroundImage =  `url(${require('@/assets/gifs/back.jpg')})`;

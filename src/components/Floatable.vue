@@ -46,17 +46,13 @@
                             {{windowState}}
 
                             <br>{{dockStyle}}<br>
-
-
-                            Systems theory says that a system can have properties that none of its underlying components have and could not have been predicted based on the parts. (An emergent property). 
-                            Zooming in and looking at a bunch of hydrogen and oxygen they are just atoms doing whatever they do but you zoom out to find they make a glass of water and your like, Where did the wetness come from. 
-                            It's an emergent property. Consciousness is an emergent property of a much larger system. Free will is probably a property of that system.
                         </p> -->
             <!-- {{windowState.zIndex}}  -->
 
             <Projects v-if="props.id == 'projects' && windowState.active" />
             <Who v-if="props.id == 'who' && windowState.active" />
             <Contact v-if="props.id == 'contact' && windowState.active" />
+
             <FluffyCat v-if="props.id == 'game' && windowState.active" />
           </div>
         </div>
@@ -76,6 +72,7 @@ import Loading from "./Loading";
 
 const Projects = defineAsyncComponent(() => import("./Projects"));
 const Contact = defineAsyncComponent(() => import("./Contact"));
+
 const FluffyCat = defineAsyncComponent(() => import("./FluffyCat"));
 
 export default {
@@ -110,7 +107,7 @@ export default {
       boxOpacity.value = 1;
     }
 
-    if (isSmartPhone()) {
+    if (isSmartPhone) {
       if (!windowState.value.overrideSmartSize) {
         boxWidth.value = window.innerWidth * (7 / 8);
         boxHeight.value = window.innerHeight * (10 / 13);

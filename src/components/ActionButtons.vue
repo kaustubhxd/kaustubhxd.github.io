@@ -44,7 +44,7 @@ import { isSmartPhone } from "../assets/scripts";
 export default {
   props: ["name", "id", "isMaximizable"],
   setup(props, { emit }) {
-    const thisIsASmartPhone = isSmartPhone();
+    const thisIsASmartPhone = isSmartPhone;
 
     // preload images
     Object.entries(X).forEach(([_, image]) => {
