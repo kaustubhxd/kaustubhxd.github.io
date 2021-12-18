@@ -11,7 +11,7 @@
         @animationend="shakeDock = false"
         @mouseup="handleClick()"
       >
-        <img :src="icon" :alt="props.name + 'icon'"/>
+        <img :src="icon" :alt="props.name"/>
 
         <div
           class="dock-dot"
