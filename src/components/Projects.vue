@@ -5,22 +5,26 @@
 
       <div class="post-wrapper">
         <div class="post" v-for="project in projects" :key="project">
-          <!-- <ExpandableImage :src="require('../assets/images/' + project.thumbnail)" /> -->
           <div class="images" v-viewer.static="imageViewerOpts">
-            <img class="thumbnail" :src="project.thumbnail" />
+            <img class="thumbnail" :alt="project.title" :src="project.thumbnail" />
           </div>
-          <!-- <expandable-image :src="require('../assets/images/' + project.thumbnail)"/> -->
           <div class="post-preview">
             <h6 class="post-title">{{ project.title }}</h6>
             <p class="post-content">{{ project.content }}</p>
             <div class="post-lang">
               <span v-for="lang in project.languages" :key="lang" v-tooltip="lang">
-                <img class="lang-icon" :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')" />
+                <img
+                  class="lang-icon"
+                  :alt="lang"
+                  :src="require('../assets/icons/skills/' + lang.toLowerCase() + '.svg')"
+                />
               </span>
             </div>
             <div v-if="project.link != ''">
               <p>
-                <a class="post-link" target="_blank" :href="project.link">Check Out</a>
+                <a class="post-link" target="_blank" rel="noreferrer noopener" :href="project.link"
+                  >Check Out</a
+                >
               </p>
             </div>
           </div>

@@ -6,7 +6,8 @@
       Discord. <br />
       <div id="gap15"></div>
       Not a fan of contact forms? Send me an email at
-      <a id="email-link" href="mailto:kaustubhpb@gmail.com">kaustubhpb@gmail.com</a><br />
+      <a id="email-link" rel="noreferrer noopener" href="mailto:kaustubhpb@gmail.com">kaustubhpb@gmail.com</a
+      ><br />
       Else, please fill the form below :) <br />
       <div id="gap15"></div>
       <form id="myForm" @submit.prevent="submitContactInfo">
@@ -72,7 +73,12 @@
             <p>{{ helperHint }}</p>
           </div>
           <button id="submit-button">
-            <img v-if="isSubmitting" class="spinner" :src="require('../assets/gifs/' + 'spinner.png')" />
+            <img
+              v-if="isSubmitting"
+              class="spinner"
+              alt="Loading Spinner"
+              :src="require('../assets/gifs/' + 'spinner.png')"
+            />
             <p>{{ submitButtonText }}</p>
           </button>
         </div>

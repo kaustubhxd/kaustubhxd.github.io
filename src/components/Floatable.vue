@@ -29,7 +29,12 @@
         />
 
         <div class="tab-space" id="tab-space" @mousedown.left="dragMouseDown" @dblclick.left="maxWindow()">
-          <img class="spinner" v-if="!windowState.loaded" :src="require('../assets/gifs/' + 'spinner.png')" />
+          <img
+            class="spinner"
+            v-if="!windowState.loaded"
+            alt="Loading Spinner"
+            :src="require('../assets/gifs/' + 'spinner.png')"
+          />
           <div class="box-title">
             <p>{{ props.title.toLowerCase() }}</p>
           </div>

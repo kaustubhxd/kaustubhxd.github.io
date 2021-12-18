@@ -2,10 +2,7 @@
   <div class="skills-wrapper">
     <div class="skill" v-for="(icon, skill) in skills" :key="skill">
       <span id="skill-tooltip" v-tooltip="skill">
-        <img
-          class="skill-icon"
-          :src="require('../assets/icons/skills/' + icon)"
-        />
+        <img class="skill-icon" :src="require('../assets/icons/skills/' + icon)" :alt="icon" />
       </span>
       <!-- <div class="skill-name">{{ skill }}</div> -->
     </div>
@@ -44,6 +41,7 @@ export default {
 .skill-icon {
   display: block;
   width: 40px;
+  height: 40px;
   object-fit: contain;
 
   margin-top: 20px;

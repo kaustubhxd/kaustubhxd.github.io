@@ -3,14 +3,15 @@
     <li>
       <span>{{ props.name }}</span>
       <a
-        id="element"
+        :id="props.name + 'icon'"
         href="#"
+        rel="noreferrer noopener"
         class="dock-element"
         :class="{ 'shake-dock': shakeDock }"
         @animationend="shakeDock = false"
         @mouseup="handleClick()"
       >
-        <img :src="icon"/>
+        <img :src="icon" :alt="props.name + 'icon'"/>
 
         <div
           class="dock-dot"
