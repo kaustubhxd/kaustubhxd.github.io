@@ -13,7 +13,7 @@
       id="resume"
       target="_blank"
       rel="noreferrer noopener"
-      href="https://kaustubh.app/files/kaustubh's_resume.pdf"
+      href="https://raw.githubusercontent.com/itskaustubh/itskaustubh.github.io/master/src/assets/kaustubh_resume.pdf"
       >Download Resume</a
     >
     <div class="social-links">
