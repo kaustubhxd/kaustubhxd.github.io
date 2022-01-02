@@ -1,8 +1,6 @@
 # Kaustubh's Desktop
 
-https://itskaustubh.github.io/
- 
-Also deployed on https://www.kaustubh.app
+https://itskaustubh.github.io/ || https://www.kaustubh.app
 
 ## Project setup
 ```
