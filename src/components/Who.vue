@@ -31,7 +31,7 @@
       </p>
       <p class="social-link">
         LinkedIn:
-        <a target="_blank" rel="noreferrer noopener" href="https://linkedin.com/in/kaustubhbhagwat"
+        <a target="_blank" rel="noreferrer noopener" href="https://www.linkedin.com/in/kaustubh-bhagwat/"
           >@kaustubhbhagwat</a
         >
       </p>
