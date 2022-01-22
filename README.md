@@ -1,21 +1,7 @@
-# Kaustubh's Desktop
+## Kaustubh's Desktop
 
 https://itskaustubh.github.io/ | https://www.kaustubh.app
 
-## Project setup
-```
-yarn install
-```
+### Description
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+A desktop UI experience to showcase my portfolio pieces. Do people even read this?
