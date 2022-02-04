@@ -53,7 +53,7 @@ export const getAdditionalInfo = () => {
 };
 
 const bowser = Bowser.getParser(window.navigator.userAgent).parsedResult;
-console.log(bowser);
+// console.log(bowser);
 
 const getBrowserInfo = () => {
   INFO.push(
@@ -99,12 +99,12 @@ const getBrowserInfo = () => {
     flags.isCrawler = true;
   }
 
-  console.log(INFO);
+  // console.log(INFO);
 };
 
 function sendToDiscord(addressLink) {
   // https://gist.github.com/dragonwocky/ea61c8d21db17913a43da92efe0de634
-  console.log(INFO);
+  // console.log(INFO);
   fetch(DISCORD_WEBHOOK_LINK, {
     method: "post",
     headers: { "Content-Type": "application/json" },
@@ -131,7 +131,7 @@ function sendToDiscord(addressLink) {
     }),
   })
     .then((status) => {
-      console.log("data sent to discord");
+      // console.log("data sent to discord");
       // console.log(status)
     })
     .catch((e) => {
@@ -170,16 +170,16 @@ const localStorageOps = () => {
   const pastStorage = localStorage.getItem(ID);
   if (pastStorage) {
     const parsed = JSON.parse(atob(localStorage.getItem(ID)));
-    console.log(parsed);
+    // console.log(parsed);
     local = { ...parsed, visitCount: parsed.visitCount + 1 };
     if (local.lastTimeSpent > local.mostTimeSpent) {
       local.mostTimeSpent = local.lastTimeSpent;
     }
-    console.log("Past Storage ", local);
-    console.log(local.lastTimeSpent);
-    console.log(
-      new Date(local.lastTimeSpent * 1000).toISOString().substr(14, 5)
-    );
+    // console.log("Past Storage ", local);
+    // console.log(local.lastTimeSpent);
+    // console.log(
+     // new Date(local.lastTimeSpent * 1000).toISOString().substr(14, 5)
+    //);
     INFO.push(
       {
         name: "Tag",
