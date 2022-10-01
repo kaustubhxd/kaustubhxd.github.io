@@ -33,7 +33,7 @@ const websitesArray = [
     xkey: "klink",
   },
   {
-    url: "https://itskaustubh.github.io/",
+    url: "https://kaustubhxd.github.io/",
     xkey: "gitlink",
   },
 ];

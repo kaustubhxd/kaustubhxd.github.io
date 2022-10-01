@@ -13,7 +13,7 @@
       id="resume"
       target="_blank"
       rel="noreferrer noopener"
-      href="https://raw.githubusercontent.com/itskaustubh/itskaustubh.github.io/master/src/assets/kaustubh_resume.pdf"
+      href="https://raw.githubusercontent.com/kaustubhxd/kaustubhxd.github.io/master/src/assets/kaustubh_resume.pdf"
       >Download Resume</a
     >
     <div class="social-links">
@@ -27,7 +27,7 @@
       </p>
       <p class="social-link">
         GitHub:
-        <a target="_blank" rel="noreferrer noopener" href="https://github.com/itskaustubh">@itskaustubh</a>
+        <a target="_blank" rel="noreferrer noopener" href="https://github.com/kaustubhxd">@kaustubhxd</a>
       </p>
       <p class="social-link">
         LinkedIn:
