@@ -45,13 +45,13 @@
         cool and useful.
       </p>
       <p>
-        Currently trying my hand at understanding how Cloud Services work.<br />
-        Passed the
+        Currently trying my hand at understanding interaction design, visual design, and information architecture.<br />
+        Showcasing my design work on my
         <a
           target="_blank"
           rel="noreferrer noopener"
-          href="https://www.youracclaim.com/badges/d464a37d-27ab-4d23-a86b-ee43899320ba/public_url"
-          >Microsoft Certified: Azure AZ-900</a
+          href="https://www.behance.net/kaustubhxd"
+          >Behance profile</a
         >
         Certification recently.
       </p>
