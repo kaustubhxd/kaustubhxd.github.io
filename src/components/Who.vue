@@ -3,7 +3,7 @@
     <img id="profile-pic" alt="Kaustubh's Face" :src="require('../assets/images/' + 'face-circle.png')" />
     <p id="name" style="text-align: center">Kaustubh Bhagwat</p>
     <p>
-      Computer Science major conjuring up ideas and trying to figure out the best way to turn them into code.
+      Computer scientist conjuring up ideas and trying to figure out the best way to turn them into code.
     </p>
     <p id="beloved-lang">
       JavaScript, Flutter and Python are my most beloved languages.
@@ -31,8 +31,14 @@
       </p>
       <p class="social-link">
         LinkedIn:
-        <a target="_blank" rel="noreferrer noopener" href="https://www.linkedin.com/in/kaustubh-bhagwat/"
-          >@kaustubhbhagwat</a
+        <a target="_blank" rel="noreferrer noopener" href="https://www.linkedin.com/in/kaustubhxd/"
+          >@kaustubhxd</a
+        >
+      </p>
+      <p class="social-link">
+        Behance:
+        <a target="_blank" rel="noreferrer noopener" href="https://www.behance.net/kaustubhxd"
+          >@kaustubhxd</a
         >
       </p>
     </div>
