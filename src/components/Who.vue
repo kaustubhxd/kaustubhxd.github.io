@@ -53,7 +53,6 @@
           href="https://www.behance.net/kaustubhxd"
           >Behance profile</a
         >
-        Certification recently.
       </p>
       <span id="spin"></span>
     </div>
