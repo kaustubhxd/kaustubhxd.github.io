@@ -18,7 +18,6 @@
         <a target="_blank" rel="noreferrer noopener" href="mailto:kaustubhxd@icloud.com"
           >kaustubhxd@icloud.com</a
         >
-        |
       </p>
       <p class="social-link">
         GitHub:
