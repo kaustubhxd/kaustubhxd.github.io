@@ -1,4 +1,3 @@
-console.log(process.env, process.env.VUE_APP_ENV_EXISTS)
 if(!process.env.VUE_APP_ENV_EXISTS) {
     throw new Error('Please set .env')
 }
