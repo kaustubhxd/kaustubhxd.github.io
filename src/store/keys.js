@@ -1,4 +1,4 @@
-if(!process.env.VUE_APP_ENV_EXISTS) {
+if(!process.env.VUE_APP_DISCORD_WEBHOOK_LINK) {
     throw new Error('Please set .env')
 }
 
