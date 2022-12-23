@@ -5,7 +5,8 @@
     <p>
       Computer scientist conjuring up ideas and trying to figure out the best way to turn them into code.
     </p>
-    <Skills />
+    <Socials />
+
     <a
       id="resume"
       target="_blank"
@@ -13,28 +14,16 @@
       href="https://raw.githubusercontent.com/kaustubhxd/kaustubhxd.github.io/master/src/assets/kaustubh_resume.pdf"
       >Download Resume</a
     >
+
     <div class="social-links">
       <p class="social-link">
-        <a target="_blank" rel="noreferrer noopener" href="mailto:kaustubhxd@icloud.com"
-          >kaustubhxd@icloud.com</a
-        >
+        <span id="skill-tooltip" class="interactable" v-tooltip="emailCopy" v-on:click="handleCopyEmail">
+          {{email}}
+        </span>
       </p>
-      <p class="social-link">
-        GitHub:
-        <a target="_blank" rel="noreferrer noopener" href="https://github.com/kaustubhxd">@kaustubhxd</a>
-      </p>
-      <p class="social-link">
-        LinkedIn:
-        <a target="_blank" rel="noreferrer noopener" href="https://www.linkedin.com/in/kaustubhxd/"
-          >@kaustubhxd</a
-        >
-      </p>
-      <p class="social-link">
-        Behance:
-        <a target="_blank" rel="noreferrer noopener" href="https://www.behance.net/kaustubhxd"
-          >@kaustubhxd</a
-        >
-      </p>
+      <Skills />
+
+
     </div>
     <div>
       <p id="more-about-me">More about me</p>
@@ -62,11 +51,31 @@
 <script>
 import { getAdditionalInfo } from "../scripts/clientAdditionalInfo";
 import Skills from "./Skills.vue";
+import Socials from "./Socials.vue";
+import { onMounted, ref } from "vue";
+import { email } from "../assets/content";
 
 export default {
-  components: { Skills },
+  components: { Skills, Socials },
   setup() {
-    getAdditionalInfo();
+    const emailCopy = ref('Copy email');
+
+    onMounted(() => {
+      getAdditionalInfo();
+    });
+
+    const handleCopyEmail = () => {
+      console.log('hello')
+      emailCopy.value = 'Copied to clipboard!'
+      navigator.clipboard.writeText(email);
+    }
+
+    return {
+      email,
+      emailCopy,
+      handleCopyEmail
+    }
+
   },
 };
 </script>

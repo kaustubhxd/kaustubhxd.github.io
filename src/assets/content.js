@@ -71,6 +71,14 @@ const skills = {
   PostgresSQL: "postgressql.svg",
 };
 
+const email = "kaustubhxd@icloud.com"
+
+const socials = [
+  {name: 'GitHub', type: 'newTab', value: 'https://github.com/kaustubhxd', icon: 'github/github-original.svg'},
+  {name: 'Behance', type: 'newTab', value: 'https://www.behance.net/kaustubhxd', icon: 'behance/behance-plain.svg'},
+  {name: 'LinkedIn', type: 'newTab', value: 'https://www.linkedin.com/in/kaustubhxd/', icon: 'linkedin/linkedin-plain.svg'},
+]
+
 let sort_order = [];
 let unsortedProjects = {};
 
@@ -115,4 +123,4 @@ client
     console.log("CMS fetch failed: ", err);
   });
 
-export { projects, skills };
+export { projects, skills, socials,email };

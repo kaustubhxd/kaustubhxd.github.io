@@ -77,6 +77,16 @@ a:hover {
   color: #ec7bb0;
 }
 
+.interactable { 
+  color: #17a2b8;
+  text-decoration: none;
+  transition: color 0.7s ease;
+  cursor: pointer;
+}
+.interactable:hover {
+  color: #ec7bb0;
+}
+
 p,
 a {
   outline: 0;

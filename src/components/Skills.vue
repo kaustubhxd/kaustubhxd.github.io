@@ -4,7 +4,6 @@
       <span id="skill-tooltip" v-tooltip="skill">
         <img class="skill-icon" :src="require('../assets/icons/skills/' + icon)" :alt="icon" />
       </span>
-      <!-- <div class="skill-name">{{ skill }}</div> -->
     </div>
   </div>
 </template>
