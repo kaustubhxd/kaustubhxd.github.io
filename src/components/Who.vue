@@ -5,9 +5,6 @@
     <p>
       Computer scientist conjuring up ideas and trying to figure out the best way to turn them into code.
     </p>
-    <p id="beloved-lang">
-      JavaScript, Flutter and Python are my most beloved languages.
-    </p>
     <Skills />
     <a
       id="resume"
@@ -17,13 +14,11 @@
       >Download Resume</a
     >
     <div class="social-links">
-      <p id="links">Links</p>
       <p class="social-link">
-        <a target="_blank" rel="noreferrer noopener" href="mailto:kaustubhpb@gmail.com"
-          >kaustubhpb@gmail.com</a
+        <a target="_blank" rel="noreferrer noopener" href="mailto:kaustubhxd@icloud.com"
+          >kaustubhxd@icloud.com</a
         >
         |
-        <a target="_blank" rel="noreferrer noopener" href="mailto:hello@kaustubh.app">hello@kaustubh.app</a>
       </p>
       <p class="social-link">
         GitHub:
