@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --mode=development",
+    "dev": "export SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service serve --mode=development",
     "build": "vue-cli-service build"
   },
   "dependencies": {
