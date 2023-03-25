@@ -27,6 +27,8 @@ function setWebsiteLinks(key) {
   }
 }
 
+const email = "hello@kaustubh.app"
+
 const websitesArray = [
   {
     url: "https://kaustubh.app/",
@@ -71,7 +73,6 @@ const skills = {
   PostgresSQL: "postgressql.svg",
 };
 
-const email = "kaustubhxd@icloud.com"
 
 const socials = [
   {name: 'GitHub', type: 'newTab', value: 'https://github.com/kaustubhxd', icon: 'github/github-original.svg'},
@@ -123,4 +124,4 @@ client
     console.log("CMS fetch failed: ", err);
   });
 
-export { projects, skills, socials,email };
+export { projects, skills, socials, email };
